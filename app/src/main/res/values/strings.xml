@@ -3,4 +3,6 @@
     <string name="back_button">Back</string>
     <string name="food">Food tracking</string>
     <string name="money">Money tracking</string>
+    <string name="calories_left">%1$d calories left</string>
+    <string name="settings">Settings</string>
 </resources>
