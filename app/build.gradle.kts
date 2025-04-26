@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.juanitos"
+    namespace = "com.juanitos"
     compileSdk = 35
 
     defaultConfig {

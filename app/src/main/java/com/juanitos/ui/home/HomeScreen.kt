@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.juanitos.R
+import com.juanitos.R
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 
