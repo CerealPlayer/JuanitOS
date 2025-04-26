@@ -10,7 +10,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.juanitos"
+        applicationId = "com.juanitos"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
