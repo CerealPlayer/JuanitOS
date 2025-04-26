@@ -24,23 +24,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juanitos.R
+import com.juanitos.ui.food.FoodDestination
+import com.juanitos.ui.money.MoneyDestination
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
+import com.juanitos.ui.navigation.Routes
 
 object HomeDestination : NavigationDestination {
-    override val route = "home"
+    override val route = Routes.Home
     override val titleRes = R.string.app_name
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+fun HomeScreen(
+    onNavigateTo: (Routes) -> Unit
+) {
     Scaffold(topBar = {
         JuanitOSTopAppBar(
             title = stringResource(HomeDestination.titleRes),
             canNavigateBack = false,
-            scrollBehavior = scrollBehavior,
         )
     }) { innerPadding ->
         Column(
@@ -54,8 +57,8 @@ fun HomeScreen() {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                SubAppCard(textId = R.string.food, iconId = R.drawable.subapp_food, onClick = { })
-                SubAppCard(textId = R.string.money, iconId = R.drawable.subapp_money, onClick = { })
+                SubAppCard(textId = R.string.food, iconId = R.drawable.subapp_food, onClick = { onNavigateTo(FoodDestination.route) })
+                SubAppCard(textId = R.string.money, iconId = R.drawable.subapp_money, onClick = { onNavigateTo(MoneyDestination.route) })
             }
         }
     }
@@ -89,5 +92,5 @@ fun SubAppCard(textId: Int, iconId: Int, onClick: () -> Unit, modifier: Modifier
 @Preview
 @Composable
 fun HomePreview() {
-    HomeScreen()
+    HomeScreen(onNavigateTo = {})
 }
