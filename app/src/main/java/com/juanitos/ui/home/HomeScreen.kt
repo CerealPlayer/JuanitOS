@@ -1,5 +1,6 @@
 package com.juanitos.ui.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +13,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -51,7 +51,7 @@ fun HomeScreen() {
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SubAppCard(textId = R.string.food, iconId = R.drawable.subapp_food, onClick = { })
@@ -66,7 +66,10 @@ fun SubAppCard(textId: Int, iconId: Int, onClick: () -> Unit, modifier: Modifier
     Card(
         modifier = modifier
             .size(128.dp)
-            .padding(dimensionResource(id = R.dimen.padding_small)),
+            .padding(dimensionResource(id = R.dimen.padding_small))
+            .clickable(
+                onClick = onClick
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -74,13 +77,11 @@ fun SubAppCard(textId: Int, iconId: Int, onClick: () -> Unit, modifier: Modifier
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxSize()
         ) {
-            IconButton(onClick = onClick, modifier = Modifier.fillMaxSize()) {
-                Icon(
-                    painter = painterResource(iconId),
-                    contentDescription = stringResource(textId),
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+            Icon(
+                painter = painterResource(iconId),
+                contentDescription = stringResource(textId),
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }
