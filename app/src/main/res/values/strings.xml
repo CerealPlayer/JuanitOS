@@ -5,4 +5,6 @@
     <string name="money">Money tracking</string>
     <string name="calories_left">%1$d calories left</string>
     <string name="settings">Settings</string>
+    <string name="cal_obj_input">Calorie limit</string>
+    <string name="prot_obj_input">Protein limit</string>
 </resources>
