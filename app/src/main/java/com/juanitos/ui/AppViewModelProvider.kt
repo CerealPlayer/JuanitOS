@@ -10,10 +10,10 @@ import com.juanitos.JuanitOSApplication
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            FoodSettingsViewModel(inventoryApplication().container.settingsRepository)
+            FoodSettingsViewModel(juanitOSApplication().container.settingsRepository)
         }
     }
 }
 
-fun CreationExtras.inventoryApplication(): JuanitOSApplication =
+fun CreationExtras.juanitOSApplication(): JuanitOSApplication =
     (this[AndroidViewModelFactory.APPLICATION_KEY] as JuanitOSApplication)
