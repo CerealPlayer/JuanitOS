@@ -1,9 +1,12 @@
 package com.juanitos.ui.food
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.juanitos.R
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
@@ -22,10 +25,12 @@ fun NewFoodScreen(
     Scaffold(
         topBar = {
             JuanitOSTopAppBar(
-                title
+                title = stringResource(NewFoodDestination.titleRes),
+                canNavigateBack = true,
+                navigateUp = onNavigateUp,
             )
         }
-    ) {
-        Text("new food")
+    ) { innerPadding ->
+        Text("new food", modifier = Modifier.padding(innerPadding))
     }
 }

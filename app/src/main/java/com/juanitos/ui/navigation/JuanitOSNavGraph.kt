@@ -9,6 +9,8 @@ import com.juanitos.ui.food.FoodDestination
 import com.juanitos.ui.food.FoodScreen
 import com.juanitos.ui.food.FoodSettingsDestination
 import com.juanitos.ui.food.FoodSettingsScreen
+import com.juanitos.ui.food.NewFoodDestination
+import com.juanitos.ui.food.NewFoodScreen
 import com.juanitos.ui.home.HomeDestination
 import com.juanitos.ui.home.HomeScreen
 import com.juanitos.ui.money.MoneyDestination
@@ -28,13 +30,17 @@ fun JuanitOSNavGraph(
         }
         composable(route = FoodDestination.route.name) {
             FoodScreen(onNavigateUp = { navController.navigateUp() },
-                onSettings = { navController.navigate(FoodSettingsDestination.route.name) })
+                onSettings = { navController.navigate(FoodSettingsDestination.route.name) },
+                onNewFood = { navController.navigate(NewFoodDestination.route.name) })
         }
         composable(route = MoneyDestination.route.name) {
             MoneyScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = FoodSettingsDestination.route.name) {
             FoodSettingsScreen(onNavigateUp = { navController.navigateUp() })
+        }
+        composable(route = NewFoodDestination.route.name) {
+            NewFoodScreen(onNavigateUp = { navController.navigateUp() })
         }
     }
 }

@@ -4,5 +4,6 @@ enum class Routes {
     Home,
     Food,
     FoodSettings,
+    NewFood,
     Money
 }

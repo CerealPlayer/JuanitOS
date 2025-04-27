@@ -1,12 +1,13 @@
 package com.juanitos.ui.food
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,26 +36,37 @@ object FoodDestination : NavigationDestination {
 fun FoodScreen(
     onNavigateUp: () -> Unit,
     onSettings: () -> Unit,
+    onNewFood: () -> Unit,
     viewModel: FoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val calorieLimt = viewModel.calorieLimit.collectAsState()
     val proteinLimit = viewModel.proteinLimit.collectAsState()
 
-    Scaffold(topBar = {
-        JuanitOSTopAppBar(
-            title = stringResource(FoodDestination.titleRes),
-            canNavigateBack = true,
-            navigateUp = onNavigateUp,
-            actions = {
-                IconButton(onClick = onSettings) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = stringResource(R.string.settings)
-                    )
+    Scaffold(
+        topBar = {
+            JuanitOSTopAppBar(
+                title = stringResource(FoodDestination.titleRes),
+                canNavigateBack = true,
+                navigateUp = onNavigateUp,
+                actions = {
+                    IconButton(onClick = onSettings) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = stringResource(R.string.settings)
+                        )
+                    }
                 }
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onNewFood) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.new_food)
+                )
             }
-        )
-    }) { innerPadding ->
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -76,5 +88,9 @@ fun FoodScreen(
 @Preview
 @Composable
 fun FoodScreenPreview() {
-    FoodScreen(onNavigateUp = {}, onSettings = {})
+    FoodScreen(
+        onNavigateUp = {},
+        onSettings = {},
+        onNewFood = {} // Parámetro de vista previa
+    )
 }
