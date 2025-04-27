@@ -1,0 +1,24 @@
+package com.juanitos.data
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+
+@Database(entities = [Setting::class], version = 1, exportSchema = false)
+abstract class JuanitOSDatabase : RoomDatabase() {
+    abstract fun settingDao(): SettingDao
+
+    companion object {
+        @Volatile
+        private var Instance: JuanitOSDatabase? = null
+
+        fun getDatabase(context: Context) : JuanitOSDatabase {
+            return Instance ?: synchronized(this) {
+                Room.databaseBuilder(context, JuanitOSDatabase::class.java, "JuanitOS_database")
+                    .fallbackToDestructiveMigration(false)
+                    .build().also { Instance = it }
+            }
+        }
+    }
+}
