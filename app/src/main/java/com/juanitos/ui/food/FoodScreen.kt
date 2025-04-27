@@ -1,5 +1,6 @@
 package com.juanitos.ui.food
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,11 +13,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
+import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
@@ -30,8 +34,12 @@ object FoodDestination : NavigationDestination {
 @Composable
 fun FoodScreen(
     onNavigateUp: () -> Unit,
-    onSettings: () -> Unit
+    onSettings: () -> Unit,
+    viewModel: FoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val calorieLimt = viewModel.calorieLimit.collectAsState()
+    val proteinLimit = viewModel.proteinLimit.collectAsState()
+
     Scaffold(topBar = {
         JuanitOSTopAppBar(
             title = stringResource(FoodDestination.titleRes),
@@ -54,8 +62,12 @@ fun FoodScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.calories_left, 0),
+                text = stringResource(R.string.calories_left, calorieLimt.value),
                 style = MaterialTheme.typography.titleLarge
+            )
+            Text(
+                text = stringResource(R.string.prot_left, proteinLimit.value),
+                style = MaterialTheme.typography.titleMedium
             )
         }
     }

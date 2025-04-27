@@ -3,7 +3,8 @@
     <string name="back_button">Back</string>
     <string name="food">Food tracking</string>
     <string name="money">Money tracking</string>
-    <string name="calories_left">%1$d calories left</string>
+    <string name="calories_left">%1$s calories left</string>
+    <string name="prot_left">%1s grams of protein left</string>
     <string name="settings">Settings</string>
     <string name="cal_obj_input">Calorie limit</string>
     <string name="prot_obj_input">Protein limit</string>
