@@ -1,5 +1,6 @@
 package com.juanitos.ui.food
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,6 +20,7 @@ class FoodSettingsViewModel(
 ) : ViewModel() {
     var settingsUiState by mutableStateOf(SettingsUiState())
         private set
+
 
     private fun updateUiState(uiState: SettingsUiState) {
         settingsUiState = uiState
@@ -47,30 +49,46 @@ class FoodSettingsViewModel(
         ))
     }
 
-    init {
-        viewModelScope.launch {
-            val calorieLimit = settingsRepository.getByName(name = "calorie").filterNotNull().map {
-                it.setting_value
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = "0"
+    suspend fun saveSettings() {
+        if (validateQt(settingsUiState.calorieLimit) && validateQt(settingsUiState.proteinLimit)) {
+            settingsRepository.insertSetting(
+                Setting(
+                    setting_name = "calorie",
+                    setting_value = settingsUiState.calorieLimit.toIntOrNull()?.toString() ?: "0",
+                )
             )
-            val proteinLimit = settingsRepository.getByName(name = "protein").filterNotNull().map {
-                it.setting_value
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = "0"
-            )
-            settingsUiState = SettingsUiState(
-                calorieLimit = calorieLimit.value,
-                isCalLimitValid = validateQt(calorieLimit.value),
-                proteinLimit = proteinLimit.value,
-                isProtLimitValid = validateQt(proteinLimit.value)
+            settingsRepository.insertSetting(
+                Setting(
+                    setting_name = "protein",
+                    setting_value = settingsUiState.proteinLimit.toIntOrNull()?.toString() ?: "0"
+                )
             )
         }
     }
+
+    fun getInitialCalorieLimit(): String {
+        return settingsRepository.getByName(name = "calorie").filterNotNull().map {
+            it.setting_value
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = "0"
+        ).value
+    }
+
+    fun getInitialProteinLimit(): String {
+        return settingsRepository.getByName(name = "protein").filterNotNull().map {
+            it.setting_value
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = "0"
+        ).value
+    }
+
+    //init {
+    //    viewModelScope.launch {}
+    //}
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

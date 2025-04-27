@@ -11,6 +11,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -23,6 +24,7 @@ import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
+import kotlinx.coroutines.launch
 
 object FoodSettingsDestination : NavigationDestination {
     override val route = Routes.FoodSettings
@@ -36,6 +38,7 @@ fun FoodSettingsScreen(
     viewModel: FoodSettingsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.settingsUiState
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(topBar = {
         JuanitOSTopAppBar(
             navigateUp = onNavigateUp,
@@ -71,7 +74,12 @@ fun FoodSettingsScreen(
                 isError = !uiState.isProtLimitValid
             )
             Button(
-                onClick = {},
+                onClick = {
+                    coroutineScope.launch {
+                        viewModel.saveSettings()
+                        onNavigateUp()
+                    }
+                },
                 enabled = uiState.isProtLimitValid && uiState.isCalLimitValid,
                 modifier = Modifier.fillMaxWidth()
             ) {

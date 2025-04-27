@@ -11,5 +11,5 @@ data class Setting(
     val setting_name: String,
     val setting_value: String,
     @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
-    val created_at: String
+    val created_at: String = "CURRENT_TIMESTAMP"
 )

@@ -25,6 +25,6 @@ interface SettingDao {
     @Query("select * from settings order by created_at asc")
     fun getAllSettings(): Flow<List<Setting>>
 
-    @Query("select * from settings where setting_name = :name")
+    @Query("select * from settings where setting_name = :name limit 1")
     fun getByName(name: String): Flow<Setting?>
 }
