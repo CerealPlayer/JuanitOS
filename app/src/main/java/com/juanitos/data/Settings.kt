@@ -8,8 +8,10 @@ import androidx.room.PrimaryKey
 data class Setting(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val setting_name: String,
-    val setting_value: String,
-    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
-    val created_at: String = "CURRENT_TIMESTAMP"
+    @ColumnInfo(name="setting_name")
+    val settingName: String,
+    @ColumnInfo(name="setting_value")
+    val settingValue: String,
+    @ColumnInfo(name="created_at",defaultValue = "CURRENT_TIMESTAMP")
+    val createdAt: String? = null
 )

@@ -1,5 +1,6 @@
 package com.juanitos.ui.food
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -39,6 +41,9 @@ fun FoodSettingsScreen(
 ) {
     val uiState = viewModel.settingsUiState
     val coroutineScope = rememberCoroutineScope()
+    val initCalLimit = viewModel.initialCalorieLimit.collectAsState().value
+    val initProtLimit = viewModel.initialProteinLimit.collectAsState().value
+
     Scaffold(topBar = {
         JuanitOSTopAppBar(
             navigateUp = onNavigateUp,
@@ -56,7 +61,7 @@ fun FoodSettingsScreen(
         ) {
             OutlinedTextField(
                 onValueChange = { viewModel.setCalorieLimit(it) },
-                value = uiState.calorieLimit,
+                value = if (uiState.isCalEdited) uiState.calorieLimit else initCalLimit,
                 label = { Text(stringResource(R.string.cal_obj_input)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
@@ -65,7 +70,7 @@ fun FoodSettingsScreen(
             )
             OutlinedTextField(
                 onValueChange = { viewModel.setProteinLimit(it) },
-                value = uiState.proteinLimit,
+                value = if (uiState.isProtEdited) uiState.proteinLimit else initProtLimit,
                 label = { Text(stringResource(R.string.prot_obj_input)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
