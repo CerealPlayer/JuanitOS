@@ -76,6 +76,7 @@ class NewFoodViewModel(
                     proteinsPer100 = newIngredientUiState.protein
                 )
             )
+            newIngredientUiState = NewIngredientUiState()
         }
         newIngredientOpen = false
         _ingredientQuery.value = ""
