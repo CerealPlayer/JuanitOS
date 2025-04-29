@@ -17,4 +17,8 @@
     <string name="ingredient_calories">Calories per 100 grams</string>
     <string name="ingredient_protein">Proteins per 100 grams</string>
     <string name="qt">Quantity</string>
+    <string name="food_ingredient_cals">%1$d calories</string>
+    <string name="food_ingredient_prot">%1$d grams of protein</string>
+    <string name="food_ingredient_qt">%1$d grams</string>
+    <string name="food_name">Food name</string>
 </resources>

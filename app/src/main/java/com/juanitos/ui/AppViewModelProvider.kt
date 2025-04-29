@@ -18,7 +18,11 @@ object AppViewModelProvider {
             FoodViewModel(juanitOSApplication().container.settingsRepository)
         }
         initializer {
-            NewFoodViewModel(juanitOSApplication().container.ingredientRepository)
+            NewFoodViewModel(
+                juanitOSApplication().container.ingredientRepository,
+                juanitOSApplication().container.foodRepository,
+                juanitOSApplication().container.foodIngredientRepository,
+            )
         }
     }
 }

@@ -5,6 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juanitos.data.Food
+import com.juanitos.data.FoodIngredient
+import com.juanitos.data.FoodIngredientRepository
+import com.juanitos.data.FoodRepository
 import com.juanitos.data.Ingredient
 import com.juanitos.data.IngredientRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,9 +24,16 @@ import kotlinx.coroutines.launch
 
 class NewFoodViewModel(
     private val ingredientsRepository: IngredientRepository,
+    private val foodRepository: FoodRepository,
+    private val foodIngredientRepository: FoodIngredientRepository
 ) : ViewModel() {
     var searchExpanded by mutableStateOf(false)
         private set
+    var saveFoodOpen by mutableStateOf(false)
+        private set
+    var newFoodName by mutableStateOf("")
+        private set
+
     private val _ingredientQuery = MutableStateFlow("")
     val ingredientQuery: StateFlow<String> = _ingredientQuery.asStateFlow()
 
@@ -76,7 +87,7 @@ class NewFoodViewModel(
             return
         }
         newFoodUiState = newFoodUiState.copy(
-            foodIngredients = newFoodUiState.foodIngredients + FoodIngredient(
+            foodIngredients = newFoodUiState.foodIngredients + FoodIngredientDetails(
                 ingredient = currentSelected.value!!,
                 quantity = ingredientQt
             )
@@ -155,13 +166,48 @@ class NewFoodViewModel(
         }
         _ingredientQuery.value = query
     }
+
+    fun onSaveFoodOpenChange(open: Boolean) {
+        saveFoodOpen = open
+    }
+
+    fun onNewFoodNameChange(name: String) {
+        newFoodName = name
+    }
+
+    fun onNewFoodSave(navigateUp: () -> Unit) {
+        if (newFoodUiState.foodIngredients.isEmpty()) {
+            return
+        }
+        viewModelScope.launch {
+            val res = foodRepository.insertFood(
+                Food(
+                    name = newFoodName,
+                )
+            )
+            val foodId = res.toInt()
+            newFoodUiState.foodIngredients.forEach { foodIngredient ->
+                foodIngredientRepository.insertFoodIngredient(
+                    FoodIngredient(
+                        foodId = foodId,
+                        ingredientId = foodIngredient.ingredient.id,
+                        grams = foodIngredient.quantity
+                    )
+                )
+            }
+            newFoodUiState = NewFoodUiState()
+            newFoodName = ""
+            saveFoodOpen = false
+            navigateUp()
+        }
+    }
 }
 
 data class NewFoodUiState(
-    val foodIngredients: List<FoodIngredient> = emptyList(),
+    val foodIngredients: List<FoodIngredientDetails> = emptyList(),
 )
 
-data class FoodIngredient(
+data class FoodIngredientDetails(
     val ingredient: Ingredient,
     val quantity: String,
 )
