@@ -23,4 +23,7 @@ interface IngredientDao {
 
     @Query("select * from ingredients order by id asc")
     fun getAllIngredients(): Flow<List<Ingredient>>
+
+    @Query("select * from ingredients where name like '%' || :query || '%' order by id asc")
+    fun searchIngredients(query: String): Flow<List<Ingredient>>
 }

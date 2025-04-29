@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
 import com.juanitos.ui.AppViewModelProvider
+import com.juanitos.ui.commons.FormColumn
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
@@ -51,14 +52,7 @@ fun FoodSettingsScreen(
             canNavigateBack = true
         )
     }) { padding ->
-        Column(
-            modifier = Modifier.padding(
-                top = padding.calculateTopPadding() + 24.dp,
-                bottom = padding.calculateBottomPadding(),
-                start = dimensionResource(R.dimen.padding_medium),
-                end = dimensionResource(R.dimen.padding_medium)
-            ), verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
+        FormColumn(padding) {
             OutlinedTextField(
                 onValueChange = { viewModel.setCalorieLimit(it) },
                 value = if (uiState.isCalEdited) uiState.calorieLimit else initCalLimit,

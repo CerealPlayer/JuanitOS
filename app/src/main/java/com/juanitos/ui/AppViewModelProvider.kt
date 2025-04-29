@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.juanitos.ui.food.FoodSettingsViewModel
 import com.juanitos.JuanitOSApplication
 import com.juanitos.ui.food.FoodViewModel
+import com.juanitos.ui.food.NewFoodViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -15,6 +16,9 @@ object AppViewModelProvider {
         }
         initializer {
             FoodViewModel(juanitOSApplication().container.settingsRepository)
+        }
+        initializer {
+            NewFoodViewModel(juanitOSApplication().container.ingredientRepository)
         }
     }
 }
