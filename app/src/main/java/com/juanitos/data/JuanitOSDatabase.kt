@@ -5,9 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Setting::class], version = 2, exportSchema = false)
+@Database(entities = [Setting::class, Food::class, FoodIngredient::class, Ingredient::class], version = 3, exportSchema = false)
 abstract class JuanitOSDatabase : RoomDatabase() {
     abstract fun settingDao(): SettingDao
+    abstract fun foodDao(): FoodDao
+    abstract fun foodIngredientDao(): FoodIngredientDao
+    abstract fun ingredientDao(): IngredientDao
 
     companion object {
         @Volatile
