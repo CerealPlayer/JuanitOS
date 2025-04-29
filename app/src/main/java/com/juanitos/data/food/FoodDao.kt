@@ -24,19 +24,19 @@ interface FoodDao {
     fun getAllFoods(): Flow<List<Food>>
 
     @Query("""
-    SELECT 
-        foods.id AS food_id,
-        foods.name AS food_name,
+    select 
+        foods.id as food_id,
+        foods.name as food_name,
         foods.created_at,
-        ingredients.id AS ingredient_id,
-        ingredients.name AS ingredient_name,
+        ingredients.id as ingredient_id,
+        ingredients.name as ingredient_name,
         ingredients.calories_per_100 as ingredient_calories_per_100,
         ingredients.proteins_per_100 as ingredient_proteins_per_100,
         food_ingredients.grams 
-    FROM foods 
-    INNER JOIN food_ingredients ON foods.id = food_ingredients.food_id 
-    INNER JOIN ingredients ON food_ingredients.ingredient_id = ingredients.id 
-    WHERE date(foods.created_at) = date('now')
+    from foods 
+    inner join food_ingredients on foods.id = food_ingredients.food_id 
+    inner join ingredients on food_ingredients.ingredient_id = ingredients.id 
+    where date(foods.created_at) = date('now')
 """)
     fun getTodaysFoods(): Flow<List<FoodIngredientDetails>>
 }
