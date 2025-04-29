@@ -1,7 +1,5 @@
 package com.juanitos.ui.food
 
-import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,8 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.Ingredient
 import com.juanitos.data.IngredientRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -19,56 +21,96 @@ class NewFoodViewModel(
 ) : ViewModel() {
     var searchExpanded by mutableStateOf(false)
         private set
-    var ingredientQuery by mutableStateOf("")
-        private set
+    private val _ingredientQuery = MutableStateFlow("")
+    val ingredientQuery: StateFlow<String> = _ingredientQuery.asStateFlow()
+
     var newIngredientOpen by mutableStateOf(false)
         private set
-
-    var uiState: MutableStateFlow<NewFoodUiState> = MutableStateFlow(NewFoodUiState())
+    var newIngredientUiState by mutableStateOf(NewIngredientUiState())
         private set
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val ingredientSuggestions: StateFlow<List<Ingredient>> = _ingredientQuery.flatMapLatest {
+        if (it.isNotBlank()) {
+            ingredientsRepository.searchIngredientsStream(it).filterNotNull()
+        } else {
+            ingredientsRepository.getAllIngredientsStream()
+        }
+    }.stateIn(
+        viewModelScope,
+        initialValue = emptyList(),
+        started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000)
+    )
+
+    fun onNewIngredientChange(
+        name: String,
+        kcal: String,
+        protein: String,
+    ) {
+        newIngredientUiState = newIngredientUiState.copy(
+            name = name,
+            kcal = kcal,
+            protein = protein
+        )
+    }
+
+    private fun validateNewIngredient(): Boolean {
+        if (newIngredientUiState.name.isNotBlank() &&
+            newIngredientUiState.kcal.isNotBlank() &&
+            newIngredientUiState.protein.isNotBlank()
+        ) {
+            return true
+        }
+        return false
+    }
+
+    fun onNewIngredientSave() {
+        if (!validateNewIngredient()) {
+            return
+        }
+        viewModelScope.launch {
+            ingredientsRepository.insertIngredient(
+                Ingredient(
+                    name = newIngredientUiState.name,
+                    caloriesPer100 = newIngredientUiState.kcal,
+                    proteinsPer100 = newIngredientUiState.protein
+                )
+            )
+        }
+        newIngredientOpen = false
+        _ingredientQuery.value = ""
+    }
 
     fun onQueryChange(query: String) {
         if (query == "new_ingredient") {
             newIngredientOpen = true
-            ingredientQuery = "New Ingredient"
+            _ingredientQuery.value = "New Ingredient"
             return
         }
-        ingredientQuery = query
-        searchIngredient(query)
+        _ingredientQuery.value = query
     }
 
     fun onExpandedChange(expanded: Boolean) {
         searchExpanded = expanded
     }
 
-    fun onIngredientOpenChange(open: Boolean) {
-        newIngredientOpen = open
-    }
-
-    private fun searchIngredient(query: String) {
-        viewModelScope.launch {
-            ingredientsRepository.searchIngredientsStream(query).collect { ingredients ->
-                uiState = MutableStateFlow(uiState.value.copy(ingredientSearch = ingredients))
-            }
-        }
+    fun onNewIngredientClose() {
+        newIngredientOpen = false
+        _ingredientQuery.value = ""
     }
 
     fun onSearch(query: String) {
         if (query == "new_ingredient") {
             newIngredientOpen = true
-            ingredientQuery = "New Ingredient"
+            _ingredientQuery.value = "New Ingredient"
             return
         }
-        uiState = MutableStateFlow(
-            uiState.value.copy(
-                selectedIngredient = uiState.value.ingredientSearch.find { it.name == query }
-            )
-        )
+        _ingredientQuery.value = query
     }
 }
 
-data class NewFoodUiState(
-    val ingredientSearch: List<Ingredient> = listOf(),
-    val selectedIngredient: Ingredient? = null,
+data class NewIngredientUiState(
+    val name: String = "",
+    val kcal: String = "",
+    val protein: String = "",
 )
-

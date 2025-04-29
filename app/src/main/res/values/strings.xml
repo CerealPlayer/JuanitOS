@@ -12,4 +12,7 @@
     <string name="save">Save</string>
     <string name="search_ingredient">Search ingredient</string>
     <string name="add_ingredient">Add ingredient</string>
+    <string name="ingredient_name">Ingredient name</string>
+    <string name="ingredient_calories">Ingredient calories</string>
+    <string name="ingredient_protein">Ingredient protein</string>
 </resources>

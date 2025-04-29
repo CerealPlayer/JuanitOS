@@ -1,14 +1,16 @@
 package com.juanitos.ui.food
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -16,10 +18,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
+import com.juanitos.data.Ingredient
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.commons.FormColumn
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
@@ -37,8 +42,9 @@ fun NewFoodScreen(
     onNavigateUp: () -> Unit,
     viewModel: NewFoodViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
-    Log.d("NewFoodScreen", viewModel.newIngredientOpen.toString())
-    val uiState = viewModel.uiState.collectAsState()
+    val query = viewModel.ingredientQuery.collectAsState()
+    val ingredients = viewModel.ingredientSuggestions.collectAsState()
+
     Scaffold(topBar = {
         JuanitOSTopAppBar(
             title = stringResource(NewFoodDestination.titleRes),
@@ -48,17 +54,21 @@ fun NewFoodScreen(
     }) { innerPadding ->
         FormColumn(innerPadding) {
             IngredientSearch(
-                query = viewModel.ingredientQuery,
+                query = query.value,
                 expanded = viewModel.searchExpanded,
                 onQueryChange = { viewModel.onQueryChange(it) },
                 onExpandedChange = { viewModel.onExpandedChange(it) },
                 onSearch = { viewModel.onSearch(it) },
-                uiState = uiState.value
+                ingredientSearch = ingredients.value,
             )
             if (viewModel.newIngredientOpen) {
                 NewIngredientDialog(
-                    onDismissRequest = { viewModel.onIngredientOpenChange(false) },
-                    onSave = { }
+                    onDismissRequest = { viewModel.onNewIngredientClose() },
+                    onSave = { viewModel.onNewIngredientSave() },
+                    newIngredientUiState = viewModel.newIngredientUiState,
+                    onNewIngredientChange = { name, kcal, protein ->
+                        viewModel.onNewIngredientChange(name, kcal, protein)
+                    }
                 )
             }
         }
@@ -73,7 +83,7 @@ fun IngredientSearch(
     onQueryChange: (String) -> Unit,
     onExpandedChange: (Boolean) -> Unit,
     onSearch: (String) -> Unit,
-    uiState: NewFoodUiState
+    ingredientSearch: List<Ingredient>
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         SearchBar(
@@ -98,7 +108,7 @@ fun IngredientSearch(
                             onExpandedChange(false)
                         }
                         .fillMaxWidth())
-                uiState.ingredientSearch.forEach { ingredient ->
+                ingredientSearch.forEach { ingredient ->
                     ListItem(headlineContent = { Text(ingredient.name) },
                         modifier = Modifier
                             .clickable {
@@ -115,13 +125,49 @@ fun IngredientSearch(
 @Composable
 fun NewIngredientDialog(
     onDismissRequest: () -> Unit,
+    newIngredientUiState: NewIngredientUiState,
+    onNewIngredientChange: (String, String, String) -> Unit,
     onSave: (String) -> Unit,
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
     ) {
         Card {
-            Text(text = stringResource(R.string.add_ingredient), style = MaterialTheme.typography.titleLarge)
+            Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))) {
+                OutlinedTextField(
+                    value =  newIngredientUiState.name,
+                    onValueChange = { onNewIngredientChange(it, newIngredientUiState.kcal, newIngredientUiState.protein) },
+                    label = { Text(stringResource(R.string.ingredient_name)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value =  newIngredientUiState.kcal,
+                    onValueChange = { onNewIngredientChange(newIngredientUiState.name, it, newIngredientUiState.protein) },
+                    label = { Text(stringResource(R.string.ingredient_calories)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value =  newIngredientUiState.protein,
+                    onValueChange = { onNewIngredientChange(newIngredientUiState.name, newIngredientUiState.kcal, it) },
+                    label = { Text(stringResource(R.string.ingredient_protein)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Button(
+                    onClick = {
+                        onSave(newIngredientUiState.name)
+                        onDismissRequest()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.save))
+                }
+            }
         }
     }
 }
