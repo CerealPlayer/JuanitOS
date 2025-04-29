@@ -55,14 +55,11 @@ class NewFoodViewModel(
             ingredientsRepository.getAllIngredientsStream()
         }
     }.stateIn(
-        viewModelScope,
-        initialValue = emptyList(),
-        started = SharingStarted.WhileSubscribed(5_000)
+        viewModelScope, initialValue = emptyList(), started = SharingStarted.WhileSubscribed(5_000)
     )
 
     val currentSelected: StateFlow<Ingredient?> = combine(
-        _ingredientQuery,
-        ingredientSuggestions
+        _ingredientQuery, ingredientSuggestions
     ) { query, suggestions ->
         if (query.isNotEmpty()) {
             suggestions.firstOrNull { it.name.equals(query, ignoreCase = true) }
@@ -70,9 +67,7 @@ class NewFoodViewModel(
             null
         }
     }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
+        scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = null
     )
 
     fun onIngredientQtChange(qt: String) {
@@ -88,8 +83,7 @@ class NewFoodViewModel(
         }
         newFoodUiState = newFoodUiState.copy(
             foodIngredients = newFoodUiState.foodIngredients + FoodIngredientDetails(
-                ingredient = currentSelected.value!!,
-                quantity = ingredientQt
+                ingredient = currentSelected.value!!, quantity = ingredientQt
             )
         )
         _ingredientQuery.value = ""
@@ -106,17 +100,12 @@ class NewFoodViewModel(
         protein: String,
     ) {
         newIngredientUiState = newIngredientUiState.copy(
-            name = name,
-            kcal = kcal,
-            protein = protein
+            name = name, kcal = kcal, protein = protein
         )
     }
 
     private fun validateNewIngredient(): Boolean {
-        if (newIngredientUiState.name.isNotBlank() &&
-            newIngredientUiState.kcal.isNotBlank() &&
-            newIngredientUiState.protein.isNotBlank()
-        ) {
+        if (newIngredientUiState.name.isNotBlank() && newIngredientUiState.kcal.isNotBlank() && newIngredientUiState.protein.isNotBlank()) {
             return true
         }
         return false
@@ -181,9 +170,7 @@ class NewFoodViewModel(
         }
         viewModelScope.launch {
             val res = foodRepository.insertFood(
-                Food(
-                    name = newFoodName,
-                )
+                newFoodName
             )
             val foodId = res.toInt()
             newFoodUiState.foodIngredients.forEach { foodIngredient ->

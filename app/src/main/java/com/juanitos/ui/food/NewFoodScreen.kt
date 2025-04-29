@@ -193,7 +193,7 @@ fun NewIngredientDialog(
         onDismissRequest = onDismissRequest,
     ) {
         Card {
-            FormColumn(innerPadding = PaddingValues()) {
+            FormColumn(innerPadding = PaddingValues(dimensionResource(R.dimen.padding_small))) {
                 OutlinedTextField(value = newIngredientUiState.name,
                     onValueChange = {
                         onNewIngredientChange(
@@ -342,7 +342,7 @@ fun SaveFoodDialog(
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
         Card {
-            FormColumn(innerPadding = PaddingValues()) {
+            FormColumn(innerPadding = PaddingValues(dimensionResource(R.dimen.padding_small))) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = onNameChange,

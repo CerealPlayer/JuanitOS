@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FoodDao {
-    @Insert
-    suspend fun insert(food: Food): Long
+    @Query("insert into foods (name) values (:name)")
+    suspend fun insert(name: String): Long
 
     @Update
     suspend fun update(food: Food)
