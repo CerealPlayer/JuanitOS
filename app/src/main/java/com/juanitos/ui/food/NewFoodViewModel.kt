@@ -5,12 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanitos.data.Food
-import com.juanitos.data.FoodIngredient
-import com.juanitos.data.FoodIngredientRepository
-import com.juanitos.data.FoodRepository
-import com.juanitos.data.Ingredient
-import com.juanitos.data.IngredientRepository
+import com.juanitos.data.food.FoodIngredient
+import com.juanitos.data.food.FoodIngredientRepository
+import com.juanitos.data.food.FoodRepository
+import com.juanitos.data.food.Ingredient
+import com.juanitos.data.food.IngredientRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

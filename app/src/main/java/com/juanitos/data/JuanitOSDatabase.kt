@@ -4,6 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.juanitos.data.food.Food
+import com.juanitos.data.food.FoodDao
+import com.juanitos.data.food.FoodIngredient
+import com.juanitos.data.food.FoodIngredientDao
+import com.juanitos.data.food.Ingredient
+import com.juanitos.data.food.IngredientDao
+import com.juanitos.data.food.Setting
+import com.juanitos.data.food.SettingDao
 
 @Database(entities = [Setting::class, Food::class, FoodIngredient::class, Ingredient::class], version = 5, exportSchema = false)
 abstract class JuanitOSDatabase : RoomDatabase() {

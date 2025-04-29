@@ -1,8 +1,7 @@
-package com.juanitos.data
+package com.juanitos.data.food
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
@@ -23,4 +22,7 @@ interface FoodDao {
 
     @Query("select * from foods order by id asc")
     fun getAllFoods(): Flow<List<Food>>
+
+    @Query("select * from foods where date(created_at) = date('now')")
+    fun getTodaysFoods(): Flow<List<Food>>
 }

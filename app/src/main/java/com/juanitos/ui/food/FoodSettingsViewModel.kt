@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanitos.data.SettingsRepository
+import com.juanitos.data.food.SettingsRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
