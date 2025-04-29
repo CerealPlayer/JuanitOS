@@ -1,12 +1,14 @@
 package com.juanitos.ui.food
 
-import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -18,10 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
+import com.juanitos.data.food.FoodWithIngredients
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
@@ -44,36 +48,37 @@ fun FoodScreen(
     val proteinLimit = viewModel.proteinLimit.collectAsState()
     val foods = viewModel.todaysFoods.collectAsState()
 
-    Scaffold(
-        topBar = {
-            JuanitOSTopAppBar(
-                title = stringResource(FoodDestination.titleRes),
-                canNavigateBack = true,
-                navigateUp = onNavigateUp,
-                actions = {
-                    IconButton(onClick = onSettings) {
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = stringResource(R.string.settings)
-                        )
-                    }
+    Scaffold(topBar = {
+        JuanitOSTopAppBar(title = stringResource(FoodDestination.titleRes),
+            canNavigateBack = true,
+            navigateUp = onNavigateUp,
+            actions = {
+                IconButton(onClick = onSettings) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = stringResource(R.string.settings)
+                    )
                 }
+            })
+    }, floatingActionButton = {
+        FloatingActionButton(onClick = onNewFood) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = stringResource(R.string.new_food)
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onNewFood) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(R.string.new_food)
-                )
-            }
         }
-    ) { innerPadding ->
+    }) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding(),
+                    start = dimensionResource(R.dimen.padding_small),
+                    end = dimensionResource(R.dimen.padding_small)
+                )
                 .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
         ) {
             Text(
                 text = stringResource(R.string.calories_left, calorieLimt.value),
@@ -83,6 +88,26 @@ fun FoodScreen(
                 text = stringResource(R.string.prot_left, proteinLimit.value),
                 style = MaterialTheme.typography.titleMedium
             )
+            foods.value.forEach { food ->
+                FoodEntry(entry = food)
+            }
+        }
+    }
+}
+
+@Composable
+fun FoodEntry(
+    entry: FoodWithIngredients
+) {
+    val totalCal = entry.ingredients.sumOf { (it.grams.toIntOrNull() ?: 0) * (it.ingredient.caloriesPer100.toIntOrNull() ?: 0) / 100 }
+    val totalProt = entry.ingredients.sumOf { (it.grams.toIntOrNull() ?: 0) * (it.ingredient.proteinsPer100.toIntOrNull() ?: 0) / 100 }
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))) {
+            Text(text = entry.food.name)
+            Text(text = stringResource(R.string.food_summary, totalCal, totalProt))
+            Text(text = stringResource(R.string.n_ingredients, entry.ingredients.size))
         }
     }
 }
@@ -90,9 +115,6 @@ fun FoodScreen(
 @Preview
 @Composable
 fun FoodScreenPreview() {
-    FoodScreen(
-        onNavigateUp = {},
-        onSettings = {},
-        onNewFood = {} // Parámetro de vista previa
+    FoodScreen(onNavigateUp = {}, onSettings = {}, onNewFood = {} // Parámetro de vista previa
     )
 }
