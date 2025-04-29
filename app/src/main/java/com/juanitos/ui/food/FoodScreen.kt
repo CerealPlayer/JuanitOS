@@ -44,9 +44,23 @@ fun FoodScreen(
     onNewFood: () -> Unit,
     viewModel: FoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val calorieLimt = viewModel.calorieLimit.collectAsState()
+    val calorieLimit = viewModel.calorieLimit.collectAsState()
     val proteinLimit = viewModel.proteinLimit.collectAsState()
     val foods = viewModel.todaysFoods.collectAsState()
+
+    val totalCalories = foods.value.sumOf { food ->
+        food.ingredients.sumOf {
+            (it.grams.toIntOrNull() ?: 0) * (it.ingredient.caloriesPer100.toIntOrNull() ?: 0) / 100
+        }
+    }
+    val totalProteins = foods.value.sumOf { food ->
+        food.ingredients.sumOf {
+            (it.grams.toIntOrNull() ?: 0) * (it.ingredient.proteinsPer100.toIntOrNull() ?: 0) / 100
+        }
+    }
+
+    val caloriesLeft = (calorieLimit.value.toIntOrNull() ?: 0) - totalCalories
+    val proteinsLeft = (proteinLimit.value.toIntOrNull() ?: 0) - totalProteins
 
     Scaffold(topBar = {
         JuanitOSTopAppBar(title = stringResource(FoodDestination.titleRes),
@@ -81,11 +95,11 @@ fun FoodScreen(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
         ) {
             Text(
-                text = stringResource(R.string.calories_left, calorieLimt.value),
+                text = stringResource(R.string.calories_left, caloriesLeft),
                 style = MaterialTheme.typography.titleLarge
             )
             Text(
-                text = stringResource(R.string.prot_left, proteinLimit.value),
+                text = stringResource(R.string.prot_left, proteinsLeft),
                 style = MaterialTheme.typography.titleMedium
             )
             foods.value.forEach { food ->
@@ -99,8 +113,12 @@ fun FoodScreen(
 fun FoodEntry(
     entry: FoodWithIngredients
 ) {
-    val totalCal = entry.ingredients.sumOf { (it.grams.toIntOrNull() ?: 0) * (it.ingredient.caloriesPer100.toIntOrNull() ?: 0) / 100 }
-    val totalProt = entry.ingredients.sumOf { (it.grams.toIntOrNull() ?: 0) * (it.ingredient.proteinsPer100.toIntOrNull() ?: 0) / 100 }
+    val totalCal = entry.ingredients.sumOf {
+        (it.grams.toIntOrNull() ?: 0) * (it.ingredient.caloriesPer100.toIntOrNull() ?: 0) / 100
+    }
+    val totalProt = entry.ingredients.sumOf {
+        (it.grams.toIntOrNull() ?: 0) * (it.ingredient.proteinsPer100.toIntOrNull() ?: 0) / 100
+    }
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -118,3 +136,4 @@ fun FoodScreenPreview() {
     FoodScreen(onNavigateUp = {}, onSettings = {}, onNewFood = {} // Parámetro de vista previa
     )
 }
+
