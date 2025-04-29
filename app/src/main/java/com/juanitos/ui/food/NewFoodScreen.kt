@@ -1,11 +1,14 @@
 package com.juanitos.ui.food
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -20,6 +23,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -47,6 +51,7 @@ fun NewFoodScreen(
 ) {
     val query = viewModel.ingredientQuery.collectAsState()
     val ingredients = viewModel.ingredientSuggestions.collectAsState()
+    val selected = viewModel.currentSelected.collectAsState()
 
     Scaffold(topBar = {
         JuanitOSTopAppBar(
@@ -73,6 +78,16 @@ fun NewFoodScreen(
                         viewModel.onNewIngredientChange(name, kcal, protein)
                     }
                 )
+            }
+            if (selected.value != null) {
+                IngredientQtDialog(
+                    name = selected.value!!.name,
+                    onDismissRequest = { viewModel.onIngredientQtDismiss() },
+                    qt = viewModel.ingredientQt,
+                    onQtChange = { viewModel.onIngredientQtChange(it) },
+                    onSave = {
+                        viewModel.onIngredientQtSave()
+                    })
             }
         }
     }
@@ -136,26 +151,47 @@ fun NewIngredientDialog(
         onDismissRequest = onDismissRequest,
     ) {
         Card {
-            Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)), verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))) {
+            Column(
+                modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
+            ) {
                 OutlinedTextField(
-                    value =  newIngredientUiState.name,
-                    onValueChange = { onNewIngredientChange(it, newIngredientUiState.kcal, newIngredientUiState.protein) },
+                    value = newIngredientUiState.name,
+                    onValueChange = {
+                        onNewIngredientChange(
+                            it,
+                            newIngredientUiState.kcal,
+                            newIngredientUiState.protein
+                        )
+                    },
                     label = { Text(stringResource(R.string.ingredient_name)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
                 OutlinedTextField(
-                    value =  newIngredientUiState.kcal,
-                    onValueChange = { onNewIngredientChange(newIngredientUiState.name, it, newIngredientUiState.protein) },
+                    value = newIngredientUiState.kcal,
+                    onValueChange = {
+                        onNewIngredientChange(
+                            newIngredientUiState.name,
+                            it,
+                            newIngredientUiState.protein
+                        )
+                    },
                     label = { Text(stringResource(R.string.ingredient_calories)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
                 OutlinedTextField(
-                    value =  newIngredientUiState.protein,
-                    onValueChange = { onNewIngredientChange(newIngredientUiState.name, newIngredientUiState.kcal, it) },
+                    value = newIngredientUiState.protein,
+                    onValueChange = {
+                        onNewIngredientChange(
+                            newIngredientUiState.name,
+                            newIngredientUiState.kcal,
+                            it
+                        )
+                    },
                     label = { Text(stringResource(R.string.ingredient_protein)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
@@ -179,6 +215,50 @@ fun NewIngredientDialog(
                     )
                 ) {
                     Text(stringResource(R.string.cancel))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun IngredientQtDialog(
+    name: String,
+    onDismissRequest: () -> Unit,
+    qt: String,
+    onQtChange: (String) -> Unit,
+    onSave: () -> Unit,
+) {
+    Dialog(onDismissRequest = onDismissRequest) {
+        Card {
+            Column(
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_medium))
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(dimensionResource(R.dimen.padding_medium)),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = name, style = MaterialTheme.typography.titleMedium)
+                    OutlinedTextField(
+                        value = qt,
+                        onValueChange = onQtChange,
+                        label = { Text(stringResource(R.string.qt)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.width(dimensionResource(R.dimen.input_width)),
+                        singleLine = true
+                    )
+                }
+                Button(
+                    onClick = onSave,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.save))
                 }
             }
         }

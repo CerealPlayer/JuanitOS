@@ -9,8 +9,10 @@ import com.juanitos.data.Ingredient
 import com.juanitos.data.IngredientRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -28,6 +30,11 @@ class NewFoodViewModel(
         private set
     var newIngredientUiState by mutableStateOf(NewIngredientUiState())
         private set
+    var ingredientQt by mutableStateOf("")
+        private set
+
+    var newFoodUiState by mutableStateOf(NewFoodUiState())
+        private set
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val ingredientSuggestions: StateFlow<List<Ingredient>> = _ingredientQuery.flatMapLatest {
@@ -39,8 +46,48 @@ class NewFoodViewModel(
     }.stateIn(
         viewModelScope,
         initialValue = emptyList(),
-        started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000)
+        started = SharingStarted.WhileSubscribed(5_000)
     )
+
+    val currentSelected: StateFlow<Ingredient?> = combine(
+        _ingredientQuery,
+        ingredientSuggestions
+    ) { query, suggestions ->
+        if (query.isNotEmpty()) {
+            suggestions.firstOrNull { it.name.equals(query, ignoreCase = true) }
+        } else {
+            null
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    fun onIngredientQtChange(qt: String) {
+        ingredientQt = qt
+    }
+
+    fun onIngredientQtSave() {
+        if (ingredientQt.isBlank()) {
+            return
+        }
+        if (currentSelected.value == null) {
+            return
+        }
+        newFoodUiState = newFoodUiState.copy(
+            foodIngredients = newFoodUiState.foodIngredients + FoodIngredient(
+                ingredient = currentSelected.value!!,
+                quantity = ingredientQt
+            )
+        )
+        _ingredientQuery.value = ""
+        ingredientQt = ""
+    }
+
+    fun onIngredientQtDismiss() {
+        _ingredientQuery.value = ""
+    }
 
     fun onNewIngredientChange(
         name: String,
@@ -109,6 +156,15 @@ class NewFoodViewModel(
         _ingredientQuery.value = query
     }
 }
+
+data class NewFoodUiState(
+    val foodIngredients: List<FoodIngredient> = emptyList(),
+)
+
+data class FoodIngredient(
+    val ingredient: Ingredient,
+    val quantity: String,
+)
 
 data class NewIngredientUiState(
     val name: String = "",
