@@ -1,15 +1,18 @@
 package com.juanitos.ui.food
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
@@ -133,7 +136,7 @@ fun NewIngredientDialog(
         onDismissRequest = onDismissRequest,
     ) {
         Card {
-            Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))) {
+            Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)), verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))) {
                 OutlinedTextField(
                     value =  newIngredientUiState.name,
                     onValueChange = { onNewIngredientChange(it, newIngredientUiState.kcal, newIngredientUiState.protein) },
@@ -166,6 +169,16 @@ fun NewIngredientDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(stringResource(R.string.save))
+                }
+                Button(
+                    onClick = onDismissRequest,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
+                    Text(stringResource(R.string.cancel))
                 }
             }
         }

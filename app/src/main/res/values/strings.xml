@@ -10,9 +10,10 @@
     <string name="cal_obj_input">Calorie limit</string>
     <string name="prot_obj_input">Protein limit</string>
     <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
     <string name="search_ingredient">Search ingredient</string>
     <string name="add_ingredient">Add ingredient</string>
     <string name="ingredient_name">Ingredient name</string>
-    <string name="ingredient_calories">Ingredient calories</string>
-    <string name="ingredient_protein">Ingredient protein</string>
+    <string name="ingredient_calories">Calories per 100 units</string>
+    <string name="ingredient_protein">Proteins per 100 units</string>
 </resources>
