@@ -161,7 +161,7 @@ fun IngredientSearch(
             onExpandedChange = onExpandedChange,
         ) {
             Column {
-                ListItem(headlineContent = { Text(stringResource(R.string.add_ingredient)) },
+                ListItem(headlineContent = { Text(stringResource(R.string.new_ingredient)) },
                     modifier = Modifier
                         .clickable {
                             onQueryChange("new_ingredient")

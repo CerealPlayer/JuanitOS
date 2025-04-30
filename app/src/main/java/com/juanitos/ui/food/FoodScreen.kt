@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -21,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,6 +44,7 @@ fun FoodScreen(
     onNavigateUp: () -> Unit,
     onSettings: () -> Unit,
     onNewFood: () -> Unit,
+    onNewIngredient: () -> Unit,
     viewModel: FoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val calorieLimit = viewModel.calorieLimit.collectAsState()
@@ -74,13 +77,32 @@ fun FoodScreen(
                     )
                 }
             })
-    }, floatingActionButton = {
-        FloatingActionButton(onClick = onNewFood) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = stringResource(R.string.new_food)
-            )
-        }
+    }, bottomBar = {
+        BottomAppBar(
+            actions = {
+                IconButton(onClick = onNewIngredient) {
+                    Icon(
+                        painter = painterResource(R.drawable.ingredient),
+                        contentDescription = stringResource(R.string.new_ingredient)
+                    )
+                }
+                IconButton(onClick = {}) {
+                    Icon(
+                        painter = painterResource(R.drawable.batch),
+                        contentDescription = stringResource(R.string.new_batch_food)
+                    )
+                }
+            },
+
+            floatingActionButton = {
+                FloatingActionButton(onClick = onNewFood) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = stringResource(R.string.new_food)
+                    )
+                }
+            }
+        )
     }) { innerPadding ->
         Column(
             modifier = Modifier
@@ -133,7 +155,7 @@ fun FoodEntry(
 @Preview
 @Composable
 fun FoodScreenPreview() {
-    FoodScreen(onNavigateUp = {}, onSettings = {}, onNewFood = {} // Parámetro de vista previa
+    FoodScreen(onNavigateUp = {}, onSettings = {}, onNewFood = {}, onNewIngredient = {}
     )
 }
 
