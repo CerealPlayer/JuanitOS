@@ -1,9 +1,13 @@
 package com.juanitos.data
 
 import android.content.Context
+import com.juanitos.data.food.BatchFoodIngredientRepository
+import com.juanitos.data.food.BatchFoodRepository
 import com.juanitos.data.food.FoodIngredientRepository
 import com.juanitos.data.food.FoodRepository
 import com.juanitos.data.food.IngredientRepository
+import com.juanitos.data.food.OfflineBatchFoodIngredientRepository
+import com.juanitos.data.food.OfflineBatchFoodRepository
 import com.juanitos.data.food.OfflineFoodIngredientRepository
 import com.juanitos.data.food.OfflineFoodRepository
 import com.juanitos.data.food.OfflineIngredientRepository
@@ -15,6 +19,8 @@ interface AppContainer {
     val foodRepository: FoodRepository
     val foodIngredientRepository: FoodIngredientRepository
     val ingredientRepository: IngredientRepository
+    val batchFoodRepository: BatchFoodRepository
+    val batchFoodIngredientRepository: BatchFoodIngredientRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -29,5 +35,11 @@ class AppDataContainer(private val context: Context) : AppContainer {
     }
     override val ingredientRepository: IngredientRepository by lazy {
         OfflineIngredientRepository(ingredientDao = JuanitOSDatabase.getDatabase(context).ingredientDao())
+    }
+    override val batchFoodRepository: BatchFoodRepository by lazy {
+        OfflineBatchFoodRepository(batchFoodDao = JuanitOSDatabase.getDatabase(context).batchFoodDao())
+    }
+    override val batchFoodIngredientRepository: BatchFoodIngredientRepository by lazy {
+        OfflineBatchFoodIngredientRepository(batchFoodIngredientDao = JuanitOSDatabase.getDatabase(context).batchFoodIngredientDao())
     }
 }
