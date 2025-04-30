@@ -1,8 +1,6 @@
 package com.juanitos.ui.food
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,19 +10,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,6 +33,7 @@ import com.juanitos.R
 import com.juanitos.data.food.Ingredient
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.commons.FormColumn
+import com.juanitos.ui.commons.Search
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
@@ -60,6 +55,8 @@ fun NewFoodScreen(
     val selected = viewModel.currentSelected.collectAsState()
     val uiState = viewModel.newFoodUiState
 
+    val newIngString = stringResource(R.string.new_ingredient)
+
     Scaffold(topBar = {
         JuanitOSTopAppBar(
             title = stringResource(NewFoodDestination.titleRes),
@@ -80,14 +77,19 @@ fun NewFoodScreen(
             modifier = Modifier.padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            IngredientSearch(
+            Search(
                 query = query.value,
                 expanded = viewModel.searchExpanded,
-                onQueryChange = { viewModel.onQueryChange(it) },
+                onQueryChange = {
+                    if (it == newIngString) {
+                        onNewIngredient()
+                    } else {
+                        viewModel.onQueryChange(it)
+                    }
+                },
                 onExpandedChange = { viewModel.onExpandedChange(it) },
                 onSearch = { viewModel.onSearch(it) },
-                ingredientSearch = ingredients.value,
-                onNewIngredient = onNewIngredient
+                items = listOf(newIngString) + ingredients.value.map { it.name },
             )
             if (selected.value != null) {
                 IngredientQtDialog(name = selected.value!!.name,
@@ -111,66 +113,6 @@ fun NewFoodScreen(
                     onSave = {
                         viewModel.onNewFoodSave(onNavigateUp)
                     })
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun IngredientSearch(
-    query: String,
-    expanded: Boolean,
-    onNewIngredient: () -> Unit,
-    onQueryChange: (String) -> Unit,
-    onExpandedChange: (Boolean) -> Unit,
-    onSearch: (String) -> Unit,
-    ingredientSearch: List<Ingredient>
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(dimensionResource(R.dimen.padding_small))
-    ) {
-        SearchBar(
-            inputField = {
-                SearchBarDefaults.InputField(
-                    query = query,
-                    onQueryChange = onQueryChange,
-                    onSearch = onSearch,
-                    expanded = expanded,
-                    onExpandedChange = onExpandedChange,
-                    placeholder = { Text(stringResource(R.string.search_ingredient)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = null,
-                            modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
-                        )
-                    },
-                )
-            },
-            expanded = expanded,
-            onExpandedChange = onExpandedChange,
-        ) {
-            Column {
-                ListItem(headlineContent = { Text(stringResource(R.string.new_ingredient)) },
-                    modifier = Modifier
-                        .clickable {
-                            onNewIngredient()
-                            onExpandedChange(false)
-                        }
-                        .fillMaxWidth())
-                ingredientSearch.forEach { ingredient ->
-                    ListItem(headlineContent = { Text(ingredient.name) },
-                        modifier = Modifier
-                            .clickable {
-                                onQueryChange(ingredient.name)
-                                onExpandedChange(false)
-                            }
-                            .fillMaxWidth())
-                }
             }
         }
     }

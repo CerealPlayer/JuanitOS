@@ -36,9 +36,6 @@ class NewFoodViewModel(
     private val _ingredientQuery = MutableStateFlow("")
     val ingredientQuery: StateFlow<String> = _ingredientQuery.asStateFlow()
 
-    var newIngredientOpen by mutableStateOf(false)
-        private set
-
     var ingredientQt by mutableStateOf("")
         private set
 
@@ -93,11 +90,6 @@ class NewFoodViewModel(
     }
 
     fun onQueryChange(query: String) {
-        if (query == "new_ingredient") {
-            newIngredientOpen = true
-            _ingredientQuery.value = "New Ingredient"
-            return
-        }
         _ingredientQuery.value = query
     }
 
@@ -106,11 +98,6 @@ class NewFoodViewModel(
     }
 
     fun onSearch(query: String) {
-        if (query == "new_ingredient") {
-            newIngredientOpen = true
-            _ingredientQuery.value = "New Ingredient"
-            return
-        }
         _ingredientQuery.value = query
     }
 
