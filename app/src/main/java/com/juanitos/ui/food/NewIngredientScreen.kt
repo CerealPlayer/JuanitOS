@@ -29,15 +29,13 @@ object NewIngredientDestination : NavigationDestination {
 fun NewIngredientScreen(
     onNavigateUp: () -> Unit,
 ) {
-    Scaffold(
-        topBar = {
-            JuanitOSTopAppBar(
-                title = stringResource(NewIngredientDestination.titleRes),
-                canNavigateBack = true,
-                navigateUp = onNavigateUp,
-            )
-        }
-    ) { innerPadding ->
+    Scaffold(topBar = {
+        JuanitOSTopAppBar(
+            title = stringResource(NewIngredientDestination.titleRes),
+            canNavigateBack = true,
+            navigateUp = onNavigateUp,
+        )
+    }) { innerPadding ->
         FormColumn(innerPadding) {
             OutlinedTextField(
                 value = "",

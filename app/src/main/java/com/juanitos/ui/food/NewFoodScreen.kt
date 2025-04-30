@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,6 +52,7 @@ object NewFoodDestination : NavigationDestination {
 @Composable
 fun NewFoodScreen(
     onNavigateUp: () -> Unit,
+    onNewIngredient: () -> Unit,
     viewModel: NewFoodViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val query = viewModel.ingredientQuery.collectAsState()
@@ -87,15 +87,8 @@ fun NewFoodScreen(
                 onExpandedChange = { viewModel.onExpandedChange(it) },
                 onSearch = { viewModel.onSearch(it) },
                 ingredientSearch = ingredients.value,
+                onNewIngredient = onNewIngredient
             )
-            if (viewModel.newIngredientOpen) {
-                NewIngredientDialog(onDismissRequest = { viewModel.onNewIngredientClose() },
-                    onSave = { viewModel.onNewIngredientSave() },
-                    newIngredientUiState = viewModel.newIngredientUiState,
-                    onNewIngredientChange = { name, kcal, protein ->
-                        viewModel.onNewIngredientChange(name, kcal, protein)
-                    })
-            }
             if (selected.value != null) {
                 IngredientQtDialog(name = selected.value!!.name,
                     onDismissRequest = { viewModel.onIngredientQtDismiss() },
@@ -128,6 +121,7 @@ fun NewFoodScreen(
 fun IngredientSearch(
     query: String,
     expanded: Boolean,
+    onNewIngredient: () -> Unit,
     onQueryChange: (String) -> Unit,
     onExpandedChange: (Boolean) -> Unit,
     onSearch: (String) -> Unit,
@@ -164,7 +158,7 @@ fun IngredientSearch(
                 ListItem(headlineContent = { Text(stringResource(R.string.new_ingredient)) },
                     modifier = Modifier
                         .clickable {
-                            onQueryChange("new_ingredient")
+                            onNewIngredient()
                             onExpandedChange(false)
                         }
                         .fillMaxWidth())
@@ -176,74 +170,6 @@ fun IngredientSearch(
                                 onExpandedChange(false)
                             }
                             .fillMaxWidth())
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun NewIngredientDialog(
-    onDismissRequest: () -> Unit,
-    newIngredientUiState: NewIngredientUiState,
-    onNewIngredientChange: (String, String, String) -> Unit,
-    onSave: (String) -> Unit,
-) {
-    Dialog(
-        onDismissRequest = onDismissRequest,
-    ) {
-        Card {
-            FormColumn(innerPadding = PaddingValues(dimensionResource(R.dimen.padding_small))) {
-                OutlinedTextField(value = newIngredientUiState.name,
-                    onValueChange = {
-                        onNewIngredientChange(
-                            it, newIngredientUiState.kcal, newIngredientUiState.protein
-                        )
-                    },
-                    label = { Text(stringResource(R.string.ingredient_name)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-                OutlinedTextField(value = newIngredientUiState.kcal,
-                    onValueChange = {
-                        onNewIngredientChange(
-                            newIngredientUiState.name, it, newIngredientUiState.protein
-                        )
-                    },
-                    label = { Text(stringResource(R.string.ingredient_calories)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-                OutlinedTextField(value = newIngredientUiState.protein,
-                    onValueChange = {
-                        onNewIngredientChange(
-                            newIngredientUiState.name, newIngredientUiState.kcal, it
-                        )
-                    },
-                    label = { Text(stringResource(R.string.ingredient_protein)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-                Button(
-                    onClick = {
-                        onSave(newIngredientUiState.name)
-                        onDismissRequest()
-                    }, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.save))
-                }
-                Button(
-                    onClick = onDismissRequest,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.secondary
-                    )
-                ) {
-                    Text(stringResource(R.string.cancel))
                 }
             }
         }
