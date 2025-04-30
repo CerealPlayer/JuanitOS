@@ -6,5 +6,6 @@ enum class Routes {
     FoodSettings,
     NewFood,
     NewIngredient,
+    NewBatchFood,
     Money
 }

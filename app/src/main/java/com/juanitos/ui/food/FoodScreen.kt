@@ -45,6 +45,7 @@ fun FoodScreen(
     onSettings: () -> Unit,
     onNewFood: () -> Unit,
     onNewIngredient: () -> Unit,
+    onNewBatchFood: () -> Unit,
     viewModel: FoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val calorieLimit = viewModel.calorieLimit.collectAsState()
@@ -86,7 +87,7 @@ fun FoodScreen(
                         contentDescription = stringResource(R.string.new_ingredient)
                     )
                 }
-                IconButton(onClick = {}) {
+                IconButton(onClick = onNewBatchFood) {
                     Icon(
                         painter = painterResource(R.drawable.batch),
                         contentDescription = stringResource(R.string.new_batch_food)
@@ -155,7 +156,7 @@ fun FoodEntry(
 @Preview
 @Composable
 fun FoodScreenPreview() {
-    FoodScreen(onNavigateUp = {}, onSettings = {}, onNewFood = {}, onNewIngredient = {}
+    FoodScreen(onNavigateUp = {}, onSettings = {}, onNewFood = {}, onNewIngredient = {}, onNewBatchFood = {}
     )
 }
 
