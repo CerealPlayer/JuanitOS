@@ -13,7 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
+import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.commons.FormColumn
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
@@ -28,7 +30,12 @@ object NewIngredientDestination : NavigationDestination {
 @Composable
 fun NewIngredientScreen(
     onNavigateUp: () -> Unit,
+    viewModel: NewIngredientViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val name = viewModel.uiState.name
+    val calories = viewModel.uiState.calories
+    val protein = viewModel.uiState.protein
+
     Scaffold(topBar = {
         JuanitOSTopAppBar(
             title = stringResource(NewIngredientDestination.titleRes),
@@ -38,34 +45,41 @@ fun NewIngredientScreen(
     }) { innerPadding ->
         FormColumn(innerPadding) {
             OutlinedTextField(
-                value = "",
+                value = name.value,
                 onValueChange = {
-
+                    viewModel.updateName(it)
                 },
                 label = { Text(stringResource(R.string.ingredient_name)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                isError = name.touched && !name.isValid,
             )
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = calories.value,
+                onValueChange = {
+                    viewModel.updateCalories(it)
+                },
                 label = { Text(stringResource(R.string.ingredient_calories)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                isError = calories.touched && !calories.isValid,
             )
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = protein.value,
+                onValueChange = {
+                    viewModel.updateProtein(it)
+                },
                 label = { Text(stringResource(R.string.ingredient_protein)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                isError = protein.touched && !protein.isValid,
             )
             Button(
                 onClick = {
-
+                    viewModel.saveIngredient(onNavigateUp)
                 }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.save))

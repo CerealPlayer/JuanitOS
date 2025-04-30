@@ -38,8 +38,7 @@ class NewFoodViewModel(
 
     var newIngredientOpen by mutableStateOf(false)
         private set
-    var newIngredientUiState by mutableStateOf(NewIngredientUiState())
-        private set
+
     var ingredientQt by mutableStateOf("")
         private set
 
@@ -93,41 +92,6 @@ class NewFoodViewModel(
         _ingredientQuery.value = ""
     }
 
-    fun onNewIngredientChange(
-        name: String,
-        kcal: String,
-        protein: String,
-    ) {
-        newIngredientUiState = newIngredientUiState.copy(
-            name = name, kcal = kcal, protein = protein
-        )
-    }
-
-    private fun validateNewIngredient(): Boolean {
-        if (newIngredientUiState.name.isNotBlank() && newIngredientUiState.kcal.isNotBlank() && newIngredientUiState.protein.isNotBlank()) {
-            return true
-        }
-        return false
-    }
-
-    fun onNewIngredientSave() {
-        if (!validateNewIngredient()) {
-            return
-        }
-        viewModelScope.launch {
-            ingredientsRepository.insertIngredient(
-                Ingredient(
-                    name = newIngredientUiState.name,
-                    caloriesPer100 = newIngredientUiState.kcal,
-                    proteinsPer100 = newIngredientUiState.protein
-                )
-            )
-            newIngredientUiState = NewIngredientUiState()
-        }
-        newIngredientOpen = false
-        _ingredientQuery.value = ""
-    }
-
     fun onQueryChange(query: String) {
         if (query == "new_ingredient") {
             newIngredientOpen = true
@@ -139,11 +103,6 @@ class NewFoodViewModel(
 
     fun onExpandedChange(expanded: Boolean) {
         searchExpanded = expanded
-    }
-
-    fun onNewIngredientClose() {
-        newIngredientOpen = false
-        _ingredientQuery.value = ""
     }
 
     fun onSearch(query: String) {
@@ -196,10 +155,4 @@ data class NewFoodUiState(
 data class FoodIngredientDetails(
     val ingredient: Ingredient,
     val quantity: String,
-)
-
-data class NewIngredientUiState(
-    val name: String = "",
-    val kcal: String = "",
-    val protein: String = "",
 )
