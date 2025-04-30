@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.food.Ingredient
 import com.juanitos.data.food.IngredientRepository
+import com.juanitos.lib.InputUiState
 import com.juanitos.lib.validateQt
 import kotlinx.coroutines.launch
 
@@ -58,12 +59,6 @@ data class NewIngredientUiState(
     val name: InputUiState = InputUiState(),
     val calories: InputUiState = InputUiState(),
     val protein: InputUiState = InputUiState(),
-)
-
-data class InputUiState(
-    val value: String = "",
-    val touched: Boolean = false,
-    val isValid: Boolean = false,
 )
 
 fun NewIngredientUiState.toIngredient(): Ingredient {
