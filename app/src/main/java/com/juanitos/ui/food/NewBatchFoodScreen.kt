@@ -1,10 +1,14 @@
 package com.juanitos.ui.food
 
+import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
+import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.commons.FormColumn
 import com.juanitos.ui.commons.Search
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
@@ -20,7 +24,11 @@ object NewBatchFoodDestination : NavigationDestination {
 @Composable
 fun NewBatchFoodScreen(
     onNavigateUp: () -> Unit,
+    viewModel: NewBatchFoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val uiState = viewModel.uiState
+    val ingredients = uiState.ingredients.collectAsState()
+
     Scaffold(
         topBar = {
             JuanitOSTopAppBar(
@@ -32,12 +40,12 @@ fun NewBatchFoodScreen(
     ) { innerPadding ->
         FormColumn(innerPadding) {
             Search(
-                query = "",
-                expanded = false,
-                onQueryChange = {},
-                onExpandedChange = {},
-                onSearch = {},
-                items = emptyList(),
+                query = uiState.searchQuery,
+                expanded = uiState.searchExpanded,
+                onQueryChange = {viewModel.updateSearchQuery(it)},
+                onExpandedChange = {viewModel.updateSearchExpanded(it)},
+                onSearch = {viewModel.updateSearchQuery(it)},
+                items = ingredients.value.map { it.name },
             )
         }
     }

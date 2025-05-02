@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.juanitos.ui.food.FoodSettingsViewModel
 import com.juanitos.JuanitOSApplication
 import com.juanitos.ui.food.FoodViewModel
+import com.juanitos.ui.food.NewBatchFoodViewModel
 import com.juanitos.ui.food.NewFoodViewModel
 import com.juanitos.ui.food.NewIngredientViewModel
 
@@ -30,6 +31,11 @@ object AppViewModelProvider {
         }
         initializer {
             NewIngredientViewModel(
+                juanitOSApplication().container.ingredientRepository
+            )
+        }
+        initializer {
+            NewBatchFoodViewModel(
                 juanitOSApplication().container.ingredientRepository
             )
         }
