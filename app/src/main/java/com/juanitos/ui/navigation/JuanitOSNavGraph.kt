@@ -33,7 +33,8 @@ fun JuanitOSNavGraph(
             HomeScreen(onNavigateTo = { navController.navigate(it.name) })
         }
         composable(route = FoodDestination.route.name) {
-            FoodScreen(onNavigateUp = { navController.navigateUp() },
+            FoodScreen(
+                onNavigateUp = { navController.navigateUp() },
                 onSettings = { navController.navigate(FoodSettingsDestination.route.name) },
                 onNewFood = { navController.navigate(NewFoodDestination.route.name) },
                 onNewIngredient = {
@@ -58,7 +59,9 @@ fun JuanitOSNavGraph(
             NewIngredientScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = NewBatchFoodDestination.route.name) {
-            NewBatchFoodScreen(onNavigateUp = { navController.navigateUp() })
+            NewBatchFoodScreen(onNavigateUp = { navController.navigateUp() }, onNewIngredient = {
+                navController.navigate(NewIngredientDestination.route.name)
+            })
         }
     }
 }

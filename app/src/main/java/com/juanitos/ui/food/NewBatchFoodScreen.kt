@@ -24,10 +24,13 @@ object NewBatchFoodDestination : NavigationDestination {
 @Composable
 fun NewBatchFoodScreen(
     onNavigateUp: () -> Unit,
+    onNewIngredient: () -> Unit,
     viewModel: NewBatchFoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState
     val ingredients = uiState.ingredients.collectAsState()
+
+    val newIngString = stringResource(R.string.new_ingredient)
 
     Scaffold(
         topBar = {
@@ -42,10 +45,22 @@ fun NewBatchFoodScreen(
             Search(
                 query = uiState.searchQuery,
                 expanded = uiState.searchExpanded,
-                onQueryChange = {viewModel.updateSearchQuery(it)},
-                onExpandedChange = {viewModel.updateSearchExpanded(it)},
-                onSearch = {viewModel.updateSearchQuery(it)},
-                items = ingredients.value.map { it.name },
+                onQueryChange = {
+                    if (it == newIngString) {
+                        onNewIngredient()
+                    } else {
+                        viewModel.updateSearchQuery(it)
+                    }
+                },
+                onExpandedChange = { viewModel.updateSearchExpanded(it) },
+                onSearch = {
+                    if (it == newIngString) {
+                        onNewIngredient()
+                    } else {
+                        viewModel.updateSearchQuery(it)
+                    }
+                },
+                items = listOf(newIngString) + ingredients.value.map { it.name }
             )
         }
     }
