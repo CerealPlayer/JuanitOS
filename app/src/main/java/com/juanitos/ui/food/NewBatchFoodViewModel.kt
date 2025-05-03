@@ -30,6 +30,12 @@ class NewBatchFoodViewModel(
         )
     }
 
+    fun selectIngredient(name: String) {
+        uiState = uiState.copy(
+            selectedIngredient = uiState.ingredients.value.find { it.name == name }
+        )
+    }
+
     private fun fetchIngredients(query: String) {
         viewModelScope.launch {
             if (query.isEmpty()) {
@@ -51,5 +57,6 @@ class NewBatchFoodViewModel(
 data class NewBatchFoodUiState(
     val searchQuery: String = "",
     val searchExpanded: Boolean = false,
-    val ingredients: MutableStateFlow<List<Ingredient>> = MutableStateFlow(emptyList())
+    val ingredients: MutableStateFlow<List<Ingredient>> = MutableStateFlow(emptyList()),
+    val selectedIngredient: Ingredient? = null
 )

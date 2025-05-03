@@ -27,7 +27,8 @@ fun Search(
     onQueryChange: (String) -> Unit,
     onExpandedChange: (Boolean) -> Unit,
     onSearch: (String) -> Unit,
-    items: List<String>
+    items: List<String>,
+    onItemSelect: (String) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -62,6 +63,7 @@ fun Search(
                         modifier = Modifier
                             .clickable {
                                 onQueryChange(item)
+                                onItemSelect(item)
                                 onExpandedChange(false)
                             }
                             .fillMaxWidth())
