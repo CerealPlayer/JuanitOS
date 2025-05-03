@@ -32,7 +32,35 @@ class NewBatchFoodViewModel(
 
     fun selectIngredient(name: String) {
         uiState = uiState.copy(
-            selectedIngredient = uiState.ingredients.value.find { it.name == name }
+            selectedIngredient = uiState.ingredients.value.find { it.name == name },
+            ingredientQtDialogOpen = true,
+        )
+    }
+
+    fun updateQtQuery(query: String) {
+        uiState = uiState.copy(
+            qtQuery = query
+        )
+    }
+
+    fun saveIngredientEntry() {
+        if (uiState.selectedIngredient == null) return
+
+        val ingredientEntry = IngredientEntry(
+            ingredient = uiState.selectedIngredient!!, qt = uiState.qtQuery
+        )
+        uiState = uiState.copy(
+            ingredientEntries = uiState.ingredientEntries + listOf(ingredientEntry),
+            qtQuery = "",
+            ingredientQtDialogOpen = false,
+            selectedIngredient = null,
+            searchQuery = ""
+        )
+    }
+
+    fun dismissQtDialog() {
+        uiState = uiState.copy(
+            ingredientQtDialogOpen = false
         )
     }
 
@@ -58,5 +86,12 @@ data class NewBatchFoodUiState(
     val searchQuery: String = "",
     val searchExpanded: Boolean = false,
     val ingredients: MutableStateFlow<List<Ingredient>> = MutableStateFlow(emptyList()),
-    val selectedIngredient: Ingredient? = null
+    val selectedIngredient: Ingredient? = null,
+    val ingredientQtDialogOpen: Boolean = false,
+    val qtQuery: String = "",
+    val ingredientEntries: List<IngredientEntry> = emptyList()
+)
+
+data class IngredientEntry(
+    val ingredient: Ingredient, val qt: String
 )
