@@ -22,6 +22,7 @@ import com.juanitos.R
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.commons.FormColumn
 import com.juanitos.ui.commons.Search
+import com.juanitos.ui.commons.food.IngredientEntryCard
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
@@ -72,16 +73,17 @@ fun NewBatchFoodScreen(
                     }
                 },
                 items = listOf(newIngString) + ingredients.value.map { it.name },
-                onItemSelect = { viewModel.selectIngredient(it) }
-            )
+                onItemSelect = { viewModel.selectIngredient(it) })
             if (uiState.ingredientQtDialogOpen && uiState.selectedIngredient != null) {
                 IngredientQtDialog(
                     name = uiState.selectedIngredient.name,
                     qt = uiState.qtQuery,
                     onQtChange = { viewModel.updateQtQuery(it) },
                     onDismissRequest = { viewModel.dismissQtDialog() },
-                    onSave = { viewModel.saveIngredientEntry() }
-                )
+                    onSave = { viewModel.saveIngredientEntry() })
+            }
+            uiState.ingredientEntries.forEach {
+                IngredientEntryCard(it)
             }
         }
     }

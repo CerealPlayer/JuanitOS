@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.food.Ingredient
 import com.juanitos.data.food.IngredientRepository
+import com.juanitos.ui.commons.food.IngredientEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -90,8 +91,4 @@ data class NewBatchFoodUiState(
     val ingredientQtDialogOpen: Boolean = false,
     val qtQuery: String = "",
     val ingredientEntries: List<IngredientEntry> = emptyList()
-)
-
-data class IngredientEntry(
-    val ingredient: Ingredient, val qt: String
 )
