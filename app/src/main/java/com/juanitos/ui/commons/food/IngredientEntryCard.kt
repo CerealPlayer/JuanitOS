@@ -32,7 +32,7 @@ fun IngredientEntryCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(dimensionResource(R.dimen.padding_medium)),
+            .padding(dimensionResource(R.dimen.padding_small)),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer
