@@ -12,10 +12,11 @@ import com.juanitos.R
 @Composable
 fun FormColumn(
     innerPadding: PaddingValues,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     Column (
-        modifier = Modifier.padding(
+        modifier = modifier.padding(
             top = innerPadding.calculateTopPadding(),
             bottom = innerPadding.calculateBottomPadding(),
             start = dimensionResource(R.dimen.padding_medium),

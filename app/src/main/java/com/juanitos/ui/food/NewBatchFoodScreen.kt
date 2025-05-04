@@ -1,7 +1,11 @@
 package com.juanitos.ui.food
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -44,16 +48,26 @@ fun NewBatchFoodScreen(
 
     val newIngString = stringResource(R.string.new_ingredient)
 
-    Scaffold(
-        topBar = {
-            JuanitOSTopAppBar(
-                title = stringResource(NewBatchFoodDestination.titleRes),
-                canNavigateBack = true,
-                navigateUp = onNavigateUp,
-            )
-        },
-    ) { innerPadding ->
-        FormColumn(innerPadding) {
+    Scaffold(topBar = {
+        JuanitOSTopAppBar(
+            title = stringResource(NewBatchFoodDestination.titleRes),
+            canNavigateBack = true,
+            navigateUp = onNavigateUp,
+        )
+    }, bottomBar = {
+        Button(
+            onClick = {},
+            enabled = uiState.ingredientEntries.isNotEmpty(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(R.dimen.padding_medium))
+        ) {
+            Text(stringResource(R.string.save))
+        }
+    }) { innerPadding ->
+        FormColumn(
+            innerPadding
+        ) {
             Search(
                 query = uiState.searchQuery,
                 expanded = uiState.searchExpanded,
@@ -82,8 +96,10 @@ fun NewBatchFoodScreen(
                     onDismissRequest = { viewModel.dismissQtDialog() },
                     onSave = { viewModel.saveIngredientEntry() })
             }
-            uiState.ingredientEntries.forEach {
-                IngredientEntryCard(it)
+            LazyColumn {
+                items(uiState.ingredientEntries) { entry ->
+                    IngredientEntryCard(entry)
+                }
             }
         }
     }
