@@ -65,6 +65,24 @@ class NewBatchFoodViewModel(
         )
     }
 
+    fun updateSaveDialogOpen(open: Boolean) {
+        uiState = uiState.copy(
+            saveDialogOpen = open,
+        )
+    }
+
+    fun updateBatchFoodName(query: String) {
+        uiState = uiState.copy(
+            batchFoodNameQuery = query
+        )
+    }
+
+    fun updateBatchFoodTotalGrams(query: String) {
+        uiState = uiState.copy(
+            batchFoodTotalGramsQuery = query
+        )
+    }
+
     private fun fetchIngredients(query: String) {
         viewModelScope.launch {
             if (query.isEmpty()) {
@@ -90,5 +108,8 @@ data class NewBatchFoodUiState(
     val selectedIngredient: Ingredient? = null,
     val ingredientQtDialogOpen: Boolean = false,
     val qtQuery: String = "",
-    val ingredientEntries: List<IngredientEntry> = emptyList()
+    val ingredientEntries: List<IngredientEntry> = emptyList(),
+    val saveDialogOpen: Boolean = false,
+    val batchFoodNameQuery: String = "",
+    val batchFoodTotalGramsQuery: String = ""
 )

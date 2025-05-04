@@ -1,5 +1,7 @@
 package com.juanitos.ui.food
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -56,7 +58,7 @@ fun NewBatchFoodScreen(
         )
     }, bottomBar = {
         Button(
-            onClick = {},
+            onClick = { viewModel.updateSaveDialogOpen(true) },
             enabled = uiState.ingredientEntries.isNotEmpty(),
             modifier = Modifier
                 .fillMaxWidth()
@@ -101,6 +103,15 @@ fun NewBatchFoodScreen(
                     IngredientEntryCard(entry)
                 }
             }
+            if (uiState.saveDialogOpen) {
+                SaveDialog(
+                    onDismiss = { viewModel.updateSaveDialogOpen(false) },
+                    name = uiState.batchFoodNameQuery,
+                    totalGrams = uiState.batchFoodTotalGramsQuery,
+                    onNameChange = { viewModel.updateBatchFoodName(it) },
+                    onTotalGramsChange = { viewModel.updateBatchFoodTotalGrams(it) },
+                    onSave = {})
+            }
         }
     }
 }
@@ -130,6 +141,44 @@ fun IngredientQtDialog(
                 onClick = onSave
             ) {
                 Text(stringResource(R.string.save))
+            }
+        }
+    }
+}
+
+@Composable
+fun SaveDialog(
+    onDismiss: () -> Unit,
+    name: String,
+    totalGrams: String,
+    onNameChange: (String) -> Unit,
+    onTotalGramsChange: (String) -> Unit,
+    onSave: () -> Unit
+) {
+    Dialog(onDismiss) {
+        Card {
+            Column(
+                modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)),
+                verticalArrangement = Arrangement.spacedBy(
+                    dimensionResource(R.dimen.padding_small)
+                )
+            ) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = onNameChange,
+                    label = { Text(stringResource(R.string.food_name)) },
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = totalGrams,
+                    onValueChange = onTotalGramsChange,
+                    label = { Text(stringResource(R.string.total_grams)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                )
+                Button(onClick = onSave, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.save))
+                }
             }
         }
     }
