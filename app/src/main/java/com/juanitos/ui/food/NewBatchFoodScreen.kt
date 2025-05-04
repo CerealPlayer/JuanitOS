@@ -110,7 +110,7 @@ fun NewBatchFoodScreen(
                     totalGrams = uiState.batchFoodTotalGramsQuery,
                     onNameChange = { viewModel.updateBatchFoodName(it) },
                     onTotalGramsChange = { viewModel.updateBatchFoodTotalGrams(it) },
-                    onSave = {})
+                    onSave = { viewModel.saveBatchFood(onNavigateUp) })
             }
         }
     }
