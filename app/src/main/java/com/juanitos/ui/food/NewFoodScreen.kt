@@ -33,6 +33,7 @@ import com.juanitos.R
 import com.juanitos.data.food.Ingredient
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.commons.FormColumn
+import com.juanitos.ui.commons.IngredientQtDialog
 import com.juanitos.ui.commons.Search
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
@@ -113,49 +114,6 @@ fun NewFoodScreen(
                     onSave = {
                         viewModel.onNewFoodSave(onNavigateUp)
                     })
-            }
-        }
-    }
-}
-
-@Composable
-fun IngredientQtDialog(
-    name: String,
-    onDismissRequest: () -> Unit,
-    qt: String,
-    onQtChange: (String) -> Unit,
-    onSave: () -> Unit,
-) {
-    Dialog(onDismissRequest = onDismissRequest) {
-        Card {
-            Column(
-                modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_medium))
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(dimensionResource(R.dimen.padding_medium)),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = name, style = MaterialTheme.typography.titleMedium)
-                    OutlinedTextField(
-                        value = qt,
-                        onValueChange = onQtChange,
-                        label = { Text(stringResource(R.string.qt)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.width(dimensionResource(R.dimen.input_width)),
-                        singleLine = true
-                    )
-                }
-                Button(
-                    onClick = onSave, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.save))
-                }
             }
         }
     }

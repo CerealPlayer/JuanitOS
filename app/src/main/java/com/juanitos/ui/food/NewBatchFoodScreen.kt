@@ -27,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.commons.FormColumn
+import com.juanitos.ui.commons.IngredientQtDialog
 import com.juanitos.ui.commons.Search
 import com.juanitos.ui.commons.food.IngredientEntryCard
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
@@ -111,36 +112,6 @@ fun NewBatchFoodScreen(
                     onNameChange = { viewModel.updateBatchFoodName(it) },
                     onTotalGramsChange = { viewModel.updateBatchFoodTotalGrams(it) },
                     onSave = { viewModel.saveBatchFood(onNavigateUp) })
-            }
-        }
-    }
-}
-
-@Composable
-fun IngredientQtDialog(
-    onDismiss: () -> Unit,
-    name: String,
-    qt: String,
-    onQtChange: (String) -> Unit,
-    onSave: () -> Unit
-) {
-    Dialog(onDismissRequest = onDismiss) {
-        Card {
-            Row {
-                Text(name, style = MaterialTheme.typography.titleMedium)
-                OutlinedTextField(
-                    value = qt,
-                    onValueChange = onQtChange,
-                    label = { Text(stringResource(R.string.qt)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.width(dimensionResource(R.dimen.input_width)),
-                    singleLine = true
-                )
-            }
-            Button(
-                onClick = onSave
-            ) {
-                Text(stringResource(R.string.save))
             }
         }
     }

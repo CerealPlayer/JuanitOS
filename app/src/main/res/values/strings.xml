@@ -11,6 +11,7 @@
     <string name="cal_obj_input">Calorie limit</string>
     <string name="prot_obj_input">Protein limit</string>
     <string name="save">Save</string>
+    <string name="add">Add</string>
     <string name="cancel">Cancel</string>
     <string name="search_ingredient">Search ingredient</string>
     <string name="new_ingredient">New ingredient</string>
