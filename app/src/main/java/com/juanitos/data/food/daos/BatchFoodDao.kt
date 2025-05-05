@@ -3,8 +3,10 @@ package com.juanitos.data.food.daos
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.juanitos.data.food.entities.BatchFood
+import com.juanitos.data.food.entities.relations.BatchFoodWithIngredients
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -23,4 +25,8 @@ interface BatchFoodDao {
 
     @Query("select * from batch_foods order by id asc")
     fun getAllBatchFoods(): Flow<List<BatchFood>>
+
+    @Transaction
+    @Query("SELECT * FROM batch_foods")
+    fun getBatchFoodsWithIngredients(): Flow<List<BatchFoodWithIngredients>>
 }
