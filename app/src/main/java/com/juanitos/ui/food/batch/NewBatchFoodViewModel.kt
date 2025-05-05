@@ -1,4 +1,4 @@
-package com.juanitos.ui.food
+package com.juanitos.ui.food.batch
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
