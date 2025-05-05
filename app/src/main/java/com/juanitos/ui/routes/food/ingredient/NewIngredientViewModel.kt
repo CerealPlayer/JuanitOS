@@ -1,4 +1,4 @@
-package com.juanitos.ui.food.ingredient
+package com.juanitos.ui.routes.food.ingredient
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

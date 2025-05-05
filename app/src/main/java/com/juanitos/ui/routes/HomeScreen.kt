@@ -1,4 +1,4 @@
-package com.juanitos.ui.home
+package com.juanitos.ui.routes
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +14,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,11 +23,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.juanitos.R
-import com.juanitos.ui.food.FoodDestination
-import com.juanitos.ui.money.MoneyDestination
-import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
+import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
+import com.juanitos.ui.routes.food.FoodDestination
+import com.juanitos.ui.routes.money.MoneyDestination
 
 object HomeDestination : NavigationDestination {
     override val route = Routes.Home
@@ -57,8 +56,16 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                SubAppCard(textId = R.string.food, iconId = R.drawable.subapp_food, onClick = { onNavigateTo(FoodDestination.route) })
-                SubAppCard(textId = R.string.money, iconId = R.drawable.subapp_money, onClick = { onNavigateTo(MoneyDestination.route) })
+                SubAppCard(textId = R.string.food, iconId = R.drawable.subapp_food, onClick = {
+                    onNavigateTo(
+                        FoodDestination.route
+                    )
+                })
+                SubAppCard(textId = R.string.money, iconId = R.drawable.subapp_money, onClick = {
+                    onNavigateTo(
+                        MoneyDestination.route
+                    )
+                })
             }
         }
     }

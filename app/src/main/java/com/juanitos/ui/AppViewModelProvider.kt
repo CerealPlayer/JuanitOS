@@ -5,11 +5,11 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.juanitos.JuanitOSApplication
-import com.juanitos.ui.food.FoodViewModel
-import com.juanitos.ui.food.batch.NewBatchFoodViewModel
-import com.juanitos.ui.food.ingredient.NewIngredientViewModel
-import com.juanitos.ui.food.new_food.NewFoodViewModel
-import com.juanitos.ui.food.settings.FoodSettingsViewModel
+import com.juanitos.ui.routes.food.FoodViewModel
+import com.juanitos.ui.routes.food.batch.NewBatchFoodViewModel
+import com.juanitos.ui.routes.food.ingredient.NewIngredientViewModel
+import com.juanitos.ui.routes.food.new_food.NewFoodViewModel
+import com.juanitos.ui.routes.food.settings.FoodSettingsViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {

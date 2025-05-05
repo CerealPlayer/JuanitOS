@@ -1,4 +1,4 @@
-package com.juanitos.ui.food.batch
+package com.juanitos.ui.routes.food.batch
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

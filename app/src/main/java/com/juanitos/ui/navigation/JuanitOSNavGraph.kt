@@ -5,20 +5,20 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.juanitos.ui.food.FoodDestination
-import com.juanitos.ui.food.FoodScreen
-import com.juanitos.ui.food.batch.NewBatchFoodDestination
-import com.juanitos.ui.food.batch.NewBatchFoodScreen
-import com.juanitos.ui.food.ingredient.NewIngredientDestination
-import com.juanitos.ui.food.ingredient.NewIngredientScreen
-import com.juanitos.ui.food.new_food.NewFoodDestination
-import com.juanitos.ui.food.new_food.NewFoodScreen
-import com.juanitos.ui.food.settings.FoodSettingsDestination
-import com.juanitos.ui.food.settings.FoodSettingsScreen
-import com.juanitos.ui.home.HomeDestination
-import com.juanitos.ui.home.HomeScreen
-import com.juanitos.ui.money.MoneyDestination
-import com.juanitos.ui.money.MoneyScreen
+import com.juanitos.ui.routes.HomeDestination
+import com.juanitos.ui.routes.HomeScreen
+import com.juanitos.ui.routes.food.FoodDestination
+import com.juanitos.ui.routes.food.FoodScreen
+import com.juanitos.ui.routes.food.batch.NewBatchFoodDestination
+import com.juanitos.ui.routes.food.batch.NewBatchFoodScreen
+import com.juanitos.ui.routes.food.ingredient.NewIngredientDestination
+import com.juanitos.ui.routes.food.ingredient.NewIngredientScreen
+import com.juanitos.ui.routes.food.new_food.NewFoodDestination
+import com.juanitos.ui.routes.food.new_food.NewFoodScreen
+import com.juanitos.ui.routes.food.settings.FoodSettingsDestination
+import com.juanitos.ui.routes.food.settings.FoodSettingsScreen
+import com.juanitos.ui.routes.money.MoneyDestination
+import com.juanitos.ui.routes.money.MoneyScreen
 
 @Composable
 fun JuanitOSNavGraph(

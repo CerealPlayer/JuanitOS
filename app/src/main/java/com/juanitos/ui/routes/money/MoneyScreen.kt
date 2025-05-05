@@ -1,4 +1,4 @@
-package com.juanitos.ui.money
+package com.juanitos.ui.routes.money
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api

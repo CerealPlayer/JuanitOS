@@ -1,4 +1,4 @@
-package com.juanitos.ui.food.new_food
+package com.juanitos.ui.routes.food.new_food
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
