@@ -26,4 +26,6 @@
     <string name="food_summary">%1$d calories, %2$d grams of protein</string>
     <string name="n_ingredients">%1$d ingredients</string>
     <string name="total_grams">Total grams after cooking</string>
+    <string name="food_tag">Food</string>
+    <string name="batch_tag">Batch</string>
 </resources>

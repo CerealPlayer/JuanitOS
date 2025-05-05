@@ -20,6 +20,13 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.juanitos.R
 
+data class SearchResult(
+    val id: String,
+    val label: @Composable () -> Unit,
+    val tag: @Composable () -> Unit = {},
+    val onItemSelect: () -> Unit = {}
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Search(
@@ -28,8 +35,7 @@ fun Search(
     onQueryChange: (String) -> Unit,
     onExpandedChange: (Boolean) -> Unit,
     onSearch: (String) -> Unit,
-    searchResults: List<String>,
-    onItemSelect: (String) -> Unit = {}
+    searchResults: List<SearchResult>,
 ) {
     Box(
         modifier = Modifier
@@ -60,11 +66,13 @@ fun Search(
         ) {
             LazyColumn {
                 items(searchResults) { item ->
-                    ListItem(headlineContent = { Text(item) },
+                    ListItem(
+                        headlineContent = { item.label() },
+                        trailingContent = { item.tag() },
                         modifier = Modifier
                             .clickable {
-                                onQueryChange(item)
-                                onItemSelect(item)
+                                onQueryChange(item.id)
+                                item.onItemSelect()
                                 onExpandedChange(false)
                             }
                             .fillMaxWidth())

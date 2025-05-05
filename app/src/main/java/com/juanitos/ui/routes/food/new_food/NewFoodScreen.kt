@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.commons.FormColumn
 import com.juanitos.ui.commons.IngredientQtDialog
 import com.juanitos.ui.commons.Search
+import com.juanitos.ui.commons.SearchResult
 import com.juanitos.ui.commons.food.IngredientEntryCard
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
@@ -45,6 +47,19 @@ fun NewFoodScreen(
     val ingredients = uiState.ingredients
 
     val newIngString = stringResource(R.string.new_ingredient)
+    val newIngSearchResult = SearchResult(id = newIngString, label = {
+        Text(newIngString, color = MaterialTheme.colorScheme.primary)
+    }, onItemSelect = { onNewIngredient() })
+
+    val searchResults = listOf(newIngSearchResult) + ingredients.map {
+        SearchResult(
+            id = it.name,
+            label = {
+                Text(it.name)
+            },
+            onItemSelect = { viewModel.selectIngredient(it.name) },
+            tag = { Text(stringResource(R.string.food_tag)) })
+    }
 
     Scaffold(topBar = {
         JuanitOSTopAppBar(
@@ -66,26 +81,19 @@ fun NewFoodScreen(
         FormColumn(
             innerPadding
         ) {
-            Search(
-                query = uiState.searchQuery,
-                expanded = uiState.searchExpanded,
-                onQueryChange = {
-                    if (it == newIngString) {
-                        onNewIngredient()
-                    } else {
-                        viewModel.updateSearchQuery(it)
-                    }
-                },
-                onExpandedChange = { viewModel.updateSearchExpanded(it) },
-                onSearch = {
-                    if (it == newIngString) {
-                        onNewIngredient()
-                    } else {
-                        viewModel.updateSearchQuery(it)
-                    }
-                },
-                searchResults = listOf(newIngString) + ingredients.map { it.name },
-                onItemSelect = { viewModel.selectIngredient(it) })
+            Search(query = uiState.searchQuery, expanded = uiState.searchExpanded, onQueryChange = {
+                if (it == newIngString) {
+                    onNewIngredient()
+                } else {
+                    viewModel.updateSearchQuery(it)
+                }
+            }, onExpandedChange = { viewModel.updateSearchExpanded(it) }, onSearch = {
+                if (it == newIngString) {
+                    onNewIngredient()
+                } else {
+                    viewModel.updateSearchQuery(it)
+                }
+            }, searchResults = searchResults)
             if (uiState.ingredientQtDialogOpen && uiState.selectedIngredient != null) {
                 IngredientQtDialog(
                     name = uiState.selectedIngredient.name,
@@ -112,10 +120,7 @@ fun NewFoodScreen(
 
 @Composable
 fun SaveDialog(
-    onDismiss: () -> Unit,
-    name: String,
-    onNameChange: (String) -> Unit,
-    onSave: () -> Unit
+    onDismiss: () -> Unit, name: String, onNameChange: (String) -> Unit, onSave: () -> Unit
 ) {
     Dialog(onDismiss) {
         Card {
