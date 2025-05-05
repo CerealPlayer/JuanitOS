@@ -81,7 +81,7 @@ fun NewFoodScreen(
     }, bottomBar = {
         Button(
             onClick = { viewModel.updateSaveDialogOpen(true) },
-            enabled = uiState.ingredientEntries.isNotEmpty(),
+            enabled = uiState.ingredientEntries.isNotEmpty() || uiState.batchFoodEntries.isNotEmpty(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(dimensionResource(R.dimen.padding_medium))
