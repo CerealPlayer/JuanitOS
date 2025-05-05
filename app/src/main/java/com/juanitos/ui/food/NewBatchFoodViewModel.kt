@@ -1,8 +1,5 @@
 package com.juanitos.ui.food
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.food.entities.BatchFoodIngredient
@@ -12,8 +9,17 @@ import com.juanitos.data.food.repositories.BatchFoodRepository
 import com.juanitos.data.food.repositories.IngredientRepository
 import com.juanitos.lib.validateQt
 import com.juanitos.ui.commons.food.IngredientEntry
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class NewBatchFoodViewModel(
@@ -21,83 +27,98 @@ class NewBatchFoodViewModel(
     private val batchFoodRepository: BatchFoodRepository,
     private val batchFoodIngredientRepository: BatchFoodIngredientRepository,
 ) : ViewModel() {
-    var uiState by mutableStateOf(NewBatchFoodUiState())
-        private set
+    private val _uiState = MutableStateFlow(NewBatchFoodUiState())
+    val uiState: StateFlow<NewBatchFoodUiState> = _uiState
+        .combine(createIngredientsFlow()) { state, ingredients ->
+            state.copy(ingredients = ingredients)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = NewBatchFoodUiState()
+        )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun createIngredientsFlow(): Flow<List<Ingredient>> {
+        return _uiState
+            .map { it.searchQuery }
+            .distinctUntilChanged()
+            .flatMapLatest { query ->
+                if (query.isEmpty()) {
+                    ingredientRepository.getAllIngredientsStream()
+                } else {
+                    ingredientRepository.searchIngredientsStream(query)
+                }
+            }
+    }
 
     fun updateSearchQuery(query: String) {
-        uiState = uiState.copy(
-            searchQuery = query
-        )
-        fetchIngredients(query)
+        _uiState.update { it.copy(searchQuery = query) }
     }
 
     fun updateSearchExpanded(value: Boolean) {
-        uiState = uiState.copy(
-            searchExpanded = value
-        )
+        _uiState.update { it.copy(searchExpanded = value) }
     }
 
     fun selectIngredient(name: String) {
-        uiState = uiState.copy(
-            selectedIngredient = uiState.ingredients.value.find { it.name == name },
-            ingredientQtDialogOpen = true,
-        )
+        _uiState.update {
+            it.copy(
+                selectedIngredient = it.ingredients.find { ingredient -> ingredient.name == name },
+                ingredientQtDialogOpen = true
+            )
+        }
     }
 
     fun updateQtQuery(query: String) {
-        uiState = uiState.copy(
-            qtQuery = query
-        )
+        _uiState.update { it.copy(qtQuery = query) }
     }
 
     fun saveIngredientEntry() {
-        if (uiState.selectedIngredient == null) return
+        val currentState = _uiState.value
+        if (currentState.selectedIngredient == null) return
 
         val ingredientEntry = IngredientEntry(
-            ingredient = uiState.selectedIngredient!!, qt = uiState.qtQuery
+            ingredient = currentState.selectedIngredient,
+            qt = currentState.qtQuery
         )
-        uiState = uiState.copy(
-            ingredientEntries = uiState.ingredientEntries + listOf(ingredientEntry),
-            qtQuery = "",
-            ingredientQtDialogOpen = false,
-            selectedIngredient = null,
-            searchQuery = ""
-        )
+
+        _uiState.update {
+            it.copy(
+                ingredientEntries = it.ingredientEntries + ingredientEntry,
+                qtQuery = "",
+                ingredientQtDialogOpen = false,
+                selectedIngredient = null,
+                searchQuery = ""
+            )
+        }
     }
 
     fun dismissQtDialog() {
-        uiState = uiState.copy(
-            ingredientQtDialogOpen = false
-        )
+        _uiState.update { it.copy(ingredientQtDialogOpen = false) }
     }
 
     fun updateSaveDialogOpen(open: Boolean) {
-        uiState = uiState.copy(
-            saveDialogOpen = open,
-        )
+        _uiState.update { it.copy(saveDialogOpen = open) }
     }
 
     fun updateBatchFoodName(query: String) {
-        uiState = uiState.copy(
-            batchFoodNameQuery = query
-        )
+        _uiState.update { it.copy(batchFoodNameQuery = query) }
     }
 
     fun updateBatchFoodTotalGrams(query: String) {
-        uiState = uiState.copy(
-            batchFoodTotalGramsQuery = query
-        )
+        _uiState.update { it.copy(batchFoodTotalGramsQuery = query) }
     }
 
     fun saveBatchFood(navigateUp: () -> Unit) {
         viewModelScope.launch {
-            if (uiState.batchFoodNameQuery.isNotBlank() && validateQt(uiState.batchFoodTotalGramsQuery)) {
+            val currentState = _uiState.value
+            if (currentState.batchFoodNameQuery.isNotBlank() && validateQt(currentState.batchFoodTotalGramsQuery)) {
                 val id = batchFoodRepository.insert(
-                    name = uiState.batchFoodNameQuery,
-                    totalGrams = uiState.batchFoodTotalGramsQuery.toIntOrNull() ?: 0
+                    name = currentState.batchFoodNameQuery,
+                    totalGrams = currentState.batchFoodTotalGramsQuery.toIntOrNull() ?: 0
                 )
                 val batchFoodId = id.toInt()
-                uiState.ingredientEntries.forEach { entry ->
+                currentState.ingredientEntries.forEach { entry ->
                     batchFoodIngredientRepository.insert(
                         BatchFoodIngredient(
                             batchFoodId = batchFoodId,
@@ -106,34 +127,17 @@ class NewBatchFoodViewModel(
                         )
                     )
                 }
-                uiState = NewBatchFoodUiState()
+                _uiState.value = NewBatchFoodUiState()
                 navigateUp()
             }
         }
-    }
-
-    private fun fetchIngredients(query: String) {
-        viewModelScope.launch {
-            if (query.isEmpty()) {
-                ingredientRepository.getAllIngredientsStream().filterNotNull()
-                    .collect { uiState.ingredients.value = it }
-
-            } else {
-                ingredientRepository.searchIngredientsStream(query).filterNotNull()
-                    .collect { uiState.ingredients.value = it }
-            }
-        }
-    }
-
-    init {
-        fetchIngredients("")
     }
 }
 
 data class NewBatchFoodUiState(
     val searchQuery: String = "",
     val searchExpanded: Boolean = false,
-    val ingredients: MutableStateFlow<List<Ingredient>> = MutableStateFlow(emptyList()),
+    val ingredients: List<Ingredient> = emptyList(),
     val selectedIngredient: Ingredient? = null,
     val ingredientQtDialogOpen: Boolean = false,
     val qtQuery: String = "",

@@ -43,8 +43,8 @@ fun NewBatchFoodScreen(
     onNewIngredient: () -> Unit,
     viewModel: NewBatchFoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val uiState = viewModel.uiState
-    val ingredients = uiState.ingredients.collectAsState()
+    val uiState = viewModel.uiState.collectAsState().value
+    val ingredients = uiState.ingredients
 
     val newIngString = stringResource(R.string.new_ingredient)
 
@@ -86,7 +86,7 @@ fun NewBatchFoodScreen(
                         viewModel.updateSearchQuery(it)
                     }
                 },
-                items = listOf(newIngString) + ingredients.value.map { it.name },
+                items = listOf(newIngString) + ingredients.map { it.name },
                 onItemSelect = { viewModel.selectIngredient(it) })
             if (uiState.ingredientQtDialogOpen && uiState.selectedIngredient != null) {
                 IngredientQtDialog(
