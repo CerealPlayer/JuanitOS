@@ -63,7 +63,7 @@ class NewBatchFoodViewModel(
     fun selectIngredient(name: String) {
         _uiState.update {
             it.copy(
-                selectedIngredient = it.ingredients.find { ingredient -> ingredient.name == name },
+                selectedIngredient = uiState.value.ingredients.find { ingredient -> ingredient.name == name },
                 ingredientQtDialogOpen = true
             )
         }
