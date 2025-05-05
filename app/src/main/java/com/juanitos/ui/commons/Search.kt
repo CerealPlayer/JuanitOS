@@ -2,9 +2,10 @@ package com.juanitos.ui.commons
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,7 +28,7 @@ fun Search(
     onQueryChange: (String) -> Unit,
     onExpandedChange: (Boolean) -> Unit,
     onSearch: (String) -> Unit,
-    items: List<String>,
+    searchResults: List<String>,
     onItemSelect: (String) -> Unit = {}
 ) {
     Box(
@@ -57,8 +58,8 @@ fun Search(
             expanded = expanded,
             onExpandedChange = onExpandedChange,
         ) {
-            Column {
-                items.forEach { item ->
+            LazyColumn {
+                items(searchResults) { item ->
                     ListItem(headlineContent = { Text(item) },
                         modifier = Modifier
                             .clickable {
@@ -67,6 +68,7 @@ fun Search(
                                 onExpandedChange(false)
                             }
                             .fillMaxWidth())
+
                 }
             }
         }

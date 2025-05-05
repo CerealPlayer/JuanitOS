@@ -84,7 +84,7 @@ fun NewFoodScreen(
                         viewModel.updateSearchQuery(it)
                     }
                 },
-                items = listOf(newIngString) + ingredients.map { it.name },
+                searchResults = listOf(newIngString) + ingredients.map { it.name },
                 onItemSelect = { viewModel.selectIngredient(it) })
             if (uiState.ingredientQtDialogOpen && uiState.selectedIngredient != null) {
                 IngredientQtDialog(
