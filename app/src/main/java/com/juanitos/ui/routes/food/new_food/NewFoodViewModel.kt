@@ -6,6 +6,8 @@ import com.juanitos.data.food.entities.Ingredient
 import com.juanitos.data.food.entities.relations.BatchFoodWithIngredientDetails
 import com.juanitos.data.food.repositories.BatchFoodRepository
 import com.juanitos.data.food.repositories.IngredientRepository
+import com.juanitos.lib.validateQt
+import com.juanitos.ui.commons.food.BatchFoodEntry
 import com.juanitos.ui.commons.food.IngredientEntry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -95,6 +97,7 @@ class NewFoodViewModel(
 
     fun saveIngredientEntry() {
         val currentState = _uiState.value
+        if (!validateQt(currentState.qtQuery)) return
         if (currentState.selectedIngredient == null) return
 
         val ingredientEntry = IngredientEntry(
@@ -114,7 +117,24 @@ class NewFoodViewModel(
     }
 
     fun saveBatchFoodEntry() {
+        val currentState = _uiState.value
+        if (!validateQt(currentState.qtQuery)) return
+        if (currentState.selectedBatchFood == null) return
 
+        val batchFoodEntry = BatchFoodEntry(
+            batchFood = currentState.selectedBatchFood,
+            qt = currentState.qtQuery
+        )
+
+        _uiState.update {
+            it.copy(
+                batchFoodEntries = it.batchFoodEntries + batchFoodEntry,
+                qtQuery = "",
+                batchFoodQtDialogOpen = false,
+                selectedBatchFood = null,
+                searchQuery = ""
+            )
+        }
     }
 
     fun dismissQtDialog() {
@@ -151,6 +171,7 @@ data class NewFoodUiState(
     val batchFoodQtDialogOpen: Boolean = false,
     val qtQuery: String = "",
     val ingredientEntries: List<IngredientEntry> = emptyList(),
+    val batchFoodEntries: List<BatchFoodEntry> = emptyList(),
     val saveDialogOpen: Boolean = false,
     val batchFoodNameQuery: String = "",
 )

@@ -27,6 +27,7 @@ import com.juanitos.ui.commons.FormColumn
 import com.juanitos.ui.commons.IngredientQtDialog
 import com.juanitos.ui.commons.Search
 import com.juanitos.ui.commons.SearchResult
+import com.juanitos.ui.commons.food.BatchFoodEntryCard
 import com.juanitos.ui.commons.food.IngredientEntryCard
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
@@ -117,6 +118,9 @@ fun NewFoodScreen(
             LazyColumn {
                 items(uiState.ingredientEntries) { entry ->
                     IngredientEntryCard(entry)
+                }
+                items(uiState.batchFoodEntries) { entry ->
+                    BatchFoodEntryCard(entry)
                 }
             }
             if (uiState.saveDialogOpen) {

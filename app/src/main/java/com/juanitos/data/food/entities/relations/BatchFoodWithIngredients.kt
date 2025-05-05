@@ -26,6 +26,7 @@ data class BatchFoodWithIngredients(
                     id = ingredientWithDetails.ingredient.id,
                     name = ingredientWithDetails.ingredient.name,
                     caloriesPer100 = ingredientWithDetails.ingredient.caloriesPer100,
+                    proteinsPer100 = ingredientWithDetails.ingredient.proteinsPer100,
                     grams = ingredientWithDetails.batchFoodIngredient.grams
                 )
             }
@@ -54,5 +55,6 @@ data class IngredientDetail(
     val id: Int = 0,
     val name: String,
     val caloriesPer100: String,
+    val proteinsPer100: String,
     val grams: String,
 )
