@@ -1,8 +1,8 @@
 package com.juanitos.data.food.offline
 
-import com.juanitos.data.food.FoodIngredientDetails
 import com.juanitos.data.food.daos.FoodDao
 import com.juanitos.data.food.entities.Food
+import com.juanitos.data.food.entities.relations.FoodIngredientDetails
 import com.juanitos.data.food.repositories.FoodRepository
 import kotlinx.coroutines.flow.Flow
 

@@ -1,4 +1,4 @@
-package com.juanitos.data.food
+package com.juanitos.data.food.entities.relations
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded

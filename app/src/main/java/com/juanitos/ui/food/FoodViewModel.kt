@@ -2,8 +2,8 @@ package com.juanitos.ui.food
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanitos.data.food.FoodWithIngredients
-import com.juanitos.data.food.IngredientWithGrams
+import com.juanitos.data.food.entities.relations.FoodWithIngredients
+import com.juanitos.data.food.entities.relations.IngredientWithGrams
 import com.juanitos.data.food.repositories.FoodRepository
 import com.juanitos.data.food.repositories.SettingsRepository
 import kotlinx.coroutines.flow.SharingStarted

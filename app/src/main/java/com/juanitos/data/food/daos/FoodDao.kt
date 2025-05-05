@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Update
-import com.juanitos.data.food.FoodIngredientDetails
 import com.juanitos.data.food.entities.Food
+import com.juanitos.data.food.entities.relations.FoodIngredientDetails
 import kotlinx.coroutines.flow.Flow
 
 @Dao
