@@ -3,6 +3,7 @@ package com.juanitos.ui.routes.food.new_food
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.food.entities.Ingredient
+import com.juanitos.data.food.entities.relations.BatchFoodWithIngredientDetails
 import com.juanitos.data.food.repositories.BatchFoodRepository
 import com.juanitos.data.food.repositories.IngredientRepository
 import com.juanitos.ui.commons.food.IngredientEntry
@@ -28,6 +29,9 @@ class NewFoodViewModel(
         .combine(createIngredientsFlow()) { state, ingredients ->
             state.copy(ingredients = ingredients)
         }
+        .combine(createBatchFoodsFlow()) { state, batchFoods ->
+            state.copy(batchFoods = batchFoods)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -48,6 +52,17 @@ class NewFoodViewModel(
             }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun createBatchFoodsFlow(): Flow<List<BatchFoodWithIngredientDetails>> {
+        return _uiState.map { it.searchQuery }.distinctUntilChanged().flatMapLatest { query ->
+            if (query.isEmpty()) {
+                batchFoodRepository.getBatchFoodsWithIngredients()
+            } else {
+                batchFoodRepository.searchBatchFoods(query)
+            }
+        }
+    }
+
     fun updateSearchQuery(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
     }
@@ -61,6 +76,15 @@ class NewFoodViewModel(
             it.copy(
                 selectedIngredient = uiState.value.ingredients.find { ingredient -> ingredient.name == name },
                 ingredientQtDialogOpen = true
+            )
+        }
+    }
+
+    fun selectBatchFood(name: String) {
+        _uiState.update {
+            it.copy(
+                selectedBatchFood = uiState.value.batchFoods.find { batchFood -> batchFood.name == name },
+                batchFoodQtDialogOpen = true
             )
         }
     }
@@ -89,8 +113,16 @@ class NewFoodViewModel(
         }
     }
 
+    fun saveBatchFoodEntry() {
+
+    }
+
     fun dismissQtDialog() {
         _uiState.update { it.copy(ingredientQtDialogOpen = false) }
+    }
+
+    fun dismissBatchFoodQtDialog() {
+        _uiState.update { it.copy(batchFoodQtDialogOpen = false) }
     }
 
     fun updateSaveDialogOpen(open: Boolean) {
@@ -112,8 +144,11 @@ data class NewFoodUiState(
     val searchQuery: String = "",
     val searchExpanded: Boolean = false,
     val ingredients: List<Ingredient> = emptyList(),
+    val batchFoods: List<BatchFoodWithIngredientDetails> = emptyList(),
     val selectedIngredient: Ingredient? = null,
+    val selectedBatchFood: BatchFoodWithIngredientDetails? = null,
     val ingredientQtDialogOpen: Boolean = false,
+    val batchFoodQtDialogOpen: Boolean = false,
     val qtQuery: String = "",
     val ingredientEntries: List<IngredientEntry> = emptyList(),
     val saveDialogOpen: Boolean = false,

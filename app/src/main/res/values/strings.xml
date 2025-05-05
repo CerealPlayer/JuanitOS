@@ -28,4 +28,5 @@
     <string name="total_grams">Total grams after cooking</string>
     <string name="food_tag">Food</string>
     <string name="batch_tag">Batch</string>
+    <string name="grams_left">%1$d grams left</string>
 </resources>

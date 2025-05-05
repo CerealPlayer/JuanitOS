@@ -28,6 +28,8 @@ fun IngredientQtDialog(
     qt: String,
     onQtChange: (String) -> Unit,
     onSave: () -> Unit,
+    isError: Boolean = false,
+    customMessage: @Composable (() -> Unit) = {}
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
         Card {
@@ -51,9 +53,11 @@ fun IngredientQtDialog(
                         label = { Text(stringResource(R.string.qt)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.width(dimensionResource(R.dimen.input_width)),
-                        singleLine = true
+                        isError = isError,
+                        singleLine = true,
                     )
                 }
+                customMessage()
                 Button(
                     onClick = onSave, modifier = Modifier.fillMaxWidth()
                 ) {

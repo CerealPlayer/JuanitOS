@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
@@ -45,6 +46,7 @@ fun NewFoodScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val ingredients = uiState.ingredients
+    val batchFoods = uiState.batchFoods
 
     val newIngString = stringResource(R.string.new_ingredient)
     val newIngSearchResult = SearchResult(id = newIngString, label = {
@@ -59,6 +61,14 @@ fun NewFoodScreen(
             },
             onItemSelect = { viewModel.selectIngredient(it.name) },
             tag = { Text(stringResource(R.string.food_tag)) })
+    } + batchFoods.map {
+        SearchResult(
+            id = it.name,
+            label = {
+                Text(it.name)
+            },
+            onItemSelect = { viewModel.selectBatchFood(it.name) },
+            tag = { Text(stringResource(R.string.batch_tag)) })
     }
 
     Scaffold(topBar = {
@@ -94,6 +104,16 @@ fun NewFoodScreen(
                     onDismissRequest = { viewModel.dismissQtDialog() },
                     onSave = { viewModel.saveIngredientEntry() })
             }
+            if (uiState.batchFoodQtDialogOpen && uiState.selectedBatchFood != null) {
+                BatchFoodQtDialog(
+                    name = uiState.selectedBatchFood.name,
+                    qt = uiState.qtQuery,
+                    onQtChange = { viewModel.updateQtQuery(it) },
+                    onDismiss = { viewModel.dismissBatchFoodQtDialog() },
+                    onSave = { viewModel.saveBatchFoodEntry() },
+                    totalGrams = uiState.selectedBatchFood.totalGrams
+                )
+            }
             LazyColumn {
                 items(uiState.ingredientEntries) { entry ->
                     IngredientEntryCard(entry)
@@ -108,6 +128,34 @@ fun NewFoodScreen(
             }
         }
     }
+}
+
+@Composable
+fun BatchFoodQtDialog(
+    name: String,
+    qt: String,
+    onQtChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit,
+    totalGrams: Int
+) {
+    val qtInt = qt.toIntOrNull() ?: 0
+    IngredientQtDialog(
+        name = name,
+        qt = qt,
+        onQtChange = onQtChange,
+        onDismissRequest = onDismiss,
+        onSave = onSave,
+        customMessage = {
+            Text(
+                stringResource(R.string.grams_left, totalGrams - qtInt),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+        },
+        isError = qtInt > totalGrams
+    )
 }
 
 @Composable
