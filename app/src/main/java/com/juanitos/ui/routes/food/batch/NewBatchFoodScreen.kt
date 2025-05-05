@@ -80,17 +80,9 @@ fun NewBatchFoodScreen(
             innerPadding
         ) {
             Search(query = uiState.searchQuery, expanded = uiState.searchExpanded, onQueryChange = {
-                if (it == newIngString) {
-                    onNewIngredient()
-                } else {
-                    viewModel.updateSearchQuery(it)
-                }
+                viewModel.updateSearchQuery(it)
             }, onExpandedChange = { viewModel.updateSearchExpanded(it) }, onSearch = {
-                if (it == newIngString) {
-                    onNewIngredient()
-                } else {
-                    viewModel.updateSearchQuery(it)
-                }
+                viewModel.updateSearchQuery(it)
             }, searchResults = searchResults
             )
             if (uiState.ingredientQtDialogOpen && uiState.selectedIngredient != null) {
