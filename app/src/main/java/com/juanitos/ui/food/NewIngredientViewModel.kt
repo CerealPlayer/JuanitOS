@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanitos.data.food.Ingredient
-import com.juanitos.data.food.IngredientRepository
+import com.juanitos.data.food.entities.Ingredient
+import com.juanitos.data.food.repositories.IngredientRepository
 import com.juanitos.lib.InputUiState
 import com.juanitos.lib.validateQt
 import kotlinx.coroutines.launch

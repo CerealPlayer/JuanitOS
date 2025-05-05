@@ -1,5 +1,8 @@
-package com.juanitos.data.food
+package com.juanitos.data.food.offline
 
+import com.juanitos.data.food.daos.SettingDao
+import com.juanitos.data.food.entities.Setting
+import com.juanitos.data.food.repositories.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 
 class OfflineSettingsRepository(private val settingDao: SettingDao) : SettingsRepository {

@@ -1,18 +1,18 @@
 package com.juanitos.data
 
 import android.content.Context
-import com.juanitos.data.food.BatchFoodIngredientRepository
-import com.juanitos.data.food.BatchFoodRepository
-import com.juanitos.data.food.FoodIngredientRepository
-import com.juanitos.data.food.FoodRepository
-import com.juanitos.data.food.IngredientRepository
-import com.juanitos.data.food.OfflineBatchFoodIngredientRepository
-import com.juanitos.data.food.OfflineBatchFoodRepository
-import com.juanitos.data.food.OfflineFoodIngredientRepository
-import com.juanitos.data.food.OfflineFoodRepository
-import com.juanitos.data.food.OfflineIngredientRepository
-import com.juanitos.data.food.OfflineSettingsRepository
-import com.juanitos.data.food.SettingsRepository
+import com.juanitos.data.food.offline.OfflineBatchFoodIngredientRepository
+import com.juanitos.data.food.offline.OfflineBatchFoodRepository
+import com.juanitos.data.food.offline.OfflineFoodIngredientRepository
+import com.juanitos.data.food.offline.OfflineFoodRepository
+import com.juanitos.data.food.offline.OfflineIngredientRepository
+import com.juanitos.data.food.offline.OfflineSettingsRepository
+import com.juanitos.data.food.repositories.BatchFoodIngredientRepository
+import com.juanitos.data.food.repositories.BatchFoodRepository
+import com.juanitos.data.food.repositories.FoodIngredientRepository
+import com.juanitos.data.food.repositories.FoodRepository
+import com.juanitos.data.food.repositories.IngredientRepository
+import com.juanitos.data.food.repositories.SettingsRepository
 
 interface AppContainer {
     val settingsRepository: SettingsRepository

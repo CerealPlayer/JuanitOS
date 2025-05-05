@@ -2,6 +2,8 @@ package com.juanitos.data.food
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
+import com.juanitos.data.food.entities.Food
+import com.juanitos.data.food.entities.Ingredient
 
 data class FoodIngredientDetails(
     @Embedded(prefix = "food_") val food: Food,

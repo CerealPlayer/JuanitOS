@@ -1,5 +1,6 @@
-package com.juanitos.data.food
+package com.juanitos.data.food.repositories
 
+import com.juanitos.data.food.entities.FoodIngredient
 import kotlinx.coroutines.flow.Flow
 
 interface FoodIngredientRepository {

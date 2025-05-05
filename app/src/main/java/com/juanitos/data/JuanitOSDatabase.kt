@@ -4,18 +4,18 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.juanitos.data.food.BatchFood
-import com.juanitos.data.food.BatchFoodDao
-import com.juanitos.data.food.BatchFoodIngredient
-import com.juanitos.data.food.BatchFoodIngredientDao
-import com.juanitos.data.food.Food
-import com.juanitos.data.food.FoodDao
-import com.juanitos.data.food.FoodIngredient
-import com.juanitos.data.food.FoodIngredientDao
-import com.juanitos.data.food.Ingredient
-import com.juanitos.data.food.IngredientDao
-import com.juanitos.data.food.Setting
-import com.juanitos.data.food.SettingDao
+import com.juanitos.data.food.daos.BatchFoodDao
+import com.juanitos.data.food.daos.BatchFoodIngredientDao
+import com.juanitos.data.food.daos.FoodDao
+import com.juanitos.data.food.daos.FoodIngredientDao
+import com.juanitos.data.food.daos.IngredientDao
+import com.juanitos.data.food.daos.SettingDao
+import com.juanitos.data.food.entities.BatchFood
+import com.juanitos.data.food.entities.BatchFoodIngredient
+import com.juanitos.data.food.entities.Food
+import com.juanitos.data.food.entities.FoodIngredient
+import com.juanitos.data.food.entities.Ingredient
+import com.juanitos.data.food.entities.Setting
 
 @Database(
     entities = [Setting::class, Food::class, FoodIngredient::class, Ingredient::class, BatchFood::class, BatchFoodIngredient::class],

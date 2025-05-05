@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
-import com.juanitos.data.food.Ingredient
+import com.juanitos.data.food.entities.Ingredient
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.commons.FormColumn
 import com.juanitos.ui.commons.IngredientQtDialog

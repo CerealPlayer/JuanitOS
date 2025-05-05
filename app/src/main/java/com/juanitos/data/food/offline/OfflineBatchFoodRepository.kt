@@ -1,5 +1,8 @@
-package com.juanitos.data.food
+package com.juanitos.data.food.offline
 
+import com.juanitos.data.food.daos.BatchFoodDao
+import com.juanitos.data.food.entities.BatchFood
+import com.juanitos.data.food.repositories.BatchFoodRepository
 import kotlinx.coroutines.flow.Flow
 
 class OfflineBatchFoodRepository(private val batchFoodDao: BatchFoodDao): BatchFoodRepository {

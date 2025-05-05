@@ -1,5 +1,8 @@
-package com.juanitos.data.food
+package com.juanitos.data.food.offline
 
+import com.juanitos.data.food.daos.IngredientDao
+import com.juanitos.data.food.entities.Ingredient
+import com.juanitos.data.food.repositories.IngredientRepository
 import kotlinx.coroutines.flow.Flow
 
 class OfflineIngredientRepository(private val ingredientDao: IngredientDao) : IngredientRepository {

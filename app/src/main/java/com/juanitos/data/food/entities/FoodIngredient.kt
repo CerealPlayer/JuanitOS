@@ -1,4 +1,4 @@
-package com.juanitos.data.food
+package com.juanitos.data.food.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -6,28 +6,28 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "batch_food_ingredients",
+    tableName = "food_ingredients",
     foreignKeys = [
         ForeignKey(
-            entity = BatchFood::class,
+            entity = Food::class,
             parentColumns = ["id"],
-            childColumns = ["batch_food_id"],
+            childColumns = ["food_id"],
             onDelete = ForeignKey.CASCADE
         ),
-    ForeignKey(
+        ForeignKey(
             entity = Ingredient::class,
             parentColumns = ["id"],
             childColumns = ["ingredient_id"],
             onDelete = ForeignKey.CASCADE
-    )
+        )
     ]
 )
-data class BatchFoodIngredient(
+data class FoodIngredient(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    @ColumnInfo(name = "batch_food_id")
-    val batchFoodId: Int,
+    @ColumnInfo(name = "food_id")
+    val foodId: Int,
     @ColumnInfo(name = "ingredient_id")
     val ingredientId: Int,
-    val grams: String,
+    val grams: String
 )

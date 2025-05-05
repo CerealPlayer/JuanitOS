@@ -1,9 +1,11 @@
-package com.juanitos.data.food
+package com.juanitos.data.food.daos
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Update
+import com.juanitos.data.food.FoodIngredientDetails
+import com.juanitos.data.food.entities.Food
 import kotlinx.coroutines.flow.Flow
 
 @Dao
