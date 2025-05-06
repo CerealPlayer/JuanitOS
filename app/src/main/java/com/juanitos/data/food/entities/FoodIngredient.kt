@@ -19,6 +19,12 @@ import androidx.room.PrimaryKey
             parentColumns = ["id"],
             childColumns = ["ingredient_id"],
             onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = BatchFood::class,
+            parentColumns = ["id"],
+            childColumns = ["batch_food_id"],
+            onDelete = ForeignKey.CASCADE
         )
     ]
 )
@@ -28,6 +34,8 @@ data class FoodIngredient(
     @ColumnInfo(name = "food_id")
     val foodId: Int,
     @ColumnInfo(name = "ingredient_id")
-    val ingredientId: Int,
+    val ingredientId: Int?,
+    @ColumnInfo(name = "batch_food_id")
+    val batchFoodId: Int?,
     val grams: String
 )

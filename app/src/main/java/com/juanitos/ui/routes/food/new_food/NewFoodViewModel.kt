@@ -2,9 +2,12 @@ package com.juanitos.ui.routes.food.new_food
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juanitos.data.food.entities.FoodIngredient
 import com.juanitos.data.food.entities.Ingredient
 import com.juanitos.data.food.entities.relations.BatchFoodWithIngredientDetails
 import com.juanitos.data.food.repositories.BatchFoodRepository
+import com.juanitos.data.food.repositories.FoodIngredientRepository
+import com.juanitos.data.food.repositories.FoodRepository
 import com.juanitos.data.food.repositories.IngredientRepository
 import com.juanitos.lib.validateQt
 import com.juanitos.ui.commons.food.BatchFoodEntry
@@ -25,6 +28,8 @@ import kotlinx.coroutines.launch
 class NewFoodViewModel(
     private val ingredientRepository: IngredientRepository,
     private val batchFoodRepository: BatchFoodRepository,
+    private val foodRepository: FoodRepository,
+    private val foodIngredientRepository: FoodIngredientRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(NewFoodUiState())
     val uiState: StateFlow<NewFoodUiState> = _uiState
@@ -150,12 +155,46 @@ class NewFoodViewModel(
     }
 
     fun updateFoodName(query: String) {
-        _uiState.update { it.copy(batchFoodNameQuery = query) }
+        _uiState.update { it.copy(foodNameQuery = query) }
     }
 
     fun saveFood(navigateUp: () -> Unit) {
         viewModelScope.launch {
+            val currentState = _uiState.value
+            if (currentState.ingredientEntries.isEmpty() && currentState.batchFoodEntries.isEmpty()) return@launch
+            if (currentState.foodNameQuery.isEmpty()) return@launch
 
+            val foodId = foodRepository.insertFood(currentState.foodNameQuery)
+
+            currentState.ingredientEntries.forEach { entry ->
+                foodIngredientRepository.insertFoodIngredient(
+                    FoodIngredient(
+                        foodId = foodId.toInt(),
+                        ingredientId = entry.ingredient.id,
+                        grams = entry.qt,
+                        batchFoodId = null
+                    )
+                )
+            }
+
+            currentState.batchFoodEntries.forEach { entry ->
+                foodIngredientRepository.insertFoodIngredient(
+                    FoodIngredient(
+                        foodId = foodId.toInt(),
+                        ingredientId = null,
+                        grams = entry.qt,
+                        batchFoodId = entry.batchFood.id
+                    )
+                )
+                batchFoodRepository.update(
+                    entry.batchFood.toBatchFood().copy(
+                        totalGrams = entry.batchFood.totalGrams - (entry.qt.toIntOrNull() ?: 0)
+                    )
+                )
+            }
+
+            _uiState.update { it.copy(saveDialogOpen = false) }
+            navigateUp()
         }
     }
 }
@@ -173,5 +212,5 @@ data class NewFoodUiState(
     val ingredientEntries: List<IngredientEntry> = emptyList(),
     val batchFoodEntries: List<BatchFoodEntry> = emptyList(),
     val saveDialogOpen: Boolean = false,
-    val batchFoodNameQuery: String = "",
+    val foodNameQuery: String = "",
 )

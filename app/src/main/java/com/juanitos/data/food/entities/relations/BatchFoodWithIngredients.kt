@@ -49,7 +49,15 @@ data class BatchFoodWithIngredientDetails(
     val name: String,
     val totalGrams: Int,
     val ingredients: List<IngredientDetail>
-)
+) {
+    fun toBatchFood(): BatchFood {
+        return BatchFood(
+            id = id,
+            name = name,
+            totalGrams = totalGrams
+        )
+    }
+}
 
 data class IngredientDetail(
     val id: Int = 0,

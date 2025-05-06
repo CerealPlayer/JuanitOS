@@ -126,7 +126,7 @@ fun NewFoodScreen(
             if (uiState.saveDialogOpen) {
                 SaveDialog(
                     onDismiss = { viewModel.updateSaveDialogOpen(false) },
-                    name = uiState.batchFoodNameQuery,
+                    name = uiState.foodNameQuery,
                     onNameChange = { viewModel.updateFoodName(it) },
                     onSave = { viewModel.saveFood(onNavigateUp) })
             }

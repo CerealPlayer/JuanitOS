@@ -26,6 +26,8 @@ object AppViewModelProvider {
             NewFoodViewModel(
                 juanitOSApplication().container.ingredientRepository,
                 juanitOSApplication().container.batchFoodRepository,
+                juanitOSApplication().container.foodRepository,
+                juanitOSApplication().container.foodIngredientRepository
             )
         }
         initializer {
