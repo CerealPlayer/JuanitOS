@@ -1,22 +1,103 @@
 package com.juanitos.data.food.entities.relations
 
-import androidx.room.ColumnInfo
 import androidx.room.Embedded
+import androidx.room.Relation
+import com.juanitos.data.food.entities.BatchFood
+import com.juanitos.data.food.entities.BatchFoodIngredient
 import com.juanitos.data.food.entities.Food
+import com.juanitos.data.food.entities.FoodIngredient
 import com.juanitos.data.food.entities.Ingredient
 
-data class FoodIngredientDetails(
-    @Embedded(prefix = "food_") val food: Food,
-    @Embedded(prefix = "ingredient_") val ingredient: Ingredient,
-    @ColumnInfo(name ="grams") val grams: String,
-)
-
-data class IngredientWithGrams(
-    val ingredient: Ingredient,
-    val grams: String,
-)
-
-data class FoodWithIngredients(
+// Fetch food with ingredients and batch foods using @Embedded and @Relation annotations
+data class FoodDetails(
+    @Embedded
     val food: Food,
-    val ingredients: List<IngredientWithGrams>,
+    @Relation(
+        entity = FoodIngredient::class,
+        parentColumn = "id",
+        entityColumn = "food_id"
+    )
+    val foodIngredients: List<FoodIngredientDetails>
+) {
+    fun toFormattedFoodDetails(): FormattedFoodDetails {
+        val totalCalories = foodIngredients.sumOf {
+            val ingredientCalories = it.ingredient?.caloriesPer100?.toIntOrNull() ?: 0
+            val batchFoodCalories =
+                it.batchFood?.batchFoodIngredients?.sumOf { batchFoodIngredient ->
+                    val ingredientGrams =
+                        batchFoodIngredient.batchFoodIngredient.grams.toIntOrNull() ?: 0
+                    val ingredientCaloriesPer100 =
+                        batchFoodIngredient.ingredient.caloriesPer100.toIntOrNull() ?: 0
+                    (ingredientGrams * ingredientCaloriesPer100) / 100
+                } ?: 0
+
+            val grams = it.foodIngredient.grams.toIntOrNull() ?: 0
+
+            (ingredientCalories * grams / 100) + (batchFoodCalories * grams / 100)
+        }
+        val totalProteins = foodIngredients.sumOf {
+            val ingredientProteins = it.ingredient?.proteinsPer100?.toIntOrNull() ?: 0
+            val batchFoodProteins =
+                it.batchFood?.batchFoodIngredients?.sumOf { batchFoodIngredient ->
+                    val ingredientGrams =
+                        batchFoodIngredient.batchFoodIngredient.grams.toIntOrNull() ?: 0
+                    val ingredientProteinsPer100 =
+                        batchFoodIngredient.ingredient.proteinsPer100.toIntOrNull() ?: 0
+                    (ingredientGrams * ingredientProteinsPer100) / 100
+                } ?: 0
+
+            val grams = it.foodIngredient.grams.toIntOrNull() ?: 0
+            (ingredientProteins * grams / 100) + (batchFoodProteins * grams / 100)
+        }
+        return FormattedFoodDetails(
+            id = food.id,
+            name = food.name,
+            totalCalories = totalCalories,
+            totalProteins = totalProteins
+        )
+    }
+}
+
+data class FoodIngredientDetails(
+    @Embedded
+    val foodIngredient: FoodIngredient,
+    @Relation(
+        parentColumn = "ingredient_id",
+        entityColumn = "id"
+    )
+    val ingredient: Ingredient?,
+    @Relation(
+        entity = BatchFood::class,
+        parentColumn = "batch_food_id",
+        entityColumn = "id"
+    )
+    val batchFood: BatchFoodDetails?,
+)
+
+data class BatchFoodDetails(
+    @Embedded
+    val batchFood: BatchFood,
+    @Relation(
+        entity = BatchFoodIngredient::class,
+        parentColumn = "id",
+        entityColumn = "batch_food_id"
+    )
+    val batchFoodIngredients: List<BatchFoodIngredientDetails>
+)
+
+data class BatchFoodIngredientDetails(
+    @Embedded
+    val batchFoodIngredient: BatchFoodIngredient,
+    @Relation(
+        parentColumn = "ingredient_id",
+        entityColumn = "id"
+    )
+    val ingredient: Ingredient
+)
+
+data class FormattedFoodDetails(
+    val id: Int,
+    val name: String,
+    val totalCalories: Int,
+    val totalProteins: Int,
 )

@@ -2,6 +2,7 @@ package com.juanitos.ui.routes.food
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
-import com.juanitos.data.food.entities.relations.FoodWithIngredients
+import com.juanitos.data.food.entities.relations.FormattedFoodDetails
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
@@ -50,21 +51,10 @@ fun FoodScreen(
 ) {
     val calorieLimit = viewModel.calorieLimit.collectAsState()
     val proteinLimit = viewModel.proteinLimit.collectAsState()
-    val foods = viewModel.todaysFoods.collectAsState()
+    val foods = viewModel.foods.collectAsState()
 
-    val totalCalories = foods.value.sumOf { food ->
-        food.ingredients.sumOf {
-            (it.grams.toIntOrNull() ?: 0) * (it.ingredient.caloriesPer100.toIntOrNull() ?: 0) / 100
-        }
-    }
-    val totalProteins = foods.value.sumOf { food ->
-        food.ingredients.sumOf {
-            (it.grams.toIntOrNull() ?: 0) * (it.ingredient.proteinsPer100.toIntOrNull() ?: 0) / 100
-        }
-    }
-
-    val caloriesLeft = (calorieLimit.value.toIntOrNull() ?: 0) - totalCalories
-    val proteinsLeft = (proteinLimit.value.toIntOrNull() ?: 0) - totalProteins
+    val caloriesLeft = (calorieLimit.value.toIntOrNull() ?: 0)
+    val proteinsLeft = (proteinLimit.value.toIntOrNull() ?: 0)
 
     Scaffold(topBar = {
         JuanitOSTopAppBar(title = stringResource(FoodDestination.titleRes),
@@ -126,29 +116,44 @@ fun FoodScreen(
                 style = MaterialTheme.typography.titleMedium
             )
             foods.value.forEach { food ->
-                FoodEntry(entry = food)
+                FoodDetailsCard(details = food)
             }
         }
     }
 }
 
 @Composable
-fun FoodEntry(
-    entry: FoodWithIngredients
+fun FoodDetailsCard(
+    details: FormattedFoodDetails,
 ) {
-    val totalCal = entry.ingredients.sumOf {
-        (it.grams.toIntOrNull() ?: 0) * (it.ingredient.caloriesPer100.toIntOrNull() ?: 0) / 100
-    }
-    val totalProt = entry.ingredients.sumOf {
-        (it.grams.toIntOrNull() ?: 0) * (it.ingredient.proteinsPer100.toIntOrNull() ?: 0) / 100
-    }
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))) {
-            Text(text = entry.food.name)
-            Text(text = stringResource(R.string.food_summary, totalCal, totalProt))
-            Text(text = stringResource(R.string.n_ingredients, entry.ingredients.size))
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(
+                top = dimensionResource(R.dimen.padding_small),
+                bottom = dimensionResource(R.dimen.padding_small),
+            )
+        ) {
+            Text(
+                text = details.name,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .padding(
+                        start = dimensionResource(R.dimen.padding_small),
+                        end = dimensionResource(R.dimen.padding_small)
+                    )
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(R.string.cal_summary, details.totalCalories),
+                )
+                Text(
+                    text = stringResource(R.string.prot_summary, details.totalProteins),
+                )
+            }
         }
     }
 }
@@ -156,7 +161,12 @@ fun FoodEntry(
 @Preview
 @Composable
 fun FoodScreenPreview() {
-    FoodScreen(onNavigateUp = {}, onSettings = {}, onNewFood = {}, onNewIngredient = {}, onNewBatchFood = {}
+    FoodScreen(
+        onNavigateUp = {},
+        onSettings = {},
+        onNewFood = {},
+        onNewIngredient = {},
+        onNewBatchFood = {}
     )
 }
 

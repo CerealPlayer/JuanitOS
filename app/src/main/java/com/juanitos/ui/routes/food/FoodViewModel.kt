@@ -2,8 +2,6 @@ package com.juanitos.ui.routes.food
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanitos.data.food.entities.relations.FoodWithIngredients
-import com.juanitos.data.food.entities.relations.IngredientWithGrams
 import com.juanitos.data.food.repositories.FoodRepository
 import com.juanitos.data.food.repositories.SettingsRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,14 +27,9 @@ class FoodViewModel(
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
         initialValue = "0"
     )
-
-    val todaysFoods = foodRepository.getTodaysFoodsStream().filterNotNull().map { it ->
-        val grouped = it.groupBy { it.food }
-        grouped.map { (food, details) ->
-            FoodWithIngredients(
-                food = food,
-                ingredients = details.map { IngredientWithGrams(it.ingredient, it.grams) }
-            )
+    val foods = foodRepository.getTodaysFoodsStream().map {
+        it.map { foodDetails ->
+            foodDetails.toFormattedFoodDetails()
         }
     }.stateIn(
         scope = viewModelScope,
