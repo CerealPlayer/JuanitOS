@@ -51,10 +51,13 @@ fun FoodScreen(
 ) {
     val calorieLimit = viewModel.calorieLimit.collectAsState()
     val proteinLimit = viewModel.proteinLimit.collectAsState()
-    val foods = viewModel.foods.collectAsState()
+    val foods = viewModel.foods.collectAsState().value
 
-    val caloriesLeft = (calorieLimit.value.toIntOrNull() ?: 0)
-    val proteinsLeft = (proteinLimit.value.toIntOrNull() ?: 0)
+    val foodCalories = foods.sumOf { it.totalCalories }
+    val foodProteins = foods.sumOf { it.totalProteins }
+
+    val caloriesLeft = (calorieLimit.value.toIntOrNull() ?: 0) - foodCalories
+    val proteinsLeft = (proteinLimit.value.toIntOrNull() ?: 0) - foodProteins
 
     Scaffold(topBar = {
         JuanitOSTopAppBar(title = stringResource(FoodDestination.titleRes),
@@ -115,7 +118,7 @@ fun FoodScreen(
                 text = stringResource(R.string.prot_left, proteinsLeft),
                 style = MaterialTheme.typography.titleMedium
             )
-            foods.value.forEach { food ->
+            foods.forEach { food ->
                 FoodDetailsCard(details = food)
             }
         }
