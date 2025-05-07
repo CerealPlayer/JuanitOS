@@ -3,14 +3,18 @@ package com.juanitos.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.juanitos.ui.routes.HomeDestination
 import com.juanitos.ui.routes.HomeScreen
 import com.juanitos.ui.routes.food.FoodDestination
 import com.juanitos.ui.routes.food.FoodScreen
 import com.juanitos.ui.routes.food.batch.NewBatchFoodDestination
 import com.juanitos.ui.routes.food.batch.NewBatchFoodScreen
+import com.juanitos.ui.routes.food.details.FoodDetailsDestination
+import com.juanitos.ui.routes.food.details.FoodDetailsScreen
 import com.juanitos.ui.routes.food.ingredient.NewIngredientDestination
 import com.juanitos.ui.routes.food.ingredient.NewIngredientScreen
 import com.juanitos.ui.routes.food.new_food.NewFoodDestination
@@ -26,42 +30,57 @@ fun JuanitOSNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = HomeDestination.route.name,
+        startDestination = HomeDestination.route.route,
         modifier = modifier
     ) {
-        composable(route = HomeDestination.route.name) {
-            HomeScreen(onNavigateTo = { navController.navigate(it.name) })
+        composable(route = HomeDestination.route.route) {
+            HomeScreen(onNavigateTo = { navController.navigate(it.route) })
         }
-        composable(route = FoodDestination.route.name) {
+        composable(route = FoodDestination.route.route) {
             FoodScreen(
                 onNavigateUp = { navController.navigateUp() },
-                onSettings = { navController.navigate(FoodSettingsDestination.route.name) },
-                onNewFood = { navController.navigate(NewFoodDestination.route.name) },
+                onSettings = { navController.navigate(FoodSettingsDestination.route.route) },
+                onNewFood = { navController.navigate(NewFoodDestination.route.route) },
                 onNewIngredient = {
-                    navController.navigate(NewIngredientDestination.route.name)
+                    navController.navigate(NewIngredientDestination.route.route)
                 },
                 onNewBatchFood = {
-                    navController.navigate(NewBatchFoodDestination.route.name)
+                    navController.navigate(NewBatchFoodDestination.route.route)
+                },
+                onFoodDetails = {
+                    navController.navigate("food/$it")
                 })
         }
-        composable(route = MoneyDestination.route.name) {
+        composable(route = MoneyDestination.route.route) {
             MoneyScreen(onNavigateUp = { navController.navigateUp() })
         }
-        composable(route = FoodSettingsDestination.route.name) {
+        composable(route = FoodSettingsDestination.route.route) {
             FoodSettingsScreen(onNavigateUp = { navController.navigateUp() })
         }
-        composable(route = NewFoodDestination.route.name) {
+        composable(route = NewFoodDestination.route.route) {
             NewFoodScreen(onNavigateUp = { navController.navigateUp() }, onNewIngredient = {
-                navController.navigate(NewIngredientDestination.route.name)
+                navController.navigate(NewIngredientDestination.route.route)
             })
         }
-        composable(route = NewIngredientDestination.route.name) {
+        composable(route = NewIngredientDestination.route.route) {
             NewIngredientScreen(onNavigateUp = { navController.navigateUp() })
         }
-        composable(route = NewBatchFoodDestination.route.name) {
+        composable(route = NewBatchFoodDestination.route.route) {
             NewBatchFoodScreen(onNavigateUp = { navController.navigateUp() }, onNewIngredient = {
-                navController.navigate(NewIngredientDestination.route.name)
+                navController.navigate(NewIngredientDestination.route.route)
             })
+        }
+        composable(route = FoodDetailsDestination.route.route,
+            arguments = listOf(
+                navArgument("foodId") {
+                    type = NavType.IntType
+                    nullable = false
+                }
+            )
+        ) {
+            FoodDetailsScreen(
+                onNavigateUp = { navController.navigateUp() },
+            )
         }
     }
 }

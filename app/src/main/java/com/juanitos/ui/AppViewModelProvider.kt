@@ -1,12 +1,14 @@
 package com.juanitos.ui
 
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.juanitos.JuanitOSApplication
 import com.juanitos.ui.routes.food.FoodViewModel
 import com.juanitos.ui.routes.food.batch.NewBatchFoodViewModel
+import com.juanitos.ui.routes.food.details.FoodDetailsViewModel
 import com.juanitos.ui.routes.food.ingredient.NewIngredientViewModel
 import com.juanitos.ui.routes.food.new_food.NewFoodViewModel
 import com.juanitos.ui.routes.food.settings.FoodSettingsViewModel
@@ -40,6 +42,11 @@ object AppViewModelProvider {
                 juanitOSApplication().container.ingredientRepository,
                 juanitOSApplication().container.batchFoodRepository,
                 juanitOSApplication().container.batchFoodIngredientRepository,
+            )
+        }
+        initializer {
+            FoodDetailsViewModel(
+                savedStateHandle = this.createSavedStateHandle()
             )
         }
     }

@@ -47,6 +47,7 @@ fun FoodScreen(
     onNewFood: () -> Unit,
     onNewIngredient: () -> Unit,
     onNewBatchFood: () -> Unit,
+    onFoodDetails: (Int) -> Unit,
     viewModel: FoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val calorieLimit = viewModel.calorieLimit.collectAsState()
@@ -119,7 +120,9 @@ fun FoodScreen(
                 style = MaterialTheme.typography.titleMedium
             )
             foods.forEach { food ->
-                FoodDetailsCard(details = food)
+                FoodDetailsCard(details = food, onClick = {
+                    onFoodDetails(food.id)
+                })
             }
         }
     }
@@ -128,8 +131,9 @@ fun FoodScreen(
 @Composable
 fun FoodDetailsCard(
     details: FormattedFoodDetails,
+    onClick: () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
         Column(
             modifier = Modifier.padding(
                 top = dimensionResource(R.dimen.padding_small),
@@ -169,7 +173,8 @@ fun FoodScreenPreview() {
         onSettings = {},
         onNewFood = {},
         onNewIngredient = {},
-        onNewBatchFood = {}
+        onNewBatchFood = {},
+        onFoodDetails = {},
     )
 }
 

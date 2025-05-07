@@ -1,11 +1,12 @@
 package com.juanitos.ui.navigation
 
-enum class Routes {
-    Home,
-    Food,
-    FoodSettings,
-    NewFood,
-    NewIngredient,
-    NewBatchFood,
-    Money
+enum class Routes(val route: String) {
+    Home("home"),
+    Food("food"),
+    FoodSettings("food_settings"),
+    NewFood("new_food"),
+    NewIngredient("new_ingredient"),
+    NewBatchFood("new_batch_food"),
+    FoodDetails("food/{foodId}"),
+    Money("money"),
 }
