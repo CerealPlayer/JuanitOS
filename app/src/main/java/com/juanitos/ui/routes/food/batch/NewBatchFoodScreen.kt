@@ -51,7 +51,10 @@ fun NewBatchFoodScreen(
     val newIngString = stringResource(R.string.new_ingredient)
     val newIngSearchResult = SearchResult(id = newIngString, label = {
         Text(newIngString, color = MaterialTheme.colorScheme.primary)
-    }, onItemSelect = { onNewIngredient() })
+    }, onItemSelect = {
+        viewModel.updateSearchQuery("")
+        onNewIngredient()
+    })
 
     val searchResults = listOf(newIngSearchResult) + ingredients.map {
         SearchResult(id = it.name, label = {
