@@ -46,7 +46,9 @@ object AppViewModelProvider {
         }
         initializer {
             FoodDetailsViewModel(
-                savedStateHandle = this.createSavedStateHandle()
+                savedStateHandle = this.createSavedStateHandle(),
+                juanitOSApplication().container.foodRepository,
+                juanitOSApplication().container.batchFoodRepository
             )
         }
     }

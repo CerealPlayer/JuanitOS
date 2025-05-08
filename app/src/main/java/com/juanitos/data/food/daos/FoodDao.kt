@@ -34,4 +34,8 @@ interface FoodDao {
     """
     )
     fun getTodaysFoods(): Flow<List<FoodDetails>>
+
+    @Transaction
+    @Query("select * from foods where id = :id")
+    fun getFoodDetails(id: Int): Flow<FoodDetails?>
 }

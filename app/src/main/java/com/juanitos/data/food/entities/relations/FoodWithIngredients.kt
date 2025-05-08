@@ -100,4 +100,11 @@ data class FormattedFoodDetails(
     val name: String,
     val totalCalories: Int,
     val totalProteins: Int,
-)
+) {
+    fun toFood(): Food {
+        return Food(
+            id = id,
+            name = name,
+        )
+    }
+}
