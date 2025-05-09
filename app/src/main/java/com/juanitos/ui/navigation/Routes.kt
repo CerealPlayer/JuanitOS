@@ -5,6 +5,7 @@ enum class Routes(val route: String) {
     Food("food"),
     FoodSettings("food_settings"),
     NewFood("new_food"),
+    Ingredients("ingredients"),
     NewIngredient("new_ingredient"),
     NewBatchFood("new_batch_food"),
     FoodDetails("food/{foodId}"),

@@ -15,8 +15,10 @@ import com.juanitos.ui.routes.food.batch.NewBatchFoodDestination
 import com.juanitos.ui.routes.food.batch.NewBatchFoodScreen
 import com.juanitos.ui.routes.food.details.FoodDetailsDestination
 import com.juanitos.ui.routes.food.details.FoodDetailsScreen
-import com.juanitos.ui.routes.food.ingredient.NewIngredientDestination
-import com.juanitos.ui.routes.food.ingredient.NewIngredientScreen
+import com.juanitos.ui.routes.food.ingredients.IngredientsDestination
+import com.juanitos.ui.routes.food.ingredients.IngredientsScreen
+import com.juanitos.ui.routes.food.ingredients.new_ingredient.NewIngredientDestination
+import com.juanitos.ui.routes.food.ingredients.new_ingredient.NewIngredientScreen
 import com.juanitos.ui.routes.food.new_food.NewFoodDestination
 import com.juanitos.ui.routes.food.new_food.NewFoodScreen
 import com.juanitos.ui.routes.food.settings.FoodSettingsDestination
@@ -41,8 +43,8 @@ fun JuanitOSNavGraph(
                 onNavigateUp = { navController.navigateUp() },
                 onSettings = { navController.navigate(FoodSettingsDestination.route.route) },
                 onNewFood = { navController.navigate(NewFoodDestination.route.route) },
-                onNewIngredient = {
-                    navController.navigate(NewIngredientDestination.route.route)
+                onIngredients = {
+                    navController.navigate(IngredientsDestination.route.route)
                 },
                 onNewBatchFood = {
                     navController.navigate(NewBatchFoodDestination.route.route)
@@ -59,6 +61,11 @@ fun JuanitOSNavGraph(
         }
         composable(route = NewFoodDestination.route.route) {
             NewFoodScreen(onNavigateUp = { navController.navigateUp() }, onNewIngredient = {
+                navController.navigate(NewIngredientDestination.route.route)
+            })
+        }
+        composable(route = IngredientsDestination.route.route) {
+            IngredientsScreen(onNavigateUp = { navController.navigateUp() }, onNewIngredient = {
                 navController.navigate(NewIngredientDestination.route.route)
             })
         }

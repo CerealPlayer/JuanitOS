@@ -1,4 +1,4 @@
-package com.juanitos.ui.routes.food.ingredient
+package com.juanitos.ui.routes.food.ingredients.new_ingredient
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions

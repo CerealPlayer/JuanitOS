@@ -45,7 +45,7 @@ fun FoodScreen(
     onNavigateUp: () -> Unit,
     onSettings: () -> Unit,
     onNewFood: () -> Unit,
-    onNewIngredient: () -> Unit,
+    onIngredients: () -> Unit,
     onNewBatchFood: () -> Unit,
     onFoodDetails: (Int) -> Unit,
     viewModel: FoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -75,7 +75,7 @@ fun FoodScreen(
     }, bottomBar = {
         BottomAppBar(
             actions = {
-                IconButton(onClick = onNewIngredient) {
+                IconButton(onClick = onIngredients) {
                     Icon(
                         painter = painterResource(R.drawable.ingredient),
                         contentDescription = stringResource(R.string.new_ingredient)
@@ -172,7 +172,7 @@ fun FoodScreenPreview() {
         onNavigateUp = {},
         onSettings = {},
         onNewFood = {},
-        onNewIngredient = {},
+        onIngredients = {},
         onNewBatchFood = {},
         onFoodDetails = {},
     )
