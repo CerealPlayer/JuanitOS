@@ -9,6 +9,7 @@ import com.juanitos.JuanitOSApplication
 import com.juanitos.ui.routes.food.FoodViewModel
 import com.juanitos.ui.routes.food.batch.NewBatchFoodViewModel
 import com.juanitos.ui.routes.food.details.FoodDetailsViewModel
+import com.juanitos.ui.routes.food.ingredients.IngredientsViewModel
 import com.juanitos.ui.routes.food.ingredients.new_ingredient.NewIngredientViewModel
 import com.juanitos.ui.routes.food.new_food.NewFoodViewModel
 import com.juanitos.ui.routes.food.settings.FoodSettingsViewModel
@@ -49,6 +50,11 @@ object AppViewModelProvider {
                 savedStateHandle = this.createSavedStateHandle(),
                 juanitOSApplication().container.foodRepository,
                 juanitOSApplication().container.batchFoodRepository
+            )
+        }
+        initializer {
+            IngredientsViewModel(
+                juanitOSApplication().container.ingredientRepository
             )
         }
     }
