@@ -104,13 +104,13 @@ fun IngredientsScreen(
                             Text(
                                 text = stringResource(
                                     R.string.food_ingredient_cals,
-                                    ingredient.caloriesPer100.toIntOrNull() ?: 0
+                                    ingredient.caloriesPer100
                                 )
                             )
                             Text(
                                 text = stringResource(
                                     R.string.food_ingredient_prot,
-                                    ingredient.proteinsPer100.toIntOrNull() ?: 0
+                                    ingredient.proteinsPer100
                                 )
                             )
                         }

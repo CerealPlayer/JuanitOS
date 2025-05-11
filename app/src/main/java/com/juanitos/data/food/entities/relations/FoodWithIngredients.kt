@@ -21,13 +21,13 @@ data class FoodDetails(
 ) {
     fun toFormattedFoodDetails(): FormattedFoodDetails {
         val totalCalories = foodIngredients.sumOf {
-            val ingredientCalories = it.ingredient?.caloriesPer100?.toIntOrNull() ?: 0
+            val ingredientCalories = it.ingredient?.caloriesPer100 ?: 0
             val batchFoodCalories =
                 it.batchFood?.batchFoodIngredients?.sumOf { batchFoodIngredient ->
                     val ingredientGrams =
                         batchFoodIngredient.batchFoodIngredient.grams.toIntOrNull() ?: 0
                     val ingredientCaloriesPer100 =
-                        batchFoodIngredient.ingredient.caloriesPer100.toIntOrNull() ?: 0
+                        batchFoodIngredient.ingredient.caloriesPer100
                     (ingredientGrams * ingredientCaloriesPer100) / 100
                 } ?: 0
 
@@ -36,18 +36,18 @@ data class FoodDetails(
             (ingredientCalories * grams / 100) + (batchFoodCalories * grams / 100)
         }
         val totalProteins = foodIngredients.sumOf {
-            val ingredientProteins = it.ingredient?.proteinsPer100?.toIntOrNull() ?: 0
+            val ingredientProteins = it.ingredient?.proteinsPer100 ?: 0.0
             val batchFoodProteins =
                 it.batchFood?.batchFoodIngredients?.sumOf { batchFoodIngredient ->
                     val ingredientGrams =
-                        batchFoodIngredient.batchFoodIngredient.grams.toIntOrNull() ?: 0
+                        batchFoodIngredient.batchFoodIngredient.grams.toDoubleOrNull() ?: 0.0
                     val ingredientProteinsPer100 =
-                        batchFoodIngredient.ingredient.proteinsPer100.toIntOrNull() ?: 0
-                    (ingredientGrams * ingredientProteinsPer100) / 100
-                } ?: 0
+                        batchFoodIngredient.ingredient.proteinsPer100
+                    (ingredientGrams * ingredientProteinsPer100) / 100.0
+                } ?: 0.0
 
-            val grams = it.foodIngredient.grams.toIntOrNull() ?: 0
-            (ingredientProteins * grams / 100) + (batchFoodProteins * grams / 100)
+            val grams = it.foodIngredient.grams.toDoubleOrNull() ?: 0.0
+            (ingredientProteins * grams / 100.toFloat()) + (batchFoodProteins * grams / 100)
         }
         return FormattedFoodDetails(
             id = food.id,
@@ -99,7 +99,7 @@ data class FormattedFoodDetails(
     val id: Int,
     val name: String,
     val totalCalories: Int,
-    val totalProteins: Int,
+    val totalProteins: Double,
 ) {
     fun toFood(): Food {
         return Food(

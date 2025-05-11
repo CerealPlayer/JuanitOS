@@ -63,6 +63,8 @@ data class NewIngredientUiState(
 
 fun NewIngredientUiState.toIngredient(): Ingredient {
     return Ingredient(
-        name = name.value, caloriesPer100 = calories.value, proteinsPer100 = protein.value
+        name = name.value,
+        caloriesPer100 = calories.value.toIntOrNull() ?: 0,
+        proteinsPer100 = protein.value.toDoubleOrNull() ?: 0.0
     )
 }

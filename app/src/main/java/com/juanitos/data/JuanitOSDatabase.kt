@@ -19,7 +19,7 @@ import com.juanitos.data.food.entities.Setting
 
 @Database(
     entities = [Setting::class, Food::class, FoodIngredient::class, Ingredient::class, BatchFood::class, BatchFoodIngredient::class],
-    version = 8,
+    version = 9,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {

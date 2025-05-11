@@ -25,8 +25,8 @@ fun IngredientEntryCard(
     ingredientEntry: IngredientEntry
 ) {
     val qtInt = ingredientEntry.qt.toIntOrNull() ?: 0
-    val calories = ingredientEntry.ingredient.caloriesPer100.toIntOrNull() ?: 0
-    val proteins = ingredientEntry.ingredient.proteinsPer100.toIntOrNull() ?: 0
+    val calories = ingredientEntry.ingredient.caloriesPer100
+    val proteins = ingredientEntry.ingredient.proteinsPer100
     val totalCalories = (qtInt * calories) / 100
     val totalProteins = (qtInt * proteins) / 100
     Card(

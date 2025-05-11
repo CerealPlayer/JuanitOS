@@ -26,7 +26,7 @@ class FoodSettingsViewModel(
         initialValue = "0"
     )
     val initialProteinLimit = settingsRepository.getByName(name = "protein").filterNotNull().map {
-        it.settingValue
+        it.settingValue.toDoubleOrNull()?.toString() ?: "0.0"
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -66,7 +66,7 @@ class FoodSettingsViewModel(
             )
             settingsRepository.insertSetting(
                 name = "protein",
-                value = settingsUiState.proteinLimit.toIntOrNull()?.toString() ?: "0"
+                value = settingsUiState.proteinLimit.toDoubleOrNull()?.toString() ?: "0.0"
             )
         }
     }

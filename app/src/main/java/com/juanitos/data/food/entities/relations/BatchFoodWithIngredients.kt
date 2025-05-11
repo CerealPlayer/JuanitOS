@@ -25,8 +25,8 @@ data class BatchFoodWithIngredients(
                 IngredientDetail(
                     id = ingredientWithDetails.ingredient.id,
                     name = ingredientWithDetails.ingredient.name,
-                    caloriesPer100 = ingredientWithDetails.ingredient.caloriesPer100,
-                    proteinsPer100 = ingredientWithDetails.ingredient.proteinsPer100,
+                    caloriesPer100 = ingredientWithDetails.ingredient.caloriesPer100.toString(),
+                    proteinsPer100 = ingredientWithDetails.ingredient.proteinsPer100.toString(),
                     grams = ingredientWithDetails.batchFoodIngredient.grams
                 )
             }
