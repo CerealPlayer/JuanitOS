@@ -67,9 +67,6 @@ fun FoodScreen(
     val foodCalories = foods.sumOf { it.totalCalories }
     val foodProteins = foods.sumOf { it.totalProteins }
 
-    val caloriesLeft = (calorieLimit.value.toIntOrNull() ?: 0) - foodCalories
-    val proteinsLeft = (proteinLimit.value.toDoubleOrNull() ?: 0.0) - foodProteins
-
     Scaffold(topBar = {
         JuanitOSTopAppBar(title = stringResource(FoodDestination.titleRes),
             canNavigateBack = true,
@@ -140,7 +137,7 @@ fun FoodScreen(
                     Text(
                         text = stringResource(
                             R.string.calories_left,
-                            caloriesLeft,
+                            foodCalories,
                             calorieLimit.value
                         ),
                         style = MaterialTheme.typography.titleLarge
@@ -158,7 +155,7 @@ fun FoodScreen(
                         .padding(dimensionResource(R.dimen.padding_medium)),
                 ) {
                     Text(
-                        text = stringResource(R.string.prot_left, proteinsLeft, proteinLimit.value),
+                        text = stringResource(R.string.prot_left, foodProteins, proteinLimit.value),
                         style = MaterialTheme.typography.titleLarge
                     )
                     ProgressCircle(
