@@ -26,7 +26,7 @@
     <string name="cal_summary">%1$d calories</string>
     <string name="prot_summary">%1$.2f grams of protein</string>
     <string name="total_grams">Total grams after cooking</string>
-    <string name="food_tag">Food</string>
+    <string name="food_tag">Ingredient</string>
     <string name="batch_tag">Batch</string>
     <string name="grams_left">%1$d grams left</string>
     <string name="grams_ratio">%1$d/%2$d grams</string>
