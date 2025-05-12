@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.juanitos.JuanitOSApplication
 import com.juanitos.ui.routes.food.FoodViewModel
 import com.juanitos.ui.routes.food.batch.BatchFoodsViewModel
+import com.juanitos.ui.routes.food.batch.details.BatchFoodDetailsViewModel
 import com.juanitos.ui.routes.food.batch.new_batch.NewBatchFoodViewModel
 import com.juanitos.ui.routes.food.details.FoodDetailsViewModel
 import com.juanitos.ui.routes.food.ingredients.IngredientsViewModel
@@ -67,6 +68,12 @@ object AppViewModelProvider {
         }
         initializer {
             BatchFoodsViewModel(
+                juanitOSApplication().container.batchFoodRepository
+            )
+        }
+        initializer {
+            BatchFoodDetailsViewModel(
+                savedStateHandle = this.createSavedStateHandle(),
                 juanitOSApplication().container.batchFoodRepository
             )
         }

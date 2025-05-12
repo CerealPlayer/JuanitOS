@@ -10,6 +10,11 @@ enum class Routes(val route: String) {
     IngredientDetails("ingredient/{ingredientId}"),
     BatchFoods("batch_foods"),
     NewBatchFood("new_batch_food"),
+    BatchFoodDetails("batch_food/{batchFoodId}"),
     FoodDetails("food/{foodId}"),
-    Money("money"),
+    Money("money");
+
+    fun createBatchFoodDetailsRoute(batchFoodId: Int) = "batch_food/$batchFoodId"
+    fun createIngredientDetailsRoute(ingredientId: Int) = "ingredient/$ingredientId"
+    fun createFoodDetailsRoute(foodId: Int) = "food/$foodId"
 }

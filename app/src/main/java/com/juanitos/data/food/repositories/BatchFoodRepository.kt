@@ -12,4 +12,5 @@ interface BatchFoodRepository {
     fun getAllBatchFoods(): Flow<List<BatchFood>>
     fun getBatchFoodsWithIngredients(): Flow<List<BatchFoodWithIngredientDetails>>
     fun searchBatchFoods(query: String): Flow<List<BatchFoodWithIngredientDetails>>
+    fun getBatchFoodWithIngredients(id: Int): Flow<BatchFoodWithIngredientDetails?>
 }

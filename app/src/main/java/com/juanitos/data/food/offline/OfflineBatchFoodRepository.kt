@@ -30,4 +30,8 @@ class OfflineBatchFoodRepository(private val batchFoodDao: BatchFoodDao) : Batch
     override fun searchBatchFoods(query: String): Flow<List<BatchFoodWithIngredientDetails>> =
         batchFoodDao.searchBatchFoods(query)
             .map { it -> it.map { it.toBatchFoodWithIngredientDetails() } }
+
+    override fun getBatchFoodWithIngredients(id: Int): Flow<BatchFoodWithIngredientDetails?> =
+        batchFoodDao.getBatchFoodWithIngredients(id)
+            .map { it?.toBatchFoodWithIngredientDetails() }
 }

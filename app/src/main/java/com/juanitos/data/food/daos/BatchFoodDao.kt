@@ -33,4 +33,8 @@ interface BatchFoodDao {
     @Transaction
     @Query("select * from batch_foods where total_grams > 0 and name like '%' || :query || '%' order by id asc")
     fun searchBatchFoods(query: String): Flow<List<BatchFoodWithIngredients>>
+
+    @Transaction
+    @Query("select * from batch_foods where total_grams > 0 and id = :id")
+    fun getBatchFoodWithIngredients(id: Int): Flow<BatchFoodWithIngredients?>
 }

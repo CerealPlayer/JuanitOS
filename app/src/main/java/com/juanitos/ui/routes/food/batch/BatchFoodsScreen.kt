@@ -33,6 +33,7 @@ object BatchFoodsDestination : NavigationDestination {
 fun BatchFoodsScreen(
     onNavigateUp: () -> Unit,
     onNewBatchFood: () -> Unit,
+    onBatchFoodDetails: (Int) -> Unit, // Nuevo parámetro para navegación
     viewModel: BatchFoodsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val batchFoods = viewModel.batchFoods.collectAsState().value
@@ -57,25 +58,30 @@ fun BatchFoodsScreen(
             modifier = Modifier.padding(
                 top = innerPadding.calculateTopPadding(),
                 bottom = innerPadding.calculateBottomPadding(),
+                start = dimensionResource(R.dimen.padding_medium),
+                end = dimensionResource(R.dimen.padding_medium)
             )
         ) {
-            batchFoods.forEach({
+            batchFoods.forEach { batchFood ->
                 Card(
-                    onClick = {},
+                    onClick = { onBatchFoodDetails(batchFood.id) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(dimensionResource(R.dimen.padding_medium))
+                        .padding(
+                            top = dimensionResource(R.dimen.padding_small),
+                            bottom = dimensionResource(R.dimen.padding_small)
+                        )
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(dimensionResource(R.dimen.padding_medium))
                     ) {
-                        Text(it.name)
-                        Text(stringResource(R.string.n_ingredients, it.ingredients.size))
+                        Text(batchFood.name)
+                        Text(stringResource(R.string.n_ingredients, batchFood.ingredients.size))
                     }
                 }
-            })
+            }
         }
     }
 }
