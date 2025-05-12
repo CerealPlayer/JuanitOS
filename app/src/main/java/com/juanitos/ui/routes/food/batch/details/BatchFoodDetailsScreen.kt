@@ -2,13 +2,16 @@ package com.juanitos.ui.routes.food.batch.details
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,6 +20,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -37,6 +44,7 @@ object BatchFoodDetailsDestination : NavigationDestination {
 fun BatchFoodDetailsScreen(
     onNavigateUp: () -> Unit,
     onIngredient: (Int) -> Unit,
+    onEdit: (Int) -> Unit,
     viewModel: BatchFoodDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val batchFood = viewModel.batchFood.collectAsState().value ?: return
@@ -51,12 +59,12 @@ fun BatchFoodDetailsScreen(
                 canNavigateBack = true,
                 navigateUp = onNavigateUp,
                 actions = {
-                    IconButton(onClick = { viewModel.deleteBatchFood(onNavigateUp) }) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = stringResource(R.string.delete),
-                        )
-                    }
+                    OptionsMenu(
+                        onDelete = {
+                            viewModel.deleteBatchFood(onNavigateUp)
+                        },
+                        onEdit = { onEdit(batchFood.id) }
+                    )
                 }
             )
         }
@@ -131,6 +139,36 @@ fun BatchFoodDetailsScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun OptionsMenu(
+    onDelete: () -> Unit,
+    onEdit: () -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))) {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(
+                imageVector = Icons.Filled.MoreVert,
+                contentDescription = stringResource(R.string.settings),
+            )
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.edit)) }, onClick = {
+                    onEdit()
+                    expanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.delete)) }, onClick = {
+                    onDelete()
+                    expanded = false
+                }
+            )
         }
     }
 }

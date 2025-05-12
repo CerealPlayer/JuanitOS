@@ -38,6 +38,7 @@
     <string name="food_detail_name">%1$d</string>
     <string name="ingredient_detail_name">Ingredient: %1$s</string>
     <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
     <string name="ingredients">Ingredients</string>
     <string name="n_ingredients">%1$d ingredients</string>
 </resources>

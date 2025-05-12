@@ -15,6 +15,8 @@ import com.juanitos.ui.routes.food.batch.BatchFoodsDestination
 import com.juanitos.ui.routes.food.batch.BatchFoodsScreen
 import com.juanitos.ui.routes.food.batch.details.BatchFoodDetailsDestination
 import com.juanitos.ui.routes.food.batch.details.BatchFoodDetailsScreen
+import com.juanitos.ui.routes.food.batch.edit.EditBatchFoodDestination
+import com.juanitos.ui.routes.food.batch.edit.EditBatchFoodScreen
 import com.juanitos.ui.routes.food.batch.new_batch.NewBatchFoodDestination
 import com.juanitos.ui.routes.food.batch.new_batch.NewBatchFoodScreen
 import com.juanitos.ui.routes.food.details.FoodDetailsDestination
@@ -137,6 +139,24 @@ fun JuanitOSNavGraph(
                         )
                     )
                 },
+                onEdit = {
+                    navController.navigate(
+                        EditBatchFoodDestination.route.createEditBatchFoodRoute(it)
+                    )
+                }
+            )
+        }
+        composable(route = EditBatchFoodDestination.route.route, arguments = listOf(
+            navArgument("batchFoodId") {
+                type = NavType.IntType
+                nullable = false
+            }
+        )) {
+            EditBatchFoodScreen(
+                onNavigateUp = { navController.navigateUp() },
+                onNewIngredient = {
+                    navController.navigate(NewIngredientDestination.route.route)
+                }
             )
         }
     }

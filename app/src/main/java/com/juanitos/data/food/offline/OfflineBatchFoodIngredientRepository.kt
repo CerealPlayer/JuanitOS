@@ -13,6 +13,9 @@ class OfflineBatchFoodIngredientRepository(private val batchFoodIngredientDao: B
     override suspend fun update(batchFoodIngredient: BatchFoodIngredient) =
         batchFoodIngredientDao.update(batchFoodIngredient)
 
+    override suspend fun upsert(batchFoodIngredient: BatchFoodIngredient) =
+        batchFoodIngredientDao.upsert(batchFoodIngredient)
+
     override suspend fun delete(batchFoodIngredient: BatchFoodIngredient) =
         batchFoodIngredientDao.delete(batchFoodIngredient)
 

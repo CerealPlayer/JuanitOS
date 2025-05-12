@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.juanitos.data.food.entities.BatchFoodIngredient
 import kotlinx.coroutines.flow.Flow
 
@@ -15,6 +16,9 @@ interface BatchFoodIngredientDao {
 
     @Update
     suspend fun update(batchFoodIngredient: BatchFoodIngredient)
+
+    @Upsert
+    suspend fun upsert(batchFoodIngredient: BatchFoodIngredient)
 
     @Delete
     suspend fun delete(batchFoodIngredient: BatchFoodIngredient)
