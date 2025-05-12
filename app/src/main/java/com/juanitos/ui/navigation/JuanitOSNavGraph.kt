@@ -17,6 +17,8 @@ import com.juanitos.ui.routes.food.details.FoodDetailsDestination
 import com.juanitos.ui.routes.food.details.FoodDetailsScreen
 import com.juanitos.ui.routes.food.ingredients.IngredientsDestination
 import com.juanitos.ui.routes.food.ingredients.IngredientsScreen
+import com.juanitos.ui.routes.food.ingredients.details.IngredientDetailsDestination
+import com.juanitos.ui.routes.food.ingredients.details.IngredientDetailsScreen
 import com.juanitos.ui.routes.food.ingredients.new_ingredient.NewIngredientDestination
 import com.juanitos.ui.routes.food.ingredients.new_ingredient.NewIngredientScreen
 import com.juanitos.ui.routes.food.new_food.NewFoodDestination
@@ -67,6 +69,8 @@ fun JuanitOSNavGraph(
         composable(route = IngredientsDestination.route.route) {
             IngredientsScreen(onNavigateUp = { navController.navigateUp() }, onNewIngredient = {
                 navController.navigate(NewIngredientDestination.route.route)
+            }, onIngredient = {
+                navController.navigate("ingredient/$it")
             })
         }
         composable(route = NewIngredientDestination.route.route) {
@@ -87,6 +91,18 @@ fun JuanitOSNavGraph(
         ) {
             FoodDetailsScreen(
                 onNavigateUp = { navController.navigateUp() },
+            )
+        }
+        composable(route = IngredientDetailsDestination.route.route,
+            arguments = listOf(
+                navArgument("ingredientId") {
+                    type = NavType.StringType
+                    nullable = false
+                }
+            )
+        ) {
+            IngredientDetailsScreen(
+                navigateUp = { navController.navigateUp() },
             )
         }
     }

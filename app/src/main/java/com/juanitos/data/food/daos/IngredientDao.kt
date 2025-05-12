@@ -20,7 +20,7 @@ interface IngredientDao {
     suspend fun delete(ingredient: Ingredient)
 
     @Query("select * from ingredients where id = :id")
-    fun getIngredient(id: Int): Flow<Ingredient>
+    fun getIngredient(id: Int): Flow<Ingredient?>
 
     @Query("select * from ingredients order by id asc")
     fun getAllIngredients(): Flow<List<Ingredient>>

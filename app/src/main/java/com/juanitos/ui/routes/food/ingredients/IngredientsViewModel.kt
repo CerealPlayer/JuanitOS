@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 class IngredientsViewModel(
     private val ingredientRepository: IngredientRepository
@@ -26,12 +25,6 @@ class IngredientsViewModel(
 
     private fun createIngredientsFlow(): Flow<List<Ingredient>> {
         return ingredientRepository.getAllIngredientsStream()
-    }
-
-    fun deleteIngredient(ingredient: Ingredient) {
-        viewModelScope.launch {
-            ingredientRepository.deleteIngredient(ingredient)
-        }
     }
 }
 
