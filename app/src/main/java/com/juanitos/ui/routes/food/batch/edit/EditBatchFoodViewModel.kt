@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -40,15 +41,6 @@ class EditBatchFoodViewModel(
     val uiState: StateFlow<NewBatchFoodUiState> = _uiState
         .combine(createIngredientsFlow()) { state, ingredients ->
             state.copy(ingredients = ingredients)
-        }
-        .combine(createBatchFoodFlow()) { state, batchFood ->
-            state.copy(
-                batchFoodNameQuery = batchFood.name,
-                batchFoodTotalGramsQuery = batchFood.totalGrams.toString()
-            )
-        }
-        .combine(createIngredientEntriesFlow()) { state, entries ->
-            state.copy(ingredientEntries = entries)
         }
         .stateIn(
             scope = viewModelScope,
@@ -78,6 +70,20 @@ class EditBatchFoodViewModel(
         return batchFoodRepository.getBatchFoodWithIngredients(batchFoodId).map {
             it?.ingredients?.map { ing -> ing.toIngredientEntry() } ?: emptyList()
         }.filterNotNull()
+    }
+
+    init {
+        viewModelScope.launch {
+            val batchFood = createBatchFoodFlow().first()
+            val initialEntries = createIngredientEntriesFlow().first()
+            _uiState.update {
+                it.copy(
+                    ingredientEntries = initialEntries,
+                    batchFoodNameQuery = batchFood.name,
+                    batchFoodTotalGramsQuery = batchFood.totalGrams.toString()
+                )
+            }
+        }
     }
 
     fun updateSearchQuery(query: String) {
@@ -151,6 +157,7 @@ class EditBatchFoodViewModel(
                 currentState.ingredientEntries.forEach { entry ->
                     batchFoodIngredientRepository.upsert(
                         BatchFoodIngredient(
+                            id = entry.id ?: 0,
                             batchFoodId = batchFoodId,
                             ingredientId = entry.ingredient.id,
                             grams = entry.qt
@@ -184,6 +191,7 @@ fun IngredientDetail.toIngredientEntry(): IngredientEntry {
             proteinsPer100 = this.proteinsPer100,
             caloriesPer100 = this.caloriesPer100
         ),
-        qt = this.grams
+        qt = this.grams,
+        id = this.id
     )
 }

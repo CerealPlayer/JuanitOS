@@ -17,7 +17,7 @@ import com.juanitos.R
 import com.juanitos.data.food.entities.Ingredient
 
 data class IngredientEntry(
-    val ingredient: Ingredient, val qt: String
+    val ingredient: Ingredient, val qt: String, val id: Int? = null
 )
 
 @Composable
