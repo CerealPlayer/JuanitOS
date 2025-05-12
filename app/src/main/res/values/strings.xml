@@ -20,11 +20,11 @@
     <string name="ingredient_protein">Proteins per 100 grams</string>
     <string name="qt">Quantity</string>
     <string name="food_ingredient_cals">%1$d calories</string>
-    <string name="food_ingredient_prot">%1$.2f grams of protein</string>
+    <string name="food_ingredient_prot">%1$.1f grams of protein</string>
     <string name="food_ingredient_qt">%1$d grams</string>
     <string name="food_name">Food name</string>
     <string name="cal_summary">%1$d calories</string>
-    <string name="prot_summary">%1$.2f grams of protein</string>
+    <string name="prot_summary">%1$.1f grams of protein</string>
     <string name="total_grams">Total grams after cooking</string>
     <string name="food_tag">Ingredient</string>
     <string name="batch_tag">Batch</string>
