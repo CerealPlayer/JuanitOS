@@ -1,5 +1,6 @@
 package com.juanitos.ui.routes.food.batch.details
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +40,10 @@ fun BatchFoodDetailsScreen(
     viewModel: BatchFoodDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val batchFood = viewModel.batchFood.collectAsState().value ?: return
+    val totalCalories =
+        batchFood.ingredients.sumOf { it.caloriesPer100 * (it.grams.toIntOrNull() ?: 0) / 100 }
+    val totalProteins =
+        batchFood.ingredients.sumOf { it.proteinsPer100 * (it.grams.toIntOrNull() ?: 0) / 100 }
     Scaffold(
         topBar = {
             JuanitOSTopAppBar(
@@ -63,8 +69,24 @@ fun BatchFoodDetailsScreen(
                 end = dimensionResource(R.dimen.padding_small),
             )
         ) {
-            Text(stringResource(R.string.batch_total_grams, batchFood.totalGrams))
-            Text(stringResource(R.string.batch_grams_used, batchFood.gramsUsed ?: 0))
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.inversePrimary)
+                    .padding(
+                        dimensionResource(R.dimen.padding_small)
+                    )
+                    .fillMaxWidth(),
+            ) {
+                Text(
+                    stringResource(
+                        R.string.grams_ratio,
+                        batchFood.gramsUsed ?: 0,
+                        batchFood.totalGrams
+                    ), style = MaterialTheme.typography.titleLarge
+                )
+                Text(stringResource(R.string.cal_summary, totalCalories))
+                Text(stringResource(R.string.prot_summary, totalProteins))
+            }
             batchFood.ingredients.forEach { ingredient ->
                 Card(
                     onClick = { onIngredient(ingredient.id) },
@@ -72,14 +94,40 @@ fun BatchFoodDetailsScreen(
                         .fillMaxWidth()
                         .padding(top = dimensionResource(R.dimen.padding_small))
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier
+                            .padding(
+                                dimensionResource(R.dimen.padding_small)
+                            )
                             .fillMaxWidth()
-                            .padding(dimensionResource(R.dimen.padding_medium)),
-                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text(ingredient.name)
-                        Text(stringResource(R.string.ingredient_grams, ingredient.grams))
+
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(ingredient.name)
+                            Text(stringResource(R.string.ingredient_grams, ingredient.grams))
+                        }
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                stringResource(
+                                    R.string.cal_summary,
+                                    ingredient.caloriesPer100 * (ingredient.grams.toIntOrNull()
+                                        ?: 0) / 100
+                                )
+                            )
+                            Text(
+                                stringResource(
+                                    R.string.prot_summary,
+                                    ingredient.proteinsPer100 * (ingredient.grams.toIntOrNull()
+                                        ?: 0) / 100
+                                )
+                            )
+                        }
                     }
                 }
             }
