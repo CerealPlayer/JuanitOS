@@ -36,4 +36,5 @@
     <string name="ingredient_detail_name">Ingredient: %1$s</string>
     <string name="delete">Delete</string>
     <string name="ingredients">Ingredients</string>
+    <string name="n_ingredients">%1$d ingredients</string>
 </resources>
