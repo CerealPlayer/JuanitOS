@@ -188,7 +188,8 @@ class NewFoodViewModel(
                 )
                 batchFoodRepository.update(
                     entry.batchFood.toBatchFood().copy(
-                        totalGrams = entry.batchFood.totalGrams - (entry.qt.toIntOrNull() ?: 0)
+                        gramsUsed = entry.batchFood.gramsUsed?.plus(entry.qt.toIntOrNull() ?: 0)
+                            ?: (entry.qt.toIntOrNull() ?: 0)
                     )
                 )
             }

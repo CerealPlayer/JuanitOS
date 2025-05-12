@@ -115,7 +115,9 @@ fun NewFoodScreen(
                     onQtChange = { viewModel.updateQtQuery(it) },
                     onDismiss = { viewModel.dismissBatchFoodQtDialog() },
                     onSave = { viewModel.saveBatchFoodEntry() },
-                    totalGrams = uiState.selectedBatchFood.totalGrams
+                    totalGrams = uiState.selectedBatchFood.totalGrams.minus(
+                        uiState.selectedBatchFood.gramsUsed ?: 0
+                    )
                 )
             }
             LazyColumn {

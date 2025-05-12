@@ -21,6 +21,7 @@ data class BatchFoodWithIngredients(
             id = batchFood.id,
             name = batchFood.name,
             totalGrams = batchFood.totalGrams,
+            gramsUsed = batchFood.gramsUsed,
             ingredients = ingredientsWithDetails.map { ingredientWithDetails ->
                 IngredientDetail(
                     id = ingredientWithDetails.ingredient.id,
@@ -48,13 +49,15 @@ data class BatchFoodWithIngredientDetails(
     val id: Int = 0,
     val name: String,
     val totalGrams: Int,
+    val gramsUsed: Int? = null,
     val ingredients: List<IngredientDetail>
 ) {
     fun toBatchFood(): BatchFood {
         return BatchFood(
             id = id,
             name = name,
-            totalGrams = totalGrams
+            totalGrams = totalGrams,
+            gramsUsed = gramsUsed,
         )
     }
 }

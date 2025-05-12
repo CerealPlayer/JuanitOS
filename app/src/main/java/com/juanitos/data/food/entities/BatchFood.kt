@@ -11,6 +11,8 @@ data class BatchFood(
     val name : String,
     @ColumnInfo(name = "total_grams")
     val totalGrams: Int,
+    @ColumnInfo(name = "grams_used")
+    val gramsUsed: Int? = null,
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: String? = null,
 )
