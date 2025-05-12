@@ -68,7 +68,7 @@ class EditBatchFoodViewModel(
 
     private fun createIngredientEntriesFlow(): Flow<List<IngredientEntry>> {
         return batchFoodRepository.getBatchFoodWithIngredients(batchFoodId).map {
-            it?.ingredients?.map { ing -> ing.toIngredientEntry() } ?: emptyList()
+            it?.ingredients?.map { ing -> ing.toIngredientEntry(it.id) } ?: emptyList()
         }.filterNotNull()
     }
 
@@ -113,7 +113,8 @@ class EditBatchFoodViewModel(
 
         val ingredientEntry = IngredientEntry(
             ingredient = currentState.selectedIngredient,
-            qt = currentState.qtQuery
+            qt = currentState.qtQuery,
+            batchFoodId = batchFoodId,
         )
 
         _uiState.update {
@@ -123,6 +124,15 @@ class EditBatchFoodViewModel(
                 ingredientQtDialogOpen = false,
                 selectedIngredient = null,
                 searchQuery = ""
+            )
+        }
+    }
+
+    fun deleteIngredientEntry(entry: IngredientEntry) {
+        _uiState.update {
+            it.copy(
+                ingredientEntries = it.ingredientEntries - entry,
+                toDeleteEntries = it.toDeleteEntries + entry
             )
         }
     }
@@ -154,14 +164,14 @@ class EditBatchFoodViewModel(
                         totalGrams = currentState.batchFoodTotalGramsQuery.toIntOrNull() ?: 0,
                     )
                 )
+                currentState.toDeleteEntries.forEach { entry ->
+                    batchFoodIngredientRepository.delete(
+                        entry.toBatchFoodIngredient()
+                    )
+                }
                 currentState.ingredientEntries.forEach { entry ->
                     batchFoodIngredientRepository.upsert(
-                        BatchFoodIngredient(
-                            id = entry.id ?: 0,
-                            batchFoodId = batchFoodId,
-                            ingredientId = entry.ingredient.id,
-                            grams = entry.qt
-                        )
+                        entry.toBatchFoodIngredient()
                     )
                 }
                 navigateUp()
@@ -178,20 +188,31 @@ data class NewBatchFoodUiState(
     val ingredientQtDialogOpen: Boolean = false,
     val qtQuery: String = "",
     val ingredientEntries: List<IngredientEntry> = emptyList(),
+    val toDeleteEntries: List<IngredientEntry> = emptyList(),
     val saveDialogOpen: Boolean = false,
     val batchFoodNameQuery: String = "",
     val batchFoodTotalGramsQuery: String = ""
 )
 
-fun IngredientDetail.toIngredientEntry(): IngredientEntry {
+fun IngredientDetail.toIngredientEntry(batchFoodId: Int): IngredientEntry {
     return IngredientEntry(
         ingredient = Ingredient(
-            id = this.id,
+            id = this.ingredientId,
             name = this.name,
             proteinsPer100 = this.proteinsPer100,
             caloriesPer100 = this.caloriesPer100
         ),
         qt = this.grams,
-        id = this.id
+        batchFoodId = batchFoodId,
+        id = this.batchFoodIngredientId
+    )
+}
+
+fun IngredientEntry.toBatchFoodIngredient(): BatchFoodIngredient {
+    return BatchFoodIngredient(
+        id = this.id ?: 0,
+        batchFoodId = this.batchFoodId ?: 0,
+        ingredientId = this.ingredient.id,
+        grams = this.qt
     )
 }

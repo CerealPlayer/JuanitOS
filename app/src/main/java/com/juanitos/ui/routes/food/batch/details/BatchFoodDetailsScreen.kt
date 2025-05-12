@@ -97,7 +97,7 @@ fun BatchFoodDetailsScreen(
             }
             batchFood.ingredients.forEach { ingredient ->
                 Card(
-                    onClick = { onIngredient(ingredient.id) },
+                    onClick = { onIngredient(ingredient.ingredientId) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = dimensionResource(R.dimen.padding_small))

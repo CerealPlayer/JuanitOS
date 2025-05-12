@@ -17,7 +17,7 @@ import com.juanitos.R
 import com.juanitos.data.food.entities.Ingredient
 
 data class IngredientEntry(
-    val ingredient: Ingredient, val qt: String, val id: Int? = null
+    val ingredient: Ingredient, val qt: String, val batchFoodId: Int? = null, val id: Int? = null
 )
 
 @Composable
@@ -31,8 +31,7 @@ fun IngredientEntryCard(
     val totalProteins = (qtInt * proteins) / 100
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(dimensionResource(R.dimen.padding_small)),
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer
