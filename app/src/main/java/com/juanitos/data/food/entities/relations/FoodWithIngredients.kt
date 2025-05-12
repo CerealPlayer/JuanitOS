@@ -7,6 +7,7 @@ import com.juanitos.data.food.entities.BatchFoodIngredient
 import com.juanitos.data.food.entities.Food
 import com.juanitos.data.food.entities.FoodIngredient
 import com.juanitos.data.food.entities.Ingredient
+import kotlin.math.roundToInt
 
 // Fetch food with ingredients and batch foods using @Embedded and @Relation annotations
 data class FoodDetails(
@@ -30,10 +31,18 @@ data class FoodDetails(
                         batchFoodIngredient.ingredient.caloriesPer100
                     (ingredientGrams * ingredientCaloriesPer100) / 100
                 } ?: 0
+            val batchFoodTotalGrams = it.batchFood?.batchFood?.totalGrams ?: 0
 
             val grams = it.foodIngredient.grams.toIntOrNull() ?: 0
 
-            (ingredientCalories * grams / 100) + (batchFoodCalories * grams / 100)
+            val batchFoodRatio =
+                if (batchFoodTotalGrams > 0) {
+                    batchFoodCalories / batchFoodTotalGrams.toDouble()
+                } else {
+                    0.0
+                }
+
+            (ingredientCalories * grams / 100) + (batchFoodCalories * batchFoodRatio)
         }
         val totalProteins = foodIngredients.sumOf {
             val ingredientProteins = it.ingredient?.proteinsPer100 ?: 0.0
@@ -47,12 +56,19 @@ data class FoodDetails(
                 } ?: 0.0
 
             val grams = it.foodIngredient.grams.toDoubleOrNull() ?: 0.0
-            (ingredientProteins * grams / 100.toFloat()) + (batchFoodProteins * grams / 100)
+            val batchFoodTotalGrams = it.batchFood?.batchFood?.totalGrams ?: 0
+            val batchFoodRatio =
+                if (batchFoodTotalGrams > 0) {
+                    batchFoodProteins / (it.batchFood?.batchFood?.totalGrams ?: 1).toDouble()
+                } else {
+                    0.0
+                }
+            (ingredientProteins * grams / 100.0) + (batchFoodProteins * batchFoodRatio)
         }
         return FormattedFoodDetails(
             id = food.id,
             name = food.name,
-            totalCalories = totalCalories,
+            totalCalories = totalCalories.roundToInt(),
             totalProteins = totalProteins
         )
     }
