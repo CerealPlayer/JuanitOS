@@ -1,4 +1,4 @@
-package com.juanitos.ui.routes.food.batch
+package com.juanitos.ui.routes.food.batch.new_batch
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

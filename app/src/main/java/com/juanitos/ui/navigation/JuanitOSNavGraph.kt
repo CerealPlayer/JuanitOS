@@ -11,8 +11,10 @@ import com.juanitos.ui.routes.HomeDestination
 import com.juanitos.ui.routes.HomeScreen
 import com.juanitos.ui.routes.food.FoodDestination
 import com.juanitos.ui.routes.food.FoodScreen
-import com.juanitos.ui.routes.food.batch.NewBatchFoodDestination
-import com.juanitos.ui.routes.food.batch.NewBatchFoodScreen
+import com.juanitos.ui.routes.food.batch.BatchFoodsDestination
+import com.juanitos.ui.routes.food.batch.BatchFoodsScreen
+import com.juanitos.ui.routes.food.batch.new_batch.NewBatchFoodDestination
+import com.juanitos.ui.routes.food.batch.new_batch.NewBatchFoodScreen
 import com.juanitos.ui.routes.food.details.FoodDetailsDestination
 import com.juanitos.ui.routes.food.details.FoodDetailsScreen
 import com.juanitos.ui.routes.food.ingredients.IngredientsDestination
@@ -48,8 +50,8 @@ fun JuanitOSNavGraph(
                 onIngredients = {
                     navController.navigate(IngredientsDestination.route.route)
                 },
-                onNewBatchFood = {
-                    navController.navigate(NewBatchFoodDestination.route.route)
+                onBatchFood = {
+                    navController.navigate(BatchFoodsDestination.route.route)
                 },
                 onFoodDetails = {
                     navController.navigate("food/$it")
@@ -75,6 +77,11 @@ fun JuanitOSNavGraph(
         }
         composable(route = NewIngredientDestination.route.route) {
             NewIngredientScreen(onNavigateUp = { navController.navigateUp() })
+        }
+        composable(route = BatchFoodsDestination.route.route) {
+            BatchFoodsScreen(onNavigateUp = { navController.navigateUp() }, onNewBatchFood = {
+                navController.navigate(NewBatchFoodDestination.route.route)
+            })
         }
         composable(route = NewBatchFoodDestination.route.route) {
             NewBatchFoodScreen(onNavigateUp = { navController.navigateUp() }, onNewIngredient = {
