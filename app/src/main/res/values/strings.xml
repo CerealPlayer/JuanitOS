@@ -35,7 +35,7 @@
     <string name="batch_tag">Batch</string>
     <string name="grams_left">%1$d grams left</string>
     <string name="grams_ratio">%1$d/%2$d grams</string>
-    <string name="food_detail_name">%1$d</string>
+    <string name="food_detail_name">Food: %1$s</string>
     <string name="ingredient_detail_name">Ingredient: %1$s</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>

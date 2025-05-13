@@ -1,12 +1,15 @@
 package com.juanitos.ui.routes.food.details
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +40,8 @@ fun FoodDetailsScreen(
 
     val foodDetails = food.toFormattedFoodDetails()
     Scaffold(topBar = {
-        JuanitOSTopAppBar(title = stringResource(FoodDetailsDestination.titleRes, foodDetails.id),
+        JuanitOSTopAppBar(
+            title = stringResource(FoodDetailsDestination.titleRes, foodDetails.name),
             navigateUp = onNavigateUp,
             canNavigateBack = true,
             actions = {
@@ -57,9 +61,15 @@ fun FoodDetailsScreen(
                 top = paddingValues.calculateTopPadding()
             )
         ) {
-            Text(foodDetails.name)
-            Text(stringResource(R.string.cal_summary, foodDetails.totalCalories))
-            Text(stringResource(R.string.prot_summary, foodDetails.totalProteins))
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.inversePrimary)
+                    .padding(dimensionResource(R.dimen.padding_small))
+                    .fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.cal_summary, foodDetails.totalCalories))
+                Text(stringResource(R.string.prot_summary, foodDetails.totalProteins))
+            }
         }
     }
 }
