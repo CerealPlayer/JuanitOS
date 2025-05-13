@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.food.repositories.SettingsRepository
-import com.juanitos.lib.validateQt
+import com.juanitos.lib.validateQtInt
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -42,7 +42,7 @@ class FoodSettingsViewModel(
         updateUiState(
             settingsUiState.copy(
                 calorieLimit = calorieLimit,
-                isCalLimitValid = validateQt(calorieLimit),
+                isCalLimitValid = validateQtInt(calorieLimit),
                 isCalEdited = true
             )
         )
@@ -52,14 +52,14 @@ class FoodSettingsViewModel(
         updateUiState(
             settingsUiState.copy(
                 proteinLimit = proteinLimit,
-                isProtLimitValid = validateQt(proteinLimit),
+                isProtLimitValid = validateQtInt(proteinLimit),
                 isProtEdited = true
             )
         )
     }
 
     suspend fun saveSettings() {
-        if (validateQt(settingsUiState.calorieLimit) && validateQt(settingsUiState.proteinLimit)) {
+        if (validateQtInt(settingsUiState.calorieLimit) && validateQtInt(settingsUiState.proteinLimit)) {
             settingsRepository.insertSetting(
                 name = "calorie",
                 value = settingsUiState.calorieLimit.toIntOrNull()?.toString() ?: "0",

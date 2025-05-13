@@ -8,7 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.juanitos.data.food.entities.Ingredient
 import com.juanitos.data.food.repositories.IngredientRepository
 import com.juanitos.lib.InputUiState
-import com.juanitos.lib.validateQt
+import com.juanitos.lib.validateQtDouble
+import com.juanitos.lib.validateQtInt
 import kotlinx.coroutines.launch
 
 class NewIngredientViewModel(
@@ -28,7 +29,7 @@ class NewIngredientViewModel(
     fun updateCalories(calories: String) {
         uiState = uiState.copy(
             calories = InputUiState(
-                value = calories, touched = true, isValid = validateQt(calories)
+                value = calories, touched = true, isValid = validateQtInt(calories)
             )
         )
     }
@@ -36,7 +37,7 @@ class NewIngredientViewModel(
     fun updateProtein(protein: String) {
         uiState = uiState.copy(
             protein = InputUiState(
-                value = protein, touched = true, isValid = validateQt(protein)
+                value = protein, touched = true, isValid = validateQtDouble(protein)
             )
         )
     }

@@ -9,7 +9,7 @@ import com.juanitos.data.food.repositories.BatchFoodRepository
 import com.juanitos.data.food.repositories.FoodIngredientRepository
 import com.juanitos.data.food.repositories.FoodRepository
 import com.juanitos.data.food.repositories.IngredientRepository
-import com.juanitos.lib.validateQt
+import com.juanitos.lib.validateQtInt
 import com.juanitos.ui.commons.food.BatchFoodEntry
 import com.juanitos.ui.commons.food.IngredientEntry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -102,7 +102,7 @@ class NewFoodViewModel(
 
     fun saveIngredientEntry() {
         val currentState = _uiState.value
-        if (!validateQt(currentState.qtQuery)) return
+        if (!validateQtInt(currentState.qtQuery)) return
         if (currentState.selectedIngredient == null) return
 
         val ingredientEntry = IngredientEntry(
@@ -123,7 +123,7 @@ class NewFoodViewModel(
 
     fun saveBatchFoodEntry() {
         val currentState = _uiState.value
-        if (!validateQt(currentState.qtQuery)) return
+        if (!validateQtInt(currentState.qtQuery)) return
         if (currentState.selectedBatchFood == null) return
 
         val batchFoodEntry = BatchFoodEntry(

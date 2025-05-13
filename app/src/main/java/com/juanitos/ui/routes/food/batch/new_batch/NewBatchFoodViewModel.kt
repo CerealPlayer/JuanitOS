@@ -7,7 +7,7 @@ import com.juanitos.data.food.entities.Ingredient
 import com.juanitos.data.food.repositories.BatchFoodIngredientRepository
 import com.juanitos.data.food.repositories.BatchFoodRepository
 import com.juanitos.data.food.repositories.IngredientRepository
-import com.juanitos.lib.validateQt
+import com.juanitos.lib.validateQtInt
 import com.juanitos.ui.commons.food.IngredientEntry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -112,7 +112,7 @@ class NewBatchFoodViewModel(
     fun saveBatchFood(navigateUp: () -> Unit) {
         viewModelScope.launch {
             val currentState = _uiState.value
-            if (currentState.batchFoodNameQuery.isNotBlank() && validateQt(currentState.batchFoodTotalGramsQuery)) {
+            if (currentState.batchFoodNameQuery.isNotBlank() && validateQtInt(currentState.batchFoodTotalGramsQuery)) {
                 val id = batchFoodRepository.insert(
                     name = currentState.batchFoodNameQuery,
                     totalGrams = currentState.batchFoodTotalGramsQuery.toIntOrNull() ?: 0
