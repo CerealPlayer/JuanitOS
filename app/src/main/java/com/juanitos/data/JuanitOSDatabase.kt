@@ -17,11 +17,12 @@ import com.juanitos.data.food.entities.FoodIngredient
 import com.juanitos.data.food.entities.Ingredient
 import com.juanitos.data.food.entities.Setting
 import com.juanitos.data.migrations.MIGRATION_10_11
+import com.juanitos.data.migrations.MIGRATION_11_12
 import com.juanitos.data.migrations.MIGRATION_9_10
 
 @Database(
     entities = [Setting::class, Food::class, FoodIngredient::class, Ingredient::class, BatchFood::class, BatchFoodIngredient::class],
-    version = 11,
+    version = 12,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
@@ -40,7 +41,7 @@ abstract class JuanitOSDatabase : RoomDatabase() {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, JuanitOSDatabase::class.java, "JuanitOS_database")
                     .addMigrations(
-                        MIGRATION_9_10, MIGRATION_10_11
+                        MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12
                     )
                     .fallbackToDestructiveMigration(false)
                     .build().also { Instance = it }

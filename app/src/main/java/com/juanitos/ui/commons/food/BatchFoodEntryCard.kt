@@ -18,14 +18,14 @@ import com.juanitos.data.food.entities.relations.BatchFoodWithIngredientDetails
 
 data class BatchFoodEntry(
     val batchFood: BatchFoodWithIngredientDetails,
-    val qt: String
+    val qt: Int
 )
 
 @Composable
 fun BatchFoodEntryCard(
     batchFoodEntry: BatchFoodEntry
 ) {
-    val qtInt = batchFoodEntry.qt.toIntOrNull() ?: 0
+    val qtInt = batchFoodEntry.qt
     val calories = batchFoodEntry.batchFood.ingredients.sumOf {
         it.caloriesPer100
     }

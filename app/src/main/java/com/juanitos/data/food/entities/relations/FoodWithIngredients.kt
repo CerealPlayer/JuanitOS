@@ -33,7 +33,7 @@ data class FoodDetails(
                 } ?: 0
             val batchFoodTotalGrams = it.batchFood?.batchFood?.totalGrams ?: 0
 
-            val grams = it.foodIngredient.grams.toIntOrNull() ?: 0
+            val grams = it.foodIngredient.grams
 
             val batchFoodRatio =
                 if (batchFoodTotalGrams > 0) {
@@ -55,7 +55,7 @@ data class FoodDetails(
                     (ingredientGrams * ingredientProteinsPer100) / 100.0
                 } ?: 0.0
 
-            val grams = it.foodIngredient.grams.toDoubleOrNull() ?: 0.0
+            val grams = it.foodIngredient.grams.toDouble()
             val batchFoodTotalGrams = it.batchFood?.batchFood?.totalGrams ?: 0
             val batchFoodRatio =
                 if (batchFoodTotalGrams > 0) {

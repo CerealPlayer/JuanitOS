@@ -37,8 +37,7 @@ class FoodDetailsViewModel(
                     val usedGrams = it.foodIngredient.grams
                     batchFoodRepository.update(
                         batchFood.batchFood.copy(
-                            totalGrams = batchFood.batchFood.totalGrams + (usedGrams.toIntOrNull()
-                                ?: 0),
+                            totalGrams = batchFood.batchFood.totalGrams + usedGrams,
                         )
                     )
                 }

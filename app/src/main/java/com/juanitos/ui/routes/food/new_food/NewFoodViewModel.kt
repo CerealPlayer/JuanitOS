@@ -125,10 +125,11 @@ class NewFoodViewModel(
         val currentState = _uiState.value
         if (!validateQtInt(currentState.qtQuery)) return
         if (currentState.selectedBatchFood == null) return
+        if (!validateQtInt(currentState.qtQuery)) return
 
         val batchFoodEntry = BatchFoodEntry(
             batchFood = currentState.selectedBatchFood,
-            qt = currentState.qtQuery
+            qt = currentState.qtQuery.toInt()
         )
 
         _uiState.update {
@@ -172,7 +173,7 @@ class NewFoodViewModel(
                     FoodIngredient(
                         foodId = foodId.toInt(),
                         ingredientId = entry.ingredient.id,
-                        grams = entry.qt.toString(),
+                        grams = entry.qt,
                         batchFoodId = null
                     )
                 )
@@ -189,8 +190,8 @@ class NewFoodViewModel(
                 )
                 batchFoodRepository.update(
                     entry.batchFood.toBatchFood().copy(
-                        gramsUsed = entry.batchFood.gramsUsed?.plus(entry.qt.toIntOrNull() ?: 0)
-                            ?: (entry.qt.toIntOrNull() ?: 0)
+                        gramsUsed = entry.batchFood.gramsUsed?.plus(entry.qt)
+                            ?: entry.qt
                     )
                 )
             }
