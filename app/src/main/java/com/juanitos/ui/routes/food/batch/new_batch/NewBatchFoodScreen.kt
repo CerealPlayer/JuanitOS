@@ -96,7 +96,7 @@ fun NewBatchFoodScreen(
                     onDismissRequest = { viewModel.dismissQtDialog() },
                     onSave = { viewModel.saveIngredientEntry() })
             }
-            LazyColumn {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))) {
                 items(uiState.ingredientEntries) { entry ->
                     IngredientEntryCard(entry)
                 }

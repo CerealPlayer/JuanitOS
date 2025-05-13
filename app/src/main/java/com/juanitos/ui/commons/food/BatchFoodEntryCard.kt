@@ -40,8 +40,7 @@ fun BatchFoodEntryCard(
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(dimensionResource(R.dimen.padding_small)),
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer
