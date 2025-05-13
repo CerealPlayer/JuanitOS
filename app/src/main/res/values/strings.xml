@@ -10,6 +10,7 @@
     <string name="batch_foods">Batch foods</string>
     <string name="batch_food">Batch food: %1$s</string>
     <string name="new_batch_food">New batch food</string>
+    <string name="edit_batch_food">Edit batch food</string>
     <string name="cal_obj_input">Calorie limit</string>
     <string name="prot_obj_input">Protein limit</string>
     <string name="save">Save</string>

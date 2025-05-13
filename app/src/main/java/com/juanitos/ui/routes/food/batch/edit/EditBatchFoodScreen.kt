@@ -46,7 +46,7 @@ import com.juanitos.ui.navigation.Routes
 
 object EditBatchFoodDestination : NavigationDestination {
     override val route = Routes.EditBatchFood
-    override val titleRes = R.string.new_batch_food
+    override val titleRes = R.string.edit_batch_food
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
