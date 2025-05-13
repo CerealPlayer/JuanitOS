@@ -29,5 +29,5 @@ data class BatchFoodIngredient(
     val batchFoodId: Int,
     @ColumnInfo(name = "ingredient_id")
     val ingredientId: Int,
-    val grams: String,
+    val grams: Int,
 )

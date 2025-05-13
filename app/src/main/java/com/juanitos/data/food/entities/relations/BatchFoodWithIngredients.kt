@@ -69,5 +69,5 @@ data class IngredientDetail(
     val name: String,
     val caloriesPer100: Int,
     val proteinsPer100: Double,
-    val grams: String,
+    val grams: Int,
 )

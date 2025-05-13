@@ -107,7 +107,7 @@ class NewFoodViewModel(
 
         val ingredientEntry = IngredientEntry(
             ingredient = currentState.selectedIngredient,
-            qt = currentState.qtQuery
+            qt = currentState.qtQuery.toInt()
         )
 
         _uiState.update {
@@ -167,11 +167,12 @@ class NewFoodViewModel(
             val foodId = foodRepository.insertFood(currentState.foodNameQuery)
 
             currentState.ingredientEntries.forEach { entry ->
+                if (!validateQtInt(entry.qt.toString())) return@forEach
                 foodIngredientRepository.insertFoodIngredient(
                     FoodIngredient(
                         foodId = foodId.toInt(),
                         ingredientId = entry.ingredient.id,
-                        grams = entry.qt,
+                        grams = entry.qt.toString(),
                         batchFoodId = null
                     )
                 )

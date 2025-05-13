@@ -49,9 +49,9 @@ fun BatchFoodDetailsScreen(
 ) {
     val batchFood = viewModel.batchFood.collectAsState().value ?: return
     val totalCalories =
-        batchFood.ingredients.sumOf { it.caloriesPer100 * (it.grams.toIntOrNull() ?: 0) / 100 }
+        batchFood.ingredients.sumOf { it.caloriesPer100 * it.grams / 100 }
     val totalProteins =
-        batchFood.ingredients.sumOf { it.proteinsPer100 * (it.grams.toIntOrNull() ?: 0) / 100 }
+        batchFood.ingredients.sumOf { it.proteinsPer100 * it.grams / 100 }
     Scaffold(
         topBar = {
             JuanitOSTopAppBar(
@@ -124,15 +124,13 @@ fun BatchFoodDetailsScreen(
                             Text(
                                 stringResource(
                                     R.string.cal_summary,
-                                    ingredient.caloriesPer100 * (ingredient.grams.toIntOrNull()
-                                        ?: 0) / 100
+                                    ingredient.caloriesPer100 * ingredient.grams / 100
                                 )
                             )
                             Text(
                                 stringResource(
                                     R.string.prot_summary,
-                                    ingredient.proteinsPer100 * (ingredient.grams.toIntOrNull()
-                                        ?: 0) / 100
+                                    ingredient.proteinsPer100 * ingredient.grams / 100
                                 )
                             )
                         }

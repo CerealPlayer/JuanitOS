@@ -76,10 +76,11 @@ class NewBatchFoodViewModel(
     fun saveIngredientEntry() {
         val currentState = _uiState.value
         if (currentState.selectedIngredient == null) return
+        if (!validateQtInt(currentState.qtQuery)) return
 
         val ingredientEntry = IngredientEntry(
             ingredient = currentState.selectedIngredient,
-            qt = currentState.qtQuery
+            qt = currentState.qtQuery.toInt()
         )
 
         _uiState.update {

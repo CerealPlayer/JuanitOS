@@ -9,3 +9,37 @@ val MIGRATION_9_10 = object : Migration(9, 10) {
         database.execSQL("alter table batch_foods add column grams_used integer default null")
     }
 }
+
+val MIGRATION_10_11 = object : Migration(10, 11) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // 1. Create temporary table with new schema
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS batch_food_ingredients_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                batch_food_id INTEGER NOT NULL,
+                ingredient_id INTEGER NOT NULL,
+                grams INTEGER NOT NULL,
+                FOREIGN KEY(batch_food_id) REFERENCES batch_foods(id) ON DELETE CASCADE,
+                FOREIGN KEY(ingredient_id) REFERENCES ingredients(id) ON DELETE CASCADE
+            )
+        """.trimIndent()
+        )
+
+        // 2. Copy data with type conversion
+        database.execSQL(
+            """
+            INSERT INTO batch_food_ingredients_new 
+            (id, batch_food_id, ingredient_id, grams)
+            SELECT id, batch_food_id, ingredient_id, CAST(grams AS INTEGER)
+            FROM batch_food_ingredients
+        """.trimIndent()
+        )
+
+        // 3. Drop old table
+        database.execSQL("DROP TABLE batch_food_ingredients")
+
+        // 4. Rename new table
+        database.execSQL("ALTER TABLE batch_food_ingredients_new RENAME TO batch_food_ingredients")
+    }
+}

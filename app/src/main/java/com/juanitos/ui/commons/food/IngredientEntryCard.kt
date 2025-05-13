@@ -17,14 +17,14 @@ import com.juanitos.R
 import com.juanitos.data.food.entities.Ingredient
 
 data class IngredientEntry(
-    val ingredient: Ingredient, val qt: String, val batchFoodId: Int? = null, val id: Int? = null
+    val ingredient: Ingredient, val qt: Int, val batchFoodId: Int? = null, val id: Int? = null
 )
 
 @Composable
 fun IngredientEntryCard(
     ingredientEntry: IngredientEntry
 ) {
-    val qtInt = ingredientEntry.qt.toIntOrNull() ?: 0
+    val qtInt = ingredientEntry.qt
     val calories = ingredientEntry.ingredient.caloriesPer100
     val proteins = ingredientEntry.ingredient.proteinsPer100
     val totalCalories = (qtInt * calories) / 100

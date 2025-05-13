@@ -26,7 +26,7 @@ data class FoodDetails(
             val batchFoodCalories =
                 it.batchFood?.batchFoodIngredients?.sumOf { batchFoodIngredient ->
                     val ingredientGrams =
-                        batchFoodIngredient.batchFoodIngredient.grams.toIntOrNull() ?: 0
+                        batchFoodIngredient.batchFoodIngredient.grams
                     val ingredientCaloriesPer100 =
                         batchFoodIngredient.ingredient.caloriesPer100
                     (ingredientGrams * ingredientCaloriesPer100) / 100
@@ -49,7 +49,7 @@ data class FoodDetails(
             val batchFoodProteins =
                 it.batchFood?.batchFoodIngredients?.sumOf { batchFoodIngredient ->
                     val ingredientGrams =
-                        batchFoodIngredient.batchFoodIngredient.grams.toDoubleOrNull() ?: 0.0
+                        batchFoodIngredient.batchFoodIngredient.grams.toDouble()
                     val ingredientProteinsPer100 =
                         batchFoodIngredient.ingredient.proteinsPer100
                     (ingredientGrams * ingredientProteinsPer100) / 100.0
