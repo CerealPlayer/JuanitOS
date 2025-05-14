@@ -9,6 +9,6 @@ data class Food(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String,
-    @ColumnInfo(name="created_at", defaultValue = "(datetime('now'))")
+    @ColumnInfo(name = "created_at", defaultValue = "(datetime('now', 'localtime'))")
     val createdAt: String? = null
 )

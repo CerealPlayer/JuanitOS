@@ -86,3 +86,61 @@ val MIGRATION_11_12 = object : Migration(11, 12) {
         // 5. Optional: Recreate indexes if any existed
     }
 }
+
+val MIGRATION_12_13 = object : Migration(12, 13) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // 1. Create temporary table with new default
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS foods_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                name TEXT NOT NULL,
+                created_at TEXT DEFAULT (date('now', 'localtime'))
+            )
+        """.trimIndent()
+        )
+
+        // 2. Copy existing data
+        database.execSQL(
+            """
+            INSERT INTO foods_new (id, name, created_at)
+            SELECT id, name, created_at FROM foods
+        """.trimIndent()
+        )
+
+        // 3. Drop old table
+        database.execSQL("DROP TABLE foods")
+
+        // 4. Rename new table
+        database.execSQL("ALTER TABLE foods_new RENAME TO foods")
+    }
+}
+
+val MIGRATION_13_14 = object : Migration(13, 14) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // 1. Create temporary table with new default
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS foods_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                name TEXT NOT NULL,
+                created_at TEXT DEFAULT (datetime('now', 'localtime'))
+            )
+        """.trimIndent()
+        )
+
+        // 2. Copy existing data
+        database.execSQL(
+            """
+            INSERT INTO foods_new (id, name, created_at)
+            SELECT id, name, created_at FROM foods
+        """.trimIndent()
+        )
+
+        // 3. Drop old table
+        database.execSQL("DROP TABLE foods")
+
+        // 4. Rename new table
+        database.execSQL("ALTER TABLE foods_new RENAME TO foods")
+    }
+}
