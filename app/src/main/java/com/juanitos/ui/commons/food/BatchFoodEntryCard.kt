@@ -27,10 +27,10 @@ fun BatchFoodEntryCard(
 ) {
     val qtInt = batchFoodEntry.qt
     val calories = batchFoodEntry.batchFood.ingredients.sumOf {
-        it.caloriesPer100
+        it.caloriesPer100 * it.grams / 100
     }
     val proteins = batchFoodEntry.batchFood.ingredients.sumOf {
-        it.proteinsPer100
+        it.proteinsPer100 * it.grams / 100
     }
     val totalGramsInt = batchFoodEntry.batchFood.totalGrams
     val gramsRatio = qtInt / totalGramsInt.toFloat()

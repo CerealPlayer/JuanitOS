@@ -1,6 +1,7 @@
 package com.juanitos.ui.routes.food.details
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,7 +20,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
+import com.juanitos.data.food.entities.relations.FoodIngredientDetails
 import com.juanitos.ui.AppViewModelProvider
+import com.juanitos.ui.commons.food.BatchFoodEntry
+import com.juanitos.ui.commons.food.BatchFoodEntryCard
+import com.juanitos.ui.commons.food.IngredientEntry
+import com.juanitos.ui.commons.food.IngredientEntryCard
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
@@ -59,6 +65,9 @@ fun FoodDetailsScreen(
                 end = dimensionResource(R.dimen.padding_medium),
                 bottom = paddingValues.calculateBottomPadding(),
                 top = paddingValues.calculateTopPadding()
+            ),
+            verticalArrangement = Arrangement.spacedBy(
+                dimensionResource(id = R.dimen.padding_small)
             )
         ) {
             Column(
@@ -70,6 +79,31 @@ fun FoodDetailsScreen(
                 Text(stringResource(R.string.cal_summary, foodDetails.totalCalories))
                 Text(stringResource(R.string.prot_summary, foodDetails.totalProteins))
             }
+            food.foodIngredients.forEach { foodIngredient ->
+                FoodIngredientCard(foodIngredient = foodIngredient)
+            }
         }
+    }
+}
+
+@Composable
+fun FoodIngredientCard(foodIngredient: FoodIngredientDetails) {
+    val ingredient = foodIngredient.ingredient
+    if (ingredient != null) {
+        IngredientEntryCard(
+            ingredientEntry = IngredientEntry(
+                ingredient = ingredient,
+                qt = foodIngredient.foodIngredient.grams
+            )
+        )
+    }
+    val batchFoodIngredient = foodIngredient.batchFood
+    if (batchFoodIngredient != null) {
+        BatchFoodEntryCard(
+            batchFoodEntry = BatchFoodEntry(
+                qt = foodIngredient.foodIngredient.grams,
+                batchFood = batchFoodIngredient.toBatchFoodWithIngredientDetails()
+            )
+        )
     }
 }

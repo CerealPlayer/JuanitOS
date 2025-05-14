@@ -99,7 +99,26 @@ data class BatchFoodDetails(
         entityColumn = "batch_food_id"
     )
     val batchFoodIngredients: List<BatchFoodIngredientDetails>
-)
+) {
+    fun toBatchFoodWithIngredientDetails(): BatchFoodWithIngredientDetails {
+        return BatchFoodWithIngredientDetails(
+            id = batchFood.id,
+            name = batchFood.name,
+            totalGrams = batchFood.totalGrams,
+            gramsUsed = batchFood.gramsUsed,
+            ingredients = batchFoodIngredients.map { batchFoodIngredientDetails ->
+                IngredientDetail(
+                    ingredientId = batchFoodIngredientDetails.ingredient.id,
+                    batchFoodIngredientId = batchFoodIngredientDetails.batchFoodIngredient.id,
+                    name = batchFoodIngredientDetails.ingredient.name,
+                    caloriesPer100 = batchFoodIngredientDetails.ingredient.caloriesPer100,
+                    proteinsPer100 = batchFoodIngredientDetails.ingredient.proteinsPer100,
+                    grams = batchFoodIngredientDetails.batchFoodIngredient.grams
+                )
+            }
+        )
+    }
+}
 
 data class BatchFoodIngredientDetails(
     @Embedded
