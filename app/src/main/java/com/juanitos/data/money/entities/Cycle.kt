@@ -10,6 +10,8 @@ class Cycle(
     var id: Int = 0,
     @ColumnInfo(name = "start_date", defaultValue = "(datetime('now', 'localtime'))")
     val startDate: String? = null,
+    @ColumnInfo(name = "end_date")
     val endDate: String? = null,
+    @ColumnInfo(name = "total_income")
     val totalIncome: Double = 0.0,
 )
