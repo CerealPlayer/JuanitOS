@@ -17,6 +17,7 @@ import com.juanitos.ui.routes.food.ingredients.details.IngredientDetailsViewMode
 import com.juanitos.ui.routes.food.ingredients.new_ingredient.NewIngredientViewModel
 import com.juanitos.ui.routes.food.new_food.NewFoodViewModel
 import com.juanitos.ui.routes.food.settings.FoodSettingsViewModel
+import com.juanitos.ui.routes.money.MoneyViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -84,6 +85,11 @@ object AppViewModelProvider {
                 juanitOSApplication().container.ingredientRepository,
                 juanitOSApplication().container.batchFoodRepository,
                 juanitOSApplication().container.batchFoodIngredientRepository,
+            )
+        }
+        initializer {
+            MoneyViewModel(
+                juanitOSApplication().container.cycleRepository
             )
         }
     }
