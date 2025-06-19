@@ -33,6 +33,8 @@ import com.juanitos.ui.routes.food.settings.FoodSettingsDestination
 import com.juanitos.ui.routes.food.settings.FoodSettingsScreen
 import com.juanitos.ui.routes.money.MoneyDestination
 import com.juanitos.ui.routes.money.MoneyScreen
+import com.juanitos.ui.routes.money.settings.MoneySettingsDestination
+import com.juanitos.ui.routes.money.settings.MoneySettingsScreen
 
 @Composable
 fun JuanitOSNavGraph(
@@ -60,9 +62,6 @@ fun JuanitOSNavGraph(
                 onFoodDetails = {
                     navController.navigate(FoodDetailsDestination.route.createFoodDetailsRoute(it))
                 })
-        }
-        composable(route = MoneyDestination.route.route) {
-            MoneyScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = FoodSettingsDestination.route.route) {
             FoodSettingsScreen(onNavigateUp = { navController.navigateUp() })
@@ -158,6 +157,14 @@ fun JuanitOSNavGraph(
                     navController.navigate(NewIngredientDestination.route.route)
                 }
             )
+        }
+        composable(route = MoneyDestination.route.route) {
+            MoneyScreen(onNavigateUp = { navController.navigateUp() }, onMoneySettings = {
+                navController.navigate(MoneySettingsDestination.route.route)
+            })
+        }
+        composable(route = MoneySettingsDestination.route.route) {
+            MoneySettingsScreen(onNavigateUp = { navController.navigateUp() })
         }
     }
 }
