@@ -6,18 +6,19 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.juanitos.data.money.entities.Transaction
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransactionDao {
     @Insert
-    suspend fun insertTransaction(transaction: Transaction)
+    suspend fun insert(transaction: Transaction)
 
     @Update
-    suspend fun updateTransaction(transaction: Transaction)
+    suspend fun update(transaction: Transaction)
 
     @Delete
-    suspend fun deleteTransaction(transaction: Transaction)
+    suspend fun delete(transaction: Transaction)
 
-    @Query("SELECT * FROM transactions WHERE id = :transactionId")
-    suspend fun getTransactionsByCycleId(transactionId: Int): List<Transaction>
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    fun getById(id: Int): Flow<Transaction>
 }
