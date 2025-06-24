@@ -49,4 +49,7 @@
     <string name="income_input_label">Total income</string>
     <string name="new_transaction">New transaction</string>
     <string name="new_fixed_spending">New fixed spending</string>
+    <string name="amount">Amount</string>
+    <string name="category">Category</string>
+    <string name="description_optional">Description (optional)</string>
 </resources>
