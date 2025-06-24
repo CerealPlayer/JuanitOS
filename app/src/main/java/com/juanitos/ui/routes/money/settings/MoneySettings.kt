@@ -26,7 +26,7 @@ import com.juanitos.ui.navigation.Routes
 
 object MoneySettingsDestination : NavigationDestination {
     override val route = Routes.MoneySettings
-    override val titleRes = com.juanitos.R.string.settings
+    override val titleRes = R.string.settings
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

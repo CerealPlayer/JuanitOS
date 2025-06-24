@@ -47,4 +47,6 @@
     <string name="no_active_cycle">No active cycle</string>
     <string name="create_cycle">Create cycle</string>
     <string name="income_input_label">Total income</string>
+    <string name="new_transaction">New transaction</string>
+    <string name="new_fixed_spending">New fixed spending</string>
 </resources>

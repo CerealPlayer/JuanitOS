@@ -14,7 +14,9 @@ enum class Routes(val route: String) {
     EditBatchFood("edit_batch_food/{batchFoodId}"),
     FoodDetails("food/{foodId}"),
     Money("money"),
-    MoneySettings("money_settings");
+    MoneySettings("money_settings"),
+    NewTransaction("new_transaction"),
+    NewFixedSpending("new_fixed_spending");
 
     fun createBatchFoodDetailsRoute(batchFoodId: Int) = "batch_food/$batchFoodId"
     fun createIngredientDetailsRoute(ingredientId: Int) = "ingredient/$ingredientId"
