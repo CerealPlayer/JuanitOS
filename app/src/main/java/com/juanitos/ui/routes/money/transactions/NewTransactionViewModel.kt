@@ -77,13 +77,14 @@ class NewTransactionViewModel(
         _uiState.value = state.copy(isSaving = true, errorMessage = null)
         viewModelScope.launch {
             try {
-                val transaction = Transaction(
-                    cycleId = cycleId,
-                    amount = amount,
-                    category = category,
-                    description = state.descriptionInput.takeIf { it.isNotBlank() }
+                transactionRepository.insert(
+                    Transaction(
+                        cycleId = cycleId,
+                        amount = amount,
+                        category = category,
+                        description = state.descriptionInput
+                    )
                 )
-                transactionRepository.insert(transaction)
                 _uiState.value = state.copy(success = true, isSaving = false)
                 onSuccess()
             } catch (e: Exception) {
@@ -95,4 +96,3 @@ class NewTransactionViewModel(
         }
     }
 }
-

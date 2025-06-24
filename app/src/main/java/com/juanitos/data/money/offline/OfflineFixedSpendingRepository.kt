@@ -7,7 +7,12 @@ import com.juanitos.data.money.repositories.FixedSpendingRepository
 class OfflineFixedSpendingRepository(private val fixedSpendingDao: FixedSpendingDao) :
     FixedSpendingRepository {
     override suspend fun insert(fixedSpending: FixedSpending) =
-        fixedSpendingDao.insert(fixedSpending)
+        fixedSpendingDao.insert(
+            fixedSpending.cycleId,
+            fixedSpending.amount,
+            fixedSpending.category,
+            fixedSpending.description
+        )
 
     override suspend fun update(fixedSpending: FixedSpending) =
         fixedSpendingDao.update(fixedSpending)

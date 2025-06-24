@@ -6,7 +6,14 @@ import com.juanitos.data.money.repositories.TransactionRepository
 
 class OfflineTransactionRepository(private val transactionDao: TransactionDao) :
     TransactionRepository {
-    override suspend fun insert(transaction: Transaction) = transactionDao.insert(transaction)
+    override suspend fun insert(transaction: Transaction) =
+        transactionDao.insert(
+            transaction.cycleId,
+            transaction.amount,
+            transaction.category,
+            transaction.description
+        )
+
     override suspend fun update(transaction: Transaction) = transactionDao.update(transaction)
     override suspend fun delete(transaction: Transaction) = transactionDao.delete(transaction)
     override fun getById(id: Int) = transactionDao.getById(id)

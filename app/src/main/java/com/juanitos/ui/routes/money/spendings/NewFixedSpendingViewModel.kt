@@ -77,13 +77,14 @@ class NewFixedSpendingViewModel(
         _uiState.value = state.copy(isSaving = true, errorMessage = null)
         viewModelScope.launch {
             try {
-                val fixedSpending = FixedSpending(
-                    cycleId = cycleId,
-                    amount = amount,
-                    category = category,
-                    description = state.descriptionInput.takeIf { it.isNotBlank() }
+                fixedSpendingRepository.insert(
+                    FixedSpending(
+                        cycleId = cycleId,
+                        amount = amount,
+                        category = category,
+                        description = state.descriptionInput
+                    )
                 )
-                fixedSpendingRepository.insert(fixedSpending)
                 _uiState.value = state.copy(success = true, isSaving = false)
                 onSuccess()
             } catch (e: Exception) {
@@ -95,4 +96,3 @@ class NewFixedSpendingViewModel(
         }
     }
 }
-
