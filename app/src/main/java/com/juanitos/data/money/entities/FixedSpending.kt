@@ -21,6 +21,7 @@ data class FixedSpending(
     var id: Int = 0,
     @ColumnInfo(name = "cycle_id")
     val cycleId: Int,
+    val amount: Double,
     val category: String,
     val description: String? = null,
     @ColumnInfo(name = "created_at", defaultValue = "(datetime('now', 'localtime'))")

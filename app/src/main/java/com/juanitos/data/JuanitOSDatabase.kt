@@ -30,7 +30,7 @@ import com.juanitos.data.money.entities.Transaction
 
 @Database(
     entities = [Setting::class, Food::class, FoodIngredient::class, Ingredient::class, BatchFood::class, BatchFoodIngredient::class, Cycle::class, Transaction::class, FixedSpending::class],
-    version = 15,
+    version = 16,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {

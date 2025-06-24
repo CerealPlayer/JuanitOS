@@ -104,6 +104,12 @@ object AppViewModelProvider {
                 juanitOSApplication().container.cycleRepository
             )
         }
+        initializer {
+            com.juanitos.ui.routes.money.spendings.NewFixedSpendingViewModel(
+                juanitOSApplication().container.fixedSpendingRepository,
+                juanitOSApplication().container.cycleRepository
+            )
+        }
     }
 }
 
