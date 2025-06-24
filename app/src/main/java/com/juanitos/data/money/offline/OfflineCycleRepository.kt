@@ -11,4 +11,5 @@ class OfflineCycleRepository(private val cycleDao: CycleDao) : CycleRepository {
     override suspend fun update(cycle: Cycle) = cycleDao.update(cycle)
     override suspend fun delete(cycle: Cycle) = cycleDao.delete(cycle)
     override fun getCurrentCycle(): Flow<CurrentCycleWithDetails?> = cycleDao.getCurrentCycle()
+    override suspend fun endCycle(cycleId: Int) = cycleDao.endCycle(cycleId)
 }

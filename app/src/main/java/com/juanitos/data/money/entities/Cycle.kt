@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "cycles")
-class Cycle(
+data class Cycle(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
     @ColumnInfo(name = "start_date", defaultValue = "(datetime('now', 'localtime'))")

@@ -9,4 +9,5 @@ interface CycleRepository {
     suspend fun update(cycle: Cycle)
     suspend fun delete(cycle: Cycle)
     fun getCurrentCycle(): Flow<CurrentCycleWithDetails?>
+    suspend fun endCycle(cycleId: Int)
 }

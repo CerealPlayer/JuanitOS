@@ -21,4 +21,7 @@ interface CycleDao {
 
     @Query("SELECT * FROM cycles WHERE end_date IS NULL LIMIT 1")
     fun getCurrentCycle(): Flow<CurrentCycleWithDetails?>
+
+    @Query("UPDATE cycles SET end_date = datetime('now', 'localtime') WHERE id = :cycleId")
+    suspend fun endCycle(cycleId: Int)
 }

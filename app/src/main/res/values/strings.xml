@@ -42,4 +42,9 @@
     <string name="edit">Edit</string>
     <string name="ingredients">Ingredients</string>
     <string name="n_ingredients">%1$d ingredients</string>
+    <string name="current_cycle">Current cycle</string>
+    <string name="end_cycle">End cycle</string>
+    <string name="no_active_cycle">No active cycle</string>
+    <string name="create_cycle">Create cycle</string>
+    <string name="income_input_label">Total income</string>
 </resources>

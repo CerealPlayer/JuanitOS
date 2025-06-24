@@ -15,7 +15,7 @@ import androidx.room.PrimaryKey
         )
     ]
 )
-class Transaction(
+data class Transaction(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
     @ColumnInfo(name = "cycle_id")

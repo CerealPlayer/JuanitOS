@@ -92,6 +92,11 @@ object AppViewModelProvider {
                 juanitOSApplication().container.cycleRepository
             )
         }
+        initializer {
+            com.juanitos.ui.routes.money.settings.MoneySettingsViewModel(
+                juanitOSApplication().container.cycleRepository
+            )
+        }
     }
 }
 

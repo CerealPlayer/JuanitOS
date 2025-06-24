@@ -16,7 +16,7 @@ import androidx.room.PrimaryKey
         )
     ]
 )
-class FixedSpending(
+data class FixedSpending(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
     @ColumnInfo(name = "cycle_id")
