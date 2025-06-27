@@ -7,10 +7,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -99,6 +103,7 @@ fun MoneyScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
         ) {
+            // Summary box
             Column(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.inversePrimary)
@@ -140,6 +145,41 @@ fun MoneyScreen(
                 ) {
                     Text(text = stringResource(R.string.remaining_money))
                     Text(text = summary.remaining.toString())
+                }
+            }
+            val transactions = uiState.value.cycle?.transactions ?: emptyList()
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = dimensionResource(R.dimen.padding_medium)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
+            ) {
+                items(transactions) { transaction ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = transaction.category)
+                                Text(text = transaction.amount.toString())
+                            }
+                            if (transaction.description != null) {
+                                Text(
+                                    text = transaction.description,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
