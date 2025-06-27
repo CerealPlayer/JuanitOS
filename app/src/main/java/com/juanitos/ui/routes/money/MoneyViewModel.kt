@@ -15,11 +15,37 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+data class MoneySummary(
+    val totalIncome: Double = 0.0,
+    val totalFixedSpendings: Double = 0.0,
+    val totalTransactions: Double = 0.0,
+    val remaining: Double = 0.0,
+)
+
+data class MoneyUiState(
+    val cycle: CurrentCycleWithDetails? = null,
+    val summary: MoneySummary = MoneySummary(),
+)
+
 class MoneyViewModel(private val cycleRepository: CycleRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(MoneyUiState())
     val uiState: StateFlow<MoneyUiState> = _uiState
         .combine(createCycleFlow()) { state, cycle ->
-            state.copy(cycle = cycle)
+            val summary = if (cycle != null) {
+                val totalIncome = cycle.cycle.totalIncome
+                val totalFixedSpendings = cycle.fixedSpendings.sumOf { it.amount }
+                val totalTransactions = cycle.transactions.sumOf { it.amount }
+                val remaining = totalIncome - totalFixedSpendings - totalTransactions
+                MoneySummary(
+                    totalIncome = totalIncome,
+                    totalFixedSpendings = totalFixedSpendings,
+                    totalTransactions = totalTransactions,
+                    remaining = remaining
+                )
+            } else {
+                MoneySummary()
+            }
+            state.copy(cycle = cycle, summary = summary)
         }
         .stateIn(
             scope = viewModelScope,
@@ -43,7 +69,3 @@ class MoneyViewModel(private val cycleRepository: CycleRepository) : ViewModel()
         private const val TIMEOUT_MILLIS = 5_000L
     }
 }
-
-data class MoneyUiState(
-    val cycle: CurrentCycleWithDetails? = null,
-)

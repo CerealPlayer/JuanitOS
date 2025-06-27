@@ -1,8 +1,11 @@
 package com.juanitos.ui.routes.money
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -12,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,7 +49,7 @@ fun MoneyScreen(
     )
 ) {
     val uiState = viewModel.uiState.collectAsState()
-    val cycle = uiState.value.cycle
+    val summary = uiState.value.summary
     Scaffold(
         topBar = {
             JuanitOSTopAppBar(
@@ -95,10 +99,49 @@ fun MoneyScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
         ) {
-            Text(
-                text = "Money Screen",
-                modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
-            )
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.inversePrimary)
+                    .padding(dimensionResource(R.dimen.padding_medium))
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = dimensionResource(R.dimen.padding_small)),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = stringResource(R.string.total_income))
+                    Text(text = summary.totalIncome.toString())
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = dimensionResource(R.dimen.padding_small)),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = stringResource(R.string.total_fixed_spendings))
+                    Text(text = summary.totalFixedSpendings.toString())
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = dimensionResource(R.dimen.padding_small)),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = stringResource(R.string.total_transactions))
+                    Text(text = summary.totalTransactions.toString())
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = dimensionResource(R.dimen.padding_small)),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = stringResource(R.string.remaining_money))
+                    Text(text = summary.remaining.toString())
+                }
+            }
         }
     }
 }

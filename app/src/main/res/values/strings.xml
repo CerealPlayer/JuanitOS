@@ -52,4 +52,8 @@
     <string name="amount">Amount</string>
     <string name="category">Category</string>
     <string name="description_optional">Description (optional)</string>
+    <string name="total_income">Total income</string>
+    <string name="total_fixed_spendings">Total fixed spendings</string>
+    <string name="total_transactions">Total transactions</string>
+    <string name="remaining_money">Remaining money</string>
 </resources>
