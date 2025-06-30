@@ -35,6 +35,7 @@ import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
+import java.util.Locale
 
 object MoneyDestination : NavigationDestination {
     override val route = Routes.Money
@@ -117,7 +118,7 @@ fun MoneyScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = stringResource(R.string.total_income))
-                    Text(text = summary.totalIncome.toString())
+                    Text(text = String.format(Locale.US, "%.2f", summary.totalIncome))
                 }
                 Row(
                     modifier = Modifier
@@ -126,7 +127,7 @@ fun MoneyScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = stringResource(R.string.total_fixed_spendings))
-                    Text(text = summary.totalFixedSpendings.toString())
+                    Text(text = String.format(Locale.US, "%.2f", summary.totalFixedSpendings))
                 }
                 Row(
                     modifier = Modifier
@@ -135,7 +136,7 @@ fun MoneyScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = stringResource(R.string.total_transactions))
-                    Text(text = summary.totalTransactions.toString())
+                    Text(text = String.format(Locale.US, "%.2f", summary.totalTransactions))
                 }
                 Row(
                     modifier = Modifier
@@ -144,7 +145,7 @@ fun MoneyScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = stringResource(R.string.remaining_money))
-                    Text(text = summary.remaining.toString())
+                    Text(text = String.format(Locale.US, "%.2f", summary.remaining))
                 }
             }
             val transactions = uiState.value.cycle?.transactions ?: emptyList()
@@ -169,7 +170,7 @@ fun MoneyScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(text = transaction.category)
-                                Text(text = transaction.amount.toString())
+                                Text(text = String.format(Locale.US, "%.2f", transaction.amount))
                             }
                             if (transaction.description != null) {
                                 Text(
