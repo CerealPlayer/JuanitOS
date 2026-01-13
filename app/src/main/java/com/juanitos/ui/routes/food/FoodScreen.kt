@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,32 +52,23 @@ object FoodDestination : NavigationDestination {
 @Composable
 fun FoodScreen(
     onNavigateUp: () -> Unit,
-    onSettings: () -> Unit,
     onNewFood: () -> Unit,
     onIngredients: () -> Unit,
     onBatchFood: () -> Unit,
     onFoodDetails: (Int) -> Unit,
     viewModel: FoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val calorieLimit = viewModel.calorieLimit.collectAsState()
-    val proteinLimit = viewModel.proteinLimit.collectAsState()
     val foods = viewModel.foods.collectAsState().value
 
     val foodCalories = foods.sumOf { it.totalCalories }
     val foodProteins = foods.sumOf { it.totalProteins }
 
     Scaffold(topBar = {
-        JuanitOSTopAppBar(title = stringResource(FoodDestination.titleRes),
+        JuanitOSTopAppBar(
+            title = stringResource(FoodDestination.titleRes),
             canNavigateBack = true,
             navigateUp = onNavigateUp,
-            actions = {
-                IconButton(onClick = onSettings) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = stringResource(R.string.settings)
-                    )
-                }
-            })
+        )
     }, bottomBar = {
         BottomAppBar(
             actions = {
@@ -138,13 +128,8 @@ fun FoodScreen(
                         text = stringResource(
                             R.string.calories_left,
                             foodCalories,
-                            calorieLimit.value
                         ),
                         style = MaterialTheme.typography.titleLarge
-                    )
-                    ProgressCircle(
-                        progress = foodCalories,
-                        max = calorieLimit.value.toIntOrNull() ?: 0
                     )
                 }
                 Row(
@@ -155,12 +140,8 @@ fun FoodScreen(
                         .padding(dimensionResource(R.dimen.padding_medium)),
                 ) {
                     Text(
-                        text = stringResource(R.string.prot_left, foodProteins, proteinLimit.value),
+                        text = stringResource(R.string.prot_left, foodProteins),
                         style = MaterialTheme.typography.titleLarge
-                    )
-                    ProgressCircle(
-                        progress = foodProteins.toInt(),
-                        max = proteinLimit.value.toIntOrNull() ?: 0
                     )
                 }
             }
@@ -215,7 +196,6 @@ fun FoodDetailsCard(
 fun FoodScreenPreview() {
     FoodScreen(
         onNavigateUp = {},
-        onSettings = {},
         onNewFood = {},
         onIngredients = {},
         onBatchFood = {},

@@ -104,6 +104,16 @@ fun NewFoodScreen(
                 IngredientQtDialog(
                     name = uiState.selectedIngredient.name,
                     qt = uiState.qtQuery,
+                    customMessage = {
+                        if (uiState.qtError.isNotEmpty()) {
+                            Text(
+                                uiState.qtError,
+                                color = MaterialTheme.colorScheme.error,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    },
                     onQtChange = { viewModel.updateQtQuery(it) },
                     onDismissRequest = { viewModel.dismissQtDialog() },
                     onSave = { viewModel.saveIngredientEntry() })

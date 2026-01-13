@@ -102,7 +102,12 @@ class NewFoodViewModel(
 
     fun saveIngredientEntry() {
         val currentState = _uiState.value
-        if (!validateQtInt(currentState.qtQuery)) return
+        if (!validateQtInt(currentState.qtQuery)) {
+            _uiState.update {
+                it.copy(qtError = "Invalid quantity")
+            }
+            return
+        }
         if (currentState.selectedIngredient == null) return
 
         val ingredientEntry = IngredientEntry(
@@ -212,6 +217,7 @@ data class NewFoodUiState(
     val ingredientQtDialogOpen: Boolean = false,
     val batchFoodQtDialogOpen: Boolean = false,
     val qtQuery: String = "",
+    val qtError: String = "",
     val ingredientEntries: List<IngredientEntry> = emptyList(),
     val batchFoodEntries: List<BatchFoodEntry> = emptyList(),
     val saveDialogOpen: Boolean = false,
