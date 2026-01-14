@@ -16,5 +16,7 @@ fun formatDbDatetimeToShortDate(datetime: String?): String {
     val regex = Regex("^(\\d{4})-(\\d{2})-(\\d{2})\\b")
     val match = regex.find(input) ?: return ""
     val (year, month, day) = match.destructured
-    return "$day/$month/$year"
+    // Devolver año con dos dígitos
+    val shortYear = if (year.length >= 2) year.takeLast(2) else year
+    return "$day/$month/$shortYear"
 }
