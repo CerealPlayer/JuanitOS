@@ -31,6 +31,8 @@ import com.juanitos.ui.routes.food.new_food.NewFoodDestination
 import com.juanitos.ui.routes.food.new_food.NewFoodScreen
 import com.juanitos.ui.routes.food.settings.FoodSettingsDestination
 import com.juanitos.ui.routes.food.settings.FoodSettingsScreen
+import com.juanitos.ui.routes.food.track.TrackDestination
+import com.juanitos.ui.routes.food.track.TrackScreen
 import com.juanitos.ui.routes.money.MoneyDestination
 import com.juanitos.ui.routes.money.MoneyScreen
 import com.juanitos.ui.routes.money.settings.MoneySettingsDestination
@@ -61,6 +63,9 @@ fun JuanitOSNavGraph(
                 },
                 onBatchFood = {
                     navController.navigate(BatchFoodsDestination.route.route)
+                },
+                onTrack = {
+                    navController.navigate(TrackDestination.route.route)
                 },
                 onFoodDetails = {
                     navController.navigate(FoodDetailsDestination.route.createFoodDetailsRoute(it))
@@ -177,6 +182,9 @@ fun JuanitOSNavGraph(
         }
         composable(route = NewFixedSpendingDestination.route.route) {
             NewFixedSpendingScreen(onNavigateUp = { navController.navigateUp() })
+        }
+        composable(route = TrackDestination.route.route) {
+            TrackScreen()
         }
     }
 }

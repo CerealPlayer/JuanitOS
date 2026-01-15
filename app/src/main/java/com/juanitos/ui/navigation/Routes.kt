@@ -13,6 +13,7 @@ enum class Routes(val route: String) {
     BatchFoodDetails("batch_food/{batchFoodId}"),
     EditBatchFood("edit_batch_food/{batchFoodId}"),
     FoodDetails("food/{foodId}"),
+    Track("track"),
     Money("money"),
     MoneySettings("money_settings"),
     NewTransaction("new_transaction"),

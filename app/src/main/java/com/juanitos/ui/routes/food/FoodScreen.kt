@@ -55,6 +55,7 @@ fun FoodScreen(
     onNewFood: () -> Unit,
     onIngredients: () -> Unit,
     onBatchFood: () -> Unit,
+    onTrack: () -> Unit,
     onFoodDetails: (Int) -> Unit,
     viewModel: FoodViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -82,6 +83,12 @@ fun FoodScreen(
                     Icon(
                         painter = painterResource(R.drawable.batch),
                         contentDescription = stringResource(R.string.new_batch_food)
+                    )
+                }
+                IconButton(onClick = onTrack) {
+                    Icon(
+                        painter = painterResource(R.drawable.chart),
+                        contentDescription = stringResource(R.string.tracking)
                     )
                 }
             },
@@ -200,6 +207,7 @@ fun FoodScreenPreview() {
         onIngredients = {},
         onBatchFood = {},
         onFoodDetails = {},
+        onTrack = {}
     )
 }
 
