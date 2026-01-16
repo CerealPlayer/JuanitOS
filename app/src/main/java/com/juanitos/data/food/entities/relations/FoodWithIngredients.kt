@@ -69,7 +69,8 @@ data class FoodDetails(
             id = food.id,
             name = food.name,
             totalCalories = totalCalories.roundToInt(),
-            totalProteins = totalProteins
+            totalProteins = totalProteins,
+            createdAt = food.createdAt
         )
     }
 }
@@ -135,6 +136,7 @@ data class FormattedFoodDetails(
     val name: String,
     val totalCalories: Int,
     val totalProteins: Double,
+    val createdAt: String? = null,
 ) {
     fun toFood(): Food {
         return Food(

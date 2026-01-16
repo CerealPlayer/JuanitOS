@@ -1,5 +1,7 @@
 package com.juanitos.lib
 
+import java.time.LocalDate
+
 /**
  * Convierte un datetime (como el que produce Room: "yyyy-MM-dd HH:mm:ss") a una fecha
  * con formato "dd/MM/yyyy".
@@ -20,3 +22,25 @@ fun formatDbDatetimeToShortDate(datetime: String?): String {
     val shortYear = if (year.length >= 2) year.takeLast(2) else year
     return "$day/$month/$shortYear"
 }
+
+/**
+ * Convierte un datetime de Room (formato "yyyy-MM-dd HH:mm:ss") a LocalDate.
+ *
+ * Ejemplo: "2026-01-14 18:30:01" -> LocalDate(2026, 1, 14)
+ *
+ * Si la entrada no coincide con el patrón esperado, devuelve null.
+ */
+fun parseDbDatetimeToLocalDate(datetime: String?): LocalDate? {
+    if (datetime.isNullOrBlank()) return null
+
+    val input = datetime.trim()
+    val regex = Regex("^(\\d{4})-(\\d{2})-(\\d{2})\\b")
+    val match = regex.find(input) ?: return null
+    val (year, month, day) = match.destructured
+    return try {
+        LocalDate.of(year.toInt(), month.toInt(), day.toInt())
+    } catch (e: Exception) {
+        null
+    }
+}
+

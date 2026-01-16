@@ -38,9 +38,9 @@ fun TrackScreen(
     onNavigateUp: () -> Unit,
     viewModel: TrackViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val foods = viewModel.foods.collectAsState().value;
-    val calData = foods.map { it.totalCalories }
-    val protData = foods.map { it.totalProteins }
+    val dailyData = viewModel.dailyData.collectAsState().value
+    val calData = dailyData.map { it.totalCalories }
+    val protData = dailyData.map { it.totalProteins }
 
     val modelProducer = remember { CartesianChartModelProducer() }
     LaunchedEffect(calData, protData) {
