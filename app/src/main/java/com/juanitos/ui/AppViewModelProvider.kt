@@ -17,7 +17,9 @@ import com.juanitos.ui.routes.food.ingredients.details.IngredientDetailsViewMode
 import com.juanitos.ui.routes.food.ingredients.new_ingredient.NewIngredientViewModel
 import com.juanitos.ui.routes.food.new_food.NewFoodViewModel
 import com.juanitos.ui.routes.food.settings.FoodSettingsViewModel
+import com.juanitos.ui.routes.food.track.TrackViewModel
 import com.juanitos.ui.routes.money.MoneyViewModel
+import com.juanitos.ui.routes.money.spendings.NewFixedSpendingViewModel
 import com.juanitos.ui.routes.money.transactions.NewTransactionViewModel
 
 object AppViewModelProvider {
@@ -104,9 +106,14 @@ object AppViewModelProvider {
             )
         }
         initializer {
-            com.juanitos.ui.routes.money.spendings.NewFixedSpendingViewModel(
+            NewFixedSpendingViewModel(
                 juanitOSApplication().container.fixedSpendingRepository,
                 juanitOSApplication().container.cycleRepository
+            )
+        }
+        initializer {
+            TrackViewModel(
+                juanitOSApplication().container.foodRepository
             )
         }
     }

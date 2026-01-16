@@ -6,11 +6,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
+import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
@@ -32,12 +35,20 @@ object TrackDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackScreen(
-    onNavigateUp: () -> Unit
+    onNavigateUp: () -> Unit,
+    viewModel: TrackViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val foods = viewModel.foods.collectAsState().value;
+    val calData = foods.map { it.totalCalories }
+    val protData = foods.map { it.totalProteins }
+
     val modelProducer = remember { CartesianChartModelProducer() }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(calData, protData) {
         modelProducer.runTransaction {
-            lineSeries { series(13, 8, 7, 12, 0, 1, 15, 14, 0, 11, 6, 12, 0, 11, 12, 11) }
+            lineSeries {
+                series(calData.ifEmpty { listOf(0) })
+                series(protData.ifEmpty { listOf(0) })
+            }
         }
     }
 

@@ -36,6 +36,16 @@ interface FoodDao {
     fun getTodaysFoods(): Flow<List<FoodDetails>>
 
     @Transaction
+    @Query(
+        """
+        select * from foods 
+        where date(created_at, 'localtime') >= date('now', '-6 days', 'localtime') 
+        order by created_at desc
+    """
+    )
+    fun getWeekFoods(): Flow<List<FoodDetails>>
+
+    @Transaction
     @Query("select * from foods where id = :id")
     fun getFoodDetails(id: Int): Flow<FoodDetails?>
 }
