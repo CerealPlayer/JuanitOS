@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,6 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
 import com.juanitos.ui.AppViewModelProvider
+import com.juanitos.ui.icons.Add
+import com.juanitos.ui.icons.Settings
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
@@ -63,10 +62,7 @@ fun MoneyScreen(
                 navigateUp = onNavigateUp,
                 actions = {
                     IconButton(onClick = onMoneySettings) {
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = stringResource(R.string.settings),
-                        )
+                        Settings()
                     }
                 }
             )
@@ -83,10 +79,7 @@ fun MoneyScreen(
                 },
                 floatingActionButton = {
                     FloatingActionButton(onClick = onNewTransaction) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = stringResource(R.string.new_transaction)
-                        )
+                        Add()
                     }
                 }
             )
