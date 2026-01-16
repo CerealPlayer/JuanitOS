@@ -42,12 +42,20 @@ fun TrackScreen(
     val calData = dailyData.map { it.totalCalories }
     val protData = dailyData.map { it.totalProteins }
 
-    val modelProducer = remember { CartesianChartModelProducer() }
-    LaunchedEffect(calData, protData) {
-        modelProducer.runTransaction {
+    val calModelproducer = remember { CartesianChartModelProducer() }
+    LaunchedEffect(calData) {
+        calModelproducer.runTransaction {
             lineSeries {
                 series(calData.ifEmpty { listOf(0) })
-                series(protData.ifEmpty { listOf(0) })
+            }
+        }
+    }
+
+    val protModelproducer = remember { CartesianChartModelProducer() }
+    LaunchedEffect(protData) {
+        protModelproducer.runTransaction {
+            lineSeries {
+                series(protData.ifEmpty { listOf(0.0) }.map { it.toFloat() })
             }
         }
     }
@@ -76,7 +84,15 @@ fun TrackScreen(
                     startAxis = VerticalAxis.rememberStart(),
                     bottomAxis = HorizontalAxis.rememberBottom(),
                 ),
-                modelProducer,
+                calModelproducer,
+            )
+            CartesianChartHost(
+                rememberCartesianChart(
+                    rememberLineCartesianLayer(),
+                    startAxis = VerticalAxis.rememberStart(),
+                    bottomAxis = HorizontalAxis.rememberBottom(),
+                ),
+                protModelproducer,
             )
         }
     }
