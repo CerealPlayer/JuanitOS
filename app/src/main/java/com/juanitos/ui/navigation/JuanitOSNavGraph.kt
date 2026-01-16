@@ -184,7 +184,7 @@ fun JuanitOSNavGraph(
             NewFixedSpendingScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = TrackDestination.route.route) {
-            TrackScreen()
+            TrackScreen(onNavigateUp = { navController.navigateUp() })
         }
     }
 }
