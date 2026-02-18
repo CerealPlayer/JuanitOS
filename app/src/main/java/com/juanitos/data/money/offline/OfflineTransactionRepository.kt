@@ -10,7 +10,7 @@ class OfflineTransactionRepository(private val transactionDao: TransactionDao) :
         transactionDao.insert(
             transaction.cycleId,
             transaction.amount,
-            transaction.category,
+            transaction.categoryId,
             transaction.description
         )
 

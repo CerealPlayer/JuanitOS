@@ -8,9 +8,8 @@ class OfflineFixedSpendingRepository(private val fixedSpendingDao: FixedSpending
     FixedSpendingRepository {
     override suspend fun insert(fixedSpending: FixedSpending) =
         fixedSpendingDao.insert(
-            fixedSpending.cycleId,
             fixedSpending.amount,
-            fixedSpending.category,
+            fixedSpending.categoryId,
             fixedSpending.description
         )
 

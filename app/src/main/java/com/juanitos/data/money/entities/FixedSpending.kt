@@ -9,9 +9,9 @@ import androidx.room.PrimaryKey
     tableName = "fixed_spendings",
     foreignKeys = [
         ForeignKey(
-            entity = Cycle::class,
+            entity = Category::class,
             parentColumns = ["id"],
-            childColumns = ["cycle_id"],
+            childColumns = ["category_id"],
             onDelete = ForeignKey.CASCADE
         )
     ]
@@ -19,10 +19,9 @@ import androidx.room.PrimaryKey
 data class FixedSpending(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
-    @ColumnInfo(name = "cycle_id")
-    val cycleId: Int,
     val amount: Double,
-    val category: String,
+    @ColumnInfo(name = "category_id")
+    val categoryId: Int,
     val description: String? = null,
     @ColumnInfo(name = "created_at", defaultValue = "(datetime('now', 'localtime'))")
     val createdAt: String? = null,

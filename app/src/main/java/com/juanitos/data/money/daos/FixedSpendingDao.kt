@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FixedSpendingDao {
-    @Query("INSERT INTO fixed_spendings (cycle_id, amount, category, description) VALUES (:cycleId, :amount, :category, :description)")
-    suspend fun insert(cycleId: Int, amount: Double, category: String, description: String?): Long
+    @Query("INSERT INTO fixed_spendings (amount, category_id, description) VALUES (:amount, :category, :description)")
+    suspend fun insert(amount: Double, category: Int, description: String?): Long
 
     @Update
     suspend fun update(fixedSpending: FixedSpending)
