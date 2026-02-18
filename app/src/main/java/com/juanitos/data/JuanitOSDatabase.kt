@@ -4,18 +4,6 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.juanitos.data.food.daos.BatchFoodDao
-import com.juanitos.data.food.daos.BatchFoodIngredientDao
-import com.juanitos.data.food.daos.FoodDao
-import com.juanitos.data.food.daos.FoodIngredientDao
-import com.juanitos.data.food.daos.IngredientDao
-import com.juanitos.data.food.daos.SettingDao
-import com.juanitos.data.food.entities.BatchFood
-import com.juanitos.data.food.entities.BatchFoodIngredient
-import com.juanitos.data.food.entities.Food
-import com.juanitos.data.food.entities.FoodIngredient
-import com.juanitos.data.food.entities.Ingredient
-import com.juanitos.data.food.entities.Setting
 import com.juanitos.data.migrations.MIGRATION_10_11
 import com.juanitos.data.migrations.MIGRATION_11_12
 import com.juanitos.data.migrations.MIGRATION_12_13
@@ -29,17 +17,11 @@ import com.juanitos.data.money.entities.FixedSpending
 import com.juanitos.data.money.entities.Transaction
 
 @Database(
-    entities = [Setting::class, Food::class, FoodIngredient::class, Ingredient::class, BatchFood::class, BatchFoodIngredient::class, Cycle::class, Transaction::class, FixedSpending::class],
-    version = 16,
+    entities = [Cycle::class, Transaction::class, FixedSpending::class],
+    version = 17,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
-    abstract fun settingDao(): SettingDao
-    abstract fun foodDao(): FoodDao
-    abstract fun foodIngredientDao(): FoodIngredientDao
-    abstract fun ingredientDao(): IngredientDao
-    abstract fun batchFoodDao(): BatchFoodDao
-    abstract fun batchFoodIngredientDao(): BatchFoodIngredientDao
     abstract fun cycleDao(): CycleDao
     abstract fun transactionDao(): TransactionDao
     abstract fun fixedSpendingDao(): FixedSpendingDao

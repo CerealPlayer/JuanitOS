@@ -26,7 +26,6 @@ import com.juanitos.R
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
-import com.juanitos.ui.routes.food.FoodDestination
 import com.juanitos.ui.routes.money.MoneyDestination
 
 object HomeDestination : NavigationDestination {
@@ -56,11 +55,6 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                SubAppCard(textId = R.string.food, iconId = R.drawable.subapp_food, onClick = {
-                    onNavigateTo(
-                        FoodDestination.route
-                    )
-                })
                 SubAppCard(textId = R.string.money, iconId = R.drawable.subapp_money, onClick = {
                     onNavigateTo(
                         MoneyDestination.route
