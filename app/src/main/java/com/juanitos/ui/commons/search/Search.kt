@@ -1,4 +1,4 @@
-package com.juanitos.ui.commons
+package com.juanitos.ui.commons.search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import com.juanitos.R
 import com.juanitos.ui.icons.Search
 
@@ -29,6 +28,7 @@ data class SearchResult(
 @Composable
 fun Search(
     query: String,
+    placeholder: String? = null,
     expanded: Boolean,
     onQueryChange: (String) -> Unit,
     onExpandedChange: (Boolean) -> Unit,
@@ -48,7 +48,9 @@ fun Search(
                     onSearch = onSearch,
                     expanded = expanded,
                     onExpandedChange = onExpandedChange,
-                    placeholder = { Text(stringResource(R.string.search_ingredient)) },
+                    placeholder = {
+                        Text(placeholder ?: "")
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     leadingIcon = {
                         Search()
