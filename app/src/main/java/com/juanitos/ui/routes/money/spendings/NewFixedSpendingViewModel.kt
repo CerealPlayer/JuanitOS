@@ -2,7 +2,6 @@ package com.juanitos.ui.routes.money.spendings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanitos.data.money.entities.FixedSpending
 import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,14 +76,14 @@ class NewFixedSpendingViewModel(
         _uiState.value = state.copy(isSaving = true, errorMessage = null)
         viewModelScope.launch {
             try {
-                fixedSpendingRepository.insert(
-                    FixedSpending(
-                        cycleId = cycleId,
-                        amount = amount,
-                        category = category,
-                        description = state.descriptionInput
-                    )
-                )
+//                fixedSpendingRepository.insert(
+//                    FixedSpending(
+//                        cycleId = cycleId,
+//                        amount = amount,
+//                        category = category,
+//                        description = state.descriptionInput
+//                    )
+//                )
                 _uiState.value = state.copy(success = true, isSaving = false)
                 onSuccess()
             } catch (e: Exception) {

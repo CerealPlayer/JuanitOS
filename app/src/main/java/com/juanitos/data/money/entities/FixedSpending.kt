@@ -12,7 +12,7 @@ import androidx.room.PrimaryKey
             entity = Category::class,
             parentColumns = ["id"],
             childColumns = ["category_id"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.NO_ACTION
         )
     ]
 )
@@ -25,4 +25,6 @@ data class FixedSpending(
     val description: String? = null,
     @ColumnInfo(name = "created_at", defaultValue = "(datetime('now', 'localtime'))")
     val createdAt: String? = null,
+    @ColumnInfo(name = "deleted_at")
+    val deletedAt: String? = null,
 )

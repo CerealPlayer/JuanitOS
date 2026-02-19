@@ -9,6 +9,7 @@ import com.juanitos.data.migrations.MIGRATION_11_12
 import com.juanitos.data.migrations.MIGRATION_12_13
 import com.juanitos.data.migrations.MIGRATION_13_14
 import com.juanitos.data.migrations.MIGRATION_9_10
+import com.juanitos.data.money.daos.CategoryDao
 import com.juanitos.data.money.daos.CycleDao
 import com.juanitos.data.money.daos.FixedSpendingDao
 import com.juanitos.data.money.daos.TransactionDao
@@ -26,6 +27,7 @@ abstract class JuanitOSDatabase : RoomDatabase() {
     abstract fun cycleDao(): CycleDao
     abstract fun transactionDao(): TransactionDao
     abstract fun fixedSpendingDao(): FixedSpendingDao
+    abstract fun categoryDao(): CategoryDao
 
     companion object {
         @Volatile

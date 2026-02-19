@@ -47,7 +47,7 @@ fun MoneyScreen(
     onNavigateUp: () -> Unit,
     onMoneySettings: () -> Unit,
     onNewTransaction: () -> Unit,
-    onNewFixedSpending: () -> Unit,
+    onFixedSpendings: () -> Unit,
     viewModel: MoneyViewModel = viewModel(
         factory = AppViewModelProvider.Factory
     )
@@ -70,7 +70,7 @@ fun MoneyScreen(
         bottomBar = {
             BottomAppBar(
                 actions = {
-                    IconButton(onClick = onNewFixedSpending) {
+                    IconButton(onClick = onFixedSpendings) {
                         Icon(
                             painter = painterResource(R.drawable.fixed_spending),
                             contentDescription = stringResource(R.string.new_fixed_spending)
@@ -141,7 +141,6 @@ fun MoneyScreen(
                     Text(text = String.format(Locale.US, "%.2f", summary.remaining))
                 }
             }
-            val fixedSpendings = uiState.value.cycle?.fixedSpendings ?: emptyList()
             val transactions = uiState.value.cycle?.transactions ?: emptyList()
             LazyColumn(
                 modifier = Modifier
@@ -149,34 +148,6 @@ fun MoneyScreen(
                     .padding(top = dimensionResource(R.dimen.padding_medium)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
-                // Mostrar gastos fijos primero
-                items(fixedSpendings) { fixedSpending ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = fixedSpending.category)
-                                Text(text = String.format(Locale.US, "%.2f", fixedSpending.amount))
-                            }
-                            if (fixedSpending.description != null) {
-                                Text(
-                                    text = fixedSpending.description,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
-                                )
-                            }
-                        }
-                    }
-                }
                 // Luego mostrar transacciones
                 items(transactions) { transaction ->
                     Card(
@@ -192,7 +163,6 @@ fun MoneyScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(text = transaction.category)
                                 Text(text = String.format(Locale.US, "%.2f", transaction.amount))
                             }
                             if (transaction.description != null) {

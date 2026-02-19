@@ -1,9 +1,11 @@
 package com.juanitos.data
 
 import android.content.Context
+import com.juanitos.data.money.offline.OfflineCategoryRepository
 import com.juanitos.data.money.offline.OfflineCycleRepository
 import com.juanitos.data.money.offline.OfflineFixedSpendingRepository
 import com.juanitos.data.money.offline.OfflineTransactionRepository
+import com.juanitos.data.money.repositories.CategoryRepository
 import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
 import com.juanitos.data.money.repositories.TransactionRepository
@@ -12,6 +14,7 @@ interface AppContainer {
     val cycleRepository: CycleRepository
     val transactionRepository: TransactionRepository
     val fixedSpendingRepository: FixedSpendingRepository
+    val categoryRepository: CategoryRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -26,6 +29,11 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val fixedSpendingRepository: FixedSpendingRepository by lazy {
         OfflineFixedSpendingRepository(
             fixedSpendingDao = JuanitOSDatabase.getDatabase(context).fixedSpendingDao()
+        )
+    }
+    override val categoryRepository: CategoryRepository by lazy {
+        OfflineCategoryRepository(
+            categoryDao = JuanitOSDatabase.getDatabase(context).categoryDao()
         )
     }
 }

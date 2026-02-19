@@ -2,7 +2,6 @@ package com.juanitos.ui.routes.money.transactions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanitos.data.money.entities.Transaction
 import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.TransactionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,14 +76,14 @@ class NewTransactionViewModel(
         _uiState.value = state.copy(isSaving = true, errorMessage = null)
         viewModelScope.launch {
             try {
-                transactionRepository.insert(
-                    Transaction(
-                        cycleId = cycleId,
-                        amount = amount,
-                        category = category,
-                        description = state.descriptionInput
-                    )
-                )
+//                transactionRepository.insert(
+//                    Transaction(
+//                        cycleId = cycleId,
+//                        amount = amount,
+//                        category = category,
+//                        description = state.descriptionInput
+//                    )
+//                )
                 _uiState.value = state.copy(success = true, isSaving = false)
                 onSuccess()
             } catch (e: Exception) {

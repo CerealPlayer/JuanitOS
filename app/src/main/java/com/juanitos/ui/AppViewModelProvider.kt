@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.juanitos.JuanitOSApplication
 import com.juanitos.ui.routes.money.MoneyViewModel
+import com.juanitos.ui.routes.money.spendings.FixedSpendingsViewModel
 import com.juanitos.ui.routes.money.spendings.NewFixedSpendingViewModel
 import com.juanitos.ui.routes.money.transactions.NewTransactionViewModel
 
@@ -25,6 +26,11 @@ object AppViewModelProvider {
             NewTransactionViewModel(
                 juanitOSApplication().container.transactionRepository,
                 juanitOSApplication().container.cycleRepository
+            )
+        }
+        initializer {
+            FixedSpendingsViewModel(
+                juanitOSApplication().container.fixedSpendingRepository
             )
         }
         initializer {

@@ -20,4 +20,5 @@ class OfflineFixedSpendingRepository(private val fixedSpendingDao: FixedSpending
         fixedSpendingDao.delete(fixedSpending)
 
     override fun getById(id: Int) = fixedSpendingDao.getById(id)
+    override fun getAll() = fixedSpendingDao.getAll()
 }

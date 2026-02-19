@@ -11,6 +11,8 @@ import com.juanitos.ui.routes.money.MoneyDestination
 import com.juanitos.ui.routes.money.MoneyScreen
 import com.juanitos.ui.routes.money.settings.MoneySettingsDestination
 import com.juanitos.ui.routes.money.settings.MoneySettingsScreen
+import com.juanitos.ui.routes.money.spendings.FixedSpendingsDestination
+import com.juanitos.ui.routes.money.spendings.FixedSpendingsScreen
 import com.juanitos.ui.routes.money.spendings.NewFixedSpendingDestination
 import com.juanitos.ui.routes.money.spendings.NewFixedSpendingScreen
 import com.juanitos.ui.routes.money.transactions.NewTransactionDestination
@@ -33,7 +35,7 @@ fun JuanitOSNavGraph(
                 onNavigateUp = { navController.navigateUp() },
                 onMoneySettings = { navController.navigate(MoneySettingsDestination.route.route) },
                 onNewTransaction = { navController.navigate(NewTransactionDestination.route.route) },
-                onNewFixedSpending = { navController.navigate(NewFixedSpendingDestination.route.route) }
+                onFixedSpendings = { navController.navigate(FixedSpendingsDestination.route.route) }
             )
         }
         composable(route = MoneySettingsDestination.route.route) {
@@ -41,6 +43,11 @@ fun JuanitOSNavGraph(
         }
         composable(route = NewTransactionDestination.route.route) {
             NewTransactionScreen(onNavigateUp = { navController.navigateUp() })
+        }
+        composable(route = FixedSpendingsDestination.route.route) {
+            FixedSpendingsScreen(
+                onNavigateUp = { navController.navigateUp() },
+                onNewFixedSpending = { navController.navigate(NewFixedSpendingDestination.route.route) })
         }
         composable(route = NewFixedSpendingDestination.route.route) {
             NewFixedSpendingScreen(onNavigateUp = { navController.navigateUp() })

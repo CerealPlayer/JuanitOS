@@ -6,5 +6,6 @@ enum class Routes(val route: String) {
     Money("money"),
     MoneySettings("money_settings"),
     NewTransaction("new_transaction"),
+    FixedSpending("fixed_spending"),
     NewFixedSpending("new_fixed_spending");
 }

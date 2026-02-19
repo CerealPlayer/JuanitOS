@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Update
 import com.juanitos.data.money.entities.FixedSpending
+import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,5 +20,8 @@ interface FixedSpendingDao {
     suspend fun delete(fixedSpending: FixedSpending)
 
     @Query("SELECT * FROM fixed_spendings WHERE id = :id")
-    fun getById(id: Int): Flow<FixedSpending>
+    fun getById(id: Int): Flow<FixedSpendingWithCategory>
+
+    @Query("SELECT * FROM fixed_spendings WHERE deleted_at IS NULL ORDER BY id ASC")
+    fun getAll(): Flow<List<FixedSpendingWithCategory>>
 }
