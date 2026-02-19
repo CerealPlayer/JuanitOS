@@ -3,7 +3,6 @@ package com.juanitos.ui.commons.search
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,8 +12,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
-import com.juanitos.R
+import androidx.compose.ui.unit.dp
 import com.juanitos.ui.icons.Search
 
 data class SearchResult(
@@ -38,7 +36,7 @@ fun Search(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(dimensionResource(R.dimen.padding_small))
+//            .padding(dimensionResource(R.dimen.padding_small))
     ) {
         SearchBar(
             inputField = {
@@ -59,6 +57,7 @@ fun Search(
             },
             expanded = expanded,
             onExpandedChange = onExpandedChange,
+            shadowElevation = 0.dp
         ) {
             LazyColumn {
                 items(searchResults) { item ->

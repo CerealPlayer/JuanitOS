@@ -38,7 +38,7 @@ object AppViewModelProvider {
         initializer {
             NewFixedSpendingViewModel(
                 juanitOSApplication().container.fixedSpendingRepository,
-                juanitOSApplication().container.cycleRepository
+                juanitOSApplication().container.categoryRepository
             )
         }
         initializer {

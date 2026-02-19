@@ -2,42 +2,46 @@ package com.juanitos.ui.routes.money.spendings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanitos.data.money.repositories.CycleRepository
+import com.juanitos.data.money.entities.Category
+import com.juanitos.data.money.entities.FixedSpending
+import com.juanitos.data.money.repositories.CategoryRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 // Estado de la UI para el formulario de gasto fijo
 data class NewFixedSpendingUiState(
     val amountInput: String = "",
     val isAmountValid: Boolean = true,
-    val categoryInput: String = "",
+    val categoryId: Int = 0,
     val descriptionInput: String = "",
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
     val success: Boolean = false,
-    val currentCycleId: Int? = null
+    val categories: List<Category> = emptyList(),
 )
 
 class NewFixedSpendingViewModel(
     private val fixedSpendingRepository: FixedSpendingRepository,
-    private val cycleRepository: CycleRepository
+    private val categoriesRepository: CategoryRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(NewFixedSpendingUiState())
-    val uiState: StateFlow<NewFixedSpendingUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<NewFixedSpendingUiState> =
+        _uiState.combine(createCategoriesFlow()) { state, categories ->
+            state.copy(categories = categories)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = NewFixedSpendingUiState()
+        )
 
-    init {
-        loadCurrentCycleId()
-    }
-
-    private fun loadCurrentCycleId() {
-        viewModelScope.launch {
-            val cycle = cycleRepository.getCurrentCycle().firstOrNull()?.cycle
-            _uiState.value = _uiState.value.copy(currentCycleId = cycle?.id)
-        }
+    fun createCategoriesFlow(): Flow<List<Category>> {
+        return categoriesRepository.getAll()
     }
 
     fun setAmountInput(input: String) {
@@ -48,8 +52,8 @@ class NewFixedSpendingViewModel(
         )
     }
 
-    fun setCategoryInput(input: String) {
-        _uiState.value = _uiState.value.copy(categoryInput = input, errorMessage = null)
+    fun setCategoryInput(input: Int) {
+        _uiState.value = _uiState.value.copy(categoryId = input, errorMessage = null)
     }
 
     fun setDescriptionInput(input: String) {
@@ -59,31 +63,25 @@ class NewFixedSpendingViewModel(
     fun saveFixedSpending(onSuccess: () -> Unit) {
         val state = _uiState.value
         val amount = state.amountInput.toDoubleOrNull()
-        val category = state.categoryInput.trim()
-        val cycleId = state.currentCycleId
+        val category = state.categoryId
         if (amount == null || amount <= 0) {
             _uiState.value = state.copy(isAmountValid = false, errorMessage = "Invalid amount")
             return
         }
-        if (category.isEmpty()) {
+        if (category <= 0) {
             _uiState.value = state.copy(errorMessage = "Category required")
-            return
-        }
-        if (cycleId == null) {
-            _uiState.value = state.copy(errorMessage = "No active cycle")
             return
         }
         _uiState.value = state.copy(isSaving = true, errorMessage = null)
         viewModelScope.launch {
             try {
-//                fixedSpendingRepository.insert(
-//                    FixedSpending(
-//                        cycleId = cycleId,
-//                        amount = amount,
-//                        category = category,
-//                        description = state.descriptionInput
-//                    )
-//                )
+                fixedSpendingRepository.insert(
+                    FixedSpending(
+                        amount = amount,
+                        categoryId = category,
+                        description = state.descriptionInput,
+                    )
+                )
                 _uiState.value = state.copy(success = true, isSaving = false)
                 onSuccess()
             } catch (e: Exception) {
