@@ -9,6 +9,10 @@ import com.juanitos.ui.routes.HomeDestination
 import com.juanitos.ui.routes.HomeScreen
 import com.juanitos.ui.routes.money.MoneyDestination
 import com.juanitos.ui.routes.money.MoneyScreen
+import com.juanitos.ui.routes.money.categories.CategoriesDestination
+import com.juanitos.ui.routes.money.categories.CategoriesScreen
+import com.juanitos.ui.routes.money.categories.NewCategoryDestination
+import com.juanitos.ui.routes.money.categories.NewCategoryScreen
 import com.juanitos.ui.routes.money.settings.MoneySettingsDestination
 import com.juanitos.ui.routes.money.settings.MoneySettingsScreen
 import com.juanitos.ui.routes.money.spendings.FixedSpendingsDestination
@@ -35,7 +39,8 @@ fun JuanitOSNavGraph(
                 onNavigateUp = { navController.navigateUp() },
                 onMoneySettings = { navController.navigate(MoneySettingsDestination.route.route) },
                 onNewTransaction = { navController.navigate(NewTransactionDestination.route.route) },
-                onFixedSpendings = { navController.navigate(FixedSpendingsDestination.route.route) }
+                onFixedSpendings = { navController.navigate(FixedSpendingsDestination.route.route) },
+                onCategories = { navController.navigate(CategoriesDestination.route.route) }
             )
         }
         composable(route = MoneySettingsDestination.route.route) {
@@ -51,6 +56,15 @@ fun JuanitOSNavGraph(
         }
         composable(route = NewFixedSpendingDestination.route.route) {
             NewFixedSpendingScreen(onNavigateUp = { navController.navigateUp() })
+        }
+        composable(route = CategoriesDestination.route.route) {
+            CategoriesScreen(
+                onNavigateUp = { navController.navigateUp() },
+                onNewCategory = { navController.navigate(NewCategoryDestination.route.route) }
+            )
+        }
+        composable(route = NewCategoryDestination.route.route) {
+            NewCategoryScreen(onNavigateUp = { navController.navigateUp() })
         }
     }
 }

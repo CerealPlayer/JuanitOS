@@ -19,6 +19,10 @@
     <string name="new_fixed_spending">New fixed spending</string>
     <string name="amount">Amount</string>
     <string name="category">Category</string>
+    <string name="categories">Categories</string>
+    <string name="new_category">New category</string>
+    <string name="name">Name</string>
+    <string name="description">Description</string>
     <string name="description_optional">Description (optional)</string>
     <string name="total_income">Total income</string>
     <string name="total_fixed_spendings">Total fixed spendings</string>

@@ -48,6 +48,7 @@ fun MoneyScreen(
     onMoneySettings: () -> Unit,
     onNewTransaction: () -> Unit,
     onFixedSpendings: () -> Unit,
+    onCategories: () -> Unit,
     viewModel: MoneyViewModel = viewModel(
         factory = AppViewModelProvider.Factory
     )
@@ -74,6 +75,12 @@ fun MoneyScreen(
                         Icon(
                             painter = painterResource(R.drawable.fixed_spending),
                             contentDescription = stringResource(R.string.new_fixed_spending)
+                        )
+                    }
+                    IconButton(onClick = onCategories) {
+                        Icon(
+                            painter = painterResource(R.drawable.categories),
+                            contentDescription = stringResource(R.string.categories)
                         )
                     }
                 },

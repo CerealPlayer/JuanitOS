@@ -11,6 +11,6 @@ data class OfflineCategoryRepository(private val categoryDao: CategoryDao) : Cat
 
     override suspend fun update(category: Category) = categoryDao.update(category)
     override suspend fun delete(category: Category) = categoryDao.delete(category)
-    override suspend fun getById(id: Int): Flow<Category> = categoryDao.getById(id)
-    override suspend fun getAll(): Flow<List<Category>> = categoryDao.getAll()
+    override fun getById(id: Int): Flow<Category> = categoryDao.getById(id)
+    override fun getAll(): Flow<List<Category>> = categoryDao.getAll()
 }

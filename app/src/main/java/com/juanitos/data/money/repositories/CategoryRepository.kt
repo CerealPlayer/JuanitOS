@@ -7,6 +7,6 @@ interface CategoryRepository {
     suspend fun insert(name: String, description: String?): Long
     suspend fun update(category: Category)
     suspend fun delete(category: Category)
-    suspend fun getById(id: Int): Flow<Category>
-    suspend fun getAll(): Flow<List<Category>>
+    fun getById(id: Int): Flow<Category>
+    fun getAll(): Flow<List<Category>>
 }
