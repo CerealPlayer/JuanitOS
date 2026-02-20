@@ -76,7 +76,7 @@ class NewTransactionViewModel(
         val amount = parseQtDouble(state.amountInput)
         val category = state.categoryId
         val cycleId = state.currentCycleId
-        if (amount == null || amount <= 0) {
+        if (amount == null) {
             _uiState.value = state.copy(isAmountValid = false, errorMessage = "Invalid amount")
             return
         }
