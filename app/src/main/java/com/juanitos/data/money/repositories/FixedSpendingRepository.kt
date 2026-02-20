@@ -10,4 +10,5 @@ interface FixedSpendingRepository {
     suspend fun delete(fixedSpending: FixedSpending)
     fun getById(id: Int): Flow<FixedSpendingWithCategory>
     fun getAll(): Flow<List<FixedSpendingWithCategory>>
+    suspend fun updateEnabled(spendingId: Int, enabled: Boolean)
 }

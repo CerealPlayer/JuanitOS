@@ -23,6 +23,7 @@ data class FixedSpending(
     @ColumnInfo(name = "category_id")
     val categoryId: Int,
     val description: String? = null,
+    val active: Boolean = true,
     @ColumnInfo(name = "created_at", defaultValue = "(datetime('now', 'localtime'))")
     val createdAt: String? = null,
     @ColumnInfo(name = "deleted_at")

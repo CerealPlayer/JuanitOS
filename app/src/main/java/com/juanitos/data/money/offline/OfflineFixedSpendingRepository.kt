@@ -21,4 +21,6 @@ class OfflineFixedSpendingRepository(private val fixedSpendingDao: FixedSpending
 
     override fun getById(id: Int) = fixedSpendingDao.getById(id)
     override fun getAll() = fixedSpendingDao.getAll()
+    override suspend fun updateEnabled(spendingId: Int, enabled: Boolean) =
+        fixedSpendingDao.updateEnabled(spendingId, enabled)
 }

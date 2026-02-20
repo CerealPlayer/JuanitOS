@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
@@ -73,35 +74,50 @@ fun FixedSpendingsScreen(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
         ) {
             items(fixedSpendings) { spending ->
-                FixedSpendingCard(fixedSpending = spending)
+                FixedSpendingCard(
+                    fixedSpending = spending,
+                    onFixedSpendingCheck = { enabled: Boolean ->
+                        viewModel.toggleFixedSpendingEnabled(
+                            spending.fixedSpending.id,
+                            enabled
+                        )
+                    })
             }
         }
     }
 }
 
 @Composable
-fun FixedSpendingCard(fixedSpending: FixedSpendingWithCategory) {
+fun FixedSpendingCard(
+    fixedSpending: FixedSpendingWithCategory,
+    onFixedSpendingCheck: (Boolean) -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+            Column(
+                modifier = Modifier.padding(dimensionResource(R.dimen.padding_small)),
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(text = String.format(Locale.US, "%.2f€", fixedSpending.fixedSpending.amount))
                 Text(text = fixedSpending.category.name)
+                if (!fixedSpending.fixedSpending.description.isNullOrBlank()) {
+                    Text(
+                        text = fixedSpending.fixedSpending.description,
+                    )
+                }
             }
-            if (!fixedSpending.fixedSpending.description.isNullOrBlank()) {
-                Text(
-                    text = fixedSpending.fixedSpending.description,
-                )
-            }
+            Checkbox(
+                checked = fixedSpending.fixedSpending.active,
+                onCheckedChange = onFixedSpendingCheck
+            )
         }
     }
 }

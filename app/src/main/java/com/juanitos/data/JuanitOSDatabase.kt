@@ -20,7 +20,7 @@ import com.juanitos.data.money.entities.Transaction
 
 @Database(
     entities = [Cycle::class, Transaction::class, FixedSpending::class, Category::class],
-    version = 18,
+    version = 19,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {

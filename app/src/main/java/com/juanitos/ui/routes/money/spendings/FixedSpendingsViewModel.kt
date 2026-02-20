@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class FixedSpendingsUiState(
     val fixedSpendings: List<FixedSpendingWithCategory> = emptyList(),
@@ -27,5 +28,11 @@ class FixedSpendingsViewModel(private val fixedSpendingRepository: FixedSpending
 
     private fun createFixedSpendingsFlow(): Flow<List<FixedSpendingWithCategory>> {
         return fixedSpendingRepository.getAll()
+    }
+
+    fun toggleFixedSpendingEnabled(spendingId: Int, enabled: Boolean) {
+        viewModelScope.launch {
+            fixedSpendingRepository.updateEnabled(spendingId, enabled)
+        }
     }
 }
