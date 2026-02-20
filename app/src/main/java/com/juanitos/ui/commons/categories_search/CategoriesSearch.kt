@@ -31,7 +31,7 @@ fun CategoriesSearch(
 
     val filteredCategories by remember(categories, query) {
         derivedStateOf {
-            if (query.isBlank()) emptyList()
+            if (query.isBlank()) categories
             else categories.filter { it.name.contains(query, ignoreCase = true) }
         }
     }
