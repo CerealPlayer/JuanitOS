@@ -2,10 +2,12 @@ package com.juanitos.ui.routes.money
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juanitos.data.money.entities.Transaction
 import com.juanitos.data.money.entities.relations.CurrentCycleWithDetails
 import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
 import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
+import com.juanitos.data.money.repositories.TransactionRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class MoneySummary(
     val totalIncome: Double = 0.0,
@@ -31,7 +34,8 @@ data class MoneyUiState(
 @OptIn(ExperimentalCoroutinesApi::class)
 class MoneyViewModel(
     private val cycleRepository: CycleRepository,
-    private val fixedSpendingRepository: FixedSpendingRepository
+    private val fixedSpendingRepository: FixedSpendingRepository,
+    private val transactionRepository: TransactionRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MoneyUiState())
     val uiState: StateFlow<MoneyUiState> = _uiState
@@ -71,6 +75,12 @@ class MoneyViewModel(
     private fun createFixedSpendingsFlow(): Flow<List<FixedSpendingWithCategory>> {
         return fixedSpendingRepository.getAll().map {
             it.filter { s -> s.fixedSpending.active }
+        }
+    }
+
+    fun deleteTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            transactionRepository.delete(transaction)
         }
     }
 

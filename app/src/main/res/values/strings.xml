@@ -30,4 +30,5 @@
     <string name="total_transactions">Total transactions</string>
     <string name="remaining_money">Remaining money</string>
     <string name="uncategorized">Uncategorized</string>
+    <string name="delete">Delete</string>
 </resources>

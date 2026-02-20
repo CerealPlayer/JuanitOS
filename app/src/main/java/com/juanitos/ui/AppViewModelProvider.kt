@@ -17,7 +17,8 @@ object AppViewModelProvider {
         initializer {
             MoneyViewModel(
                 juanitOSApplication().container.cycleRepository,
-                juanitOSApplication().container.fixedSpendingRepository
+                juanitOSApplication().container.fixedSpendingRepository,
+                juanitOSApplication().container.transactionRepository
             )
         }
         initializer {

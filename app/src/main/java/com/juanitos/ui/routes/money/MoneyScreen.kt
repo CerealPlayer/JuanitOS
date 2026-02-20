@@ -29,7 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
 import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
-import com.juanitos.data.money.entities.relations.TransactionWithCategory
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.icons.Add
 import com.juanitos.ui.icons.Settings
@@ -164,45 +163,11 @@ fun MoneyScreen(
                 }
                 // Luego mostrar transacciones
                 items(transactions) { transaction ->
-                    TransactionCard(transactionWithCategory = transaction)
+                    TransactionCard(
+                        transactionWithCategory = transaction,
+                        onDelete = { viewModel.deleteTransaction(it.transaction) }
+                    )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun TransactionCard(
-    transactionWithCategory: TransactionWithCategory,
-    modifier: Modifier = Modifier
-) {
-    val transaction = transactionWithCategory.transaction
-    val category = transactionWithCategory.category
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = String.format(Locale.US, "%.2f€", transaction.amount))
-                Text(
-                    text = category?.name ?: stringResource(R.string.uncategorized),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            if (transaction.description != null) {
-                Text(
-                    text = transaction.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
-                )
             }
         }
     }
