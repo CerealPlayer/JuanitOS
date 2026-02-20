@@ -53,13 +53,12 @@ fun TransactionCard(
     SwipeToDismissBox(
         state = dismissState,
         modifier = modifier,
-        enableDismissFromStartToEnd = true,
+        enableDismissFromStartToEnd = false,
         enableDismissFromEndToStart = true,
         backgroundContent = {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = dimensionResource(R.dimen.padding_medium))
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color.Red),
                 contentAlignment = if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
