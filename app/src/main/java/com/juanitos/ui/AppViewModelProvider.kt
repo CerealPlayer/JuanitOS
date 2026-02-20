@@ -16,7 +16,8 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
             MoneyViewModel(
-                juanitOSApplication().container.cycleRepository
+                juanitOSApplication().container.cycleRepository,
+                juanitOSApplication().container.fixedSpendingRepository
             )
         }
         initializer {

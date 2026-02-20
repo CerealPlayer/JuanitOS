@@ -3,17 +3,17 @@ package com.juanitos.ui.routes.money
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.money.entities.relations.CurrentCycleWithDetails
+import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
 import com.juanitos.data.money.repositories.CycleRepository
+import com.juanitos.data.money.repositories.FixedSpendingRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 data class MoneySummary(
     val totalIncome: Double = 0.0,
@@ -25,9 +25,14 @@ data class MoneySummary(
 data class MoneyUiState(
     val cycle: CurrentCycleWithDetails? = null,
     val summary: MoneySummary = MoneySummary(),
+    val fixedSpendings: List<FixedSpendingWithCategory> = emptyList(),
 )
 
-class MoneyViewModel(private val cycleRepository: CycleRepository) : ViewModel() {
+@OptIn(ExperimentalCoroutinesApi::class)
+class MoneyViewModel(
+    private val cycleRepository: CycleRepository,
+    private val fixedSpendingRepository: FixedSpendingRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(MoneyUiState())
     val uiState: StateFlow<MoneyUiState> = _uiState
         .combine(createCycleFlow()) { state, cycle ->
@@ -44,6 +49,10 @@ class MoneyViewModel(private val cycleRepository: CycleRepository) : ViewModel()
                 MoneySummary()
             }
             state.copy(cycle = cycle, summary = summary)
+        }.combine(createFixedSpendingsFlow()) { state, fixedSpendings ->
+            val totalFixedSpendings = fixedSpendings.sumOf { it.fixedSpending.amount }
+            val updatedSummary = state.summary.copy(totalFixedSpendings = totalFixedSpendings)
+            state.copy(summary = updatedSummary, fixedSpendings = fixedSpendings)
         }
         .stateIn(
             scope = viewModelScope,
@@ -51,15 +60,13 @@ class MoneyViewModel(private val cycleRepository: CycleRepository) : ViewModel()
             initialValue = MoneyUiState()
         )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun createCycleFlow(): Flow<CurrentCycleWithDetails?> {
         return cycleRepository.getCurrentCycle()
     }
 
-    init {
-        viewModelScope.launch {
-            val currentCycle = cycleRepository.getCurrentCycle().first()
-            _uiState.update { it.copy(cycle = currentCycle) }
+    private fun createFixedSpendingsFlow(): Flow<List<FixedSpendingWithCategory>> {
+        return fixedSpendingRepository.getAll().map {
+            it.filter { s -> s.fixedSpending.active }
         }
     }
 

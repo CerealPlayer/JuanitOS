@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
+import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
 import com.juanitos.data.money.entities.relations.TransactionWithCategory
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.icons.Add
@@ -149,6 +150,7 @@ fun MoneyScreen(
                     Text(text = String.format(Locale.US, "%.2f", summary.remaining))
                 }
             }
+            val fixedSpendings = uiState.value.fixedSpendings
             val transactions = uiState.value.cycle?.transactions ?: emptyList()
             LazyColumn(
                 modifier = Modifier
@@ -156,6 +158,10 @@ fun MoneyScreen(
                     .padding(top = dimensionResource(R.dimen.padding_medium)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
+                // Mostrar gastos fijos primero
+                items(fixedSpendings) { fixedSpending ->
+                    FixedSpendingCard(fixedSpendingWithCategory = fixedSpending)
+                }
                 // Luego mostrar transacciones
                 items(transactions) { transaction ->
                     TransactionCard(transactionWithCategory = transaction)
@@ -201,3 +207,43 @@ fun TransactionCard(
         }
     }
 }
+
+
+@Composable
+fun FixedSpendingCard(
+    fixedSpendingWithCategory: FixedSpendingWithCategory,
+    modifier: Modifier = Modifier
+) {
+    val fixedSpending = fixedSpendingWithCategory.fixedSpending
+    val category = fixedSpendingWithCategory.category
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = String.format(Locale.US, "%.2f€", fixedSpending.amount))
+                Text(
+                    text = category.name,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            if (fixedSpending.description != null) {
+                Text(
+                    text = fixedSpending.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
+                )
+            }
+        }
+    }
+}
+
+
