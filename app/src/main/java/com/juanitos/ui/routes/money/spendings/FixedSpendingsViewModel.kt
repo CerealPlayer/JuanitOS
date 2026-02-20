@@ -35,4 +35,10 @@ class FixedSpendingsViewModel(private val fixedSpendingRepository: FixedSpending
             fixedSpendingRepository.updateEnabled(spendingId, enabled)
         }
     }
+
+    fun deleteFixedSpending(fixedSpending: com.juanitos.data.money.entities.FixedSpending) {
+        viewModelScope.launch {
+            fixedSpendingRepository.delete(fixedSpending)
+        }
+    }
 }

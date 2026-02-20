@@ -1,21 +1,13 @@
 package com.juanitos.ui.routes.money.spendings
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -23,13 +15,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
-import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.icons.Add
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
-import java.util.Locale
+import com.juanitos.ui.routes.money.FixedSpendingCard
 
 object FixedSpendingsDestination : NavigationDestination {
     override val route = Routes.FixedSpending
@@ -75,49 +66,17 @@ fun FixedSpendingsScreen(
         ) {
             items(fixedSpendings) { spending ->
                 FixedSpendingCard(
-                    fixedSpending = spending,
+                    fixedSpendingWithCategory = spending,
                     onFixedSpendingCheck = { enabled: Boolean ->
                         viewModel.toggleFixedSpendingEnabled(
                             spending.fixedSpending.id,
                             enabled
                         )
-                    })
+                    },
+                    onDelete = { viewModel.deleteFixedSpending(it.fixedSpending) }
+                )
             }
         }
     }
 }
 
-@Composable
-fun FixedSpendingCard(
-    fixedSpending: FixedSpendingWithCategory,
-    onFixedSpendingCheck: (Boolean) -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(
-                modifier = Modifier.padding(dimensionResource(R.dimen.padding_small)),
-                verticalArrangement = Arrangement.Center,
-            ) {
-                Text(text = String.format(Locale.US, "%.2f€", fixedSpending.fixedSpending.amount))
-                Text(text = fixedSpending.category.name)
-                if (!fixedSpending.fixedSpending.description.isNullOrBlank()) {
-                    Text(
-                        text = fixedSpending.fixedSpending.description,
-                    )
-                }
-            }
-            Checkbox(
-                checked = fixedSpending.fixedSpending.active,
-                onCheckedChange = onFixedSpendingCheck
-            )
-        }
-    }
-}

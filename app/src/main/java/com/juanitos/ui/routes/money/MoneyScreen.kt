@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -28,7 +26,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
-import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.icons.Add
 import com.juanitos.ui.icons.Settings
@@ -159,7 +156,9 @@ fun MoneyScreen(
             ) {
                 // Mostrar gastos fijos primero
                 items(fixedSpendings) { fixedSpending ->
-                    FixedSpendingCard(fixedSpendingWithCategory = fixedSpending)
+                    FixedSpendingCard(
+                        fixedSpendingWithCategory = fixedSpending
+                    )
                 }
                 // Luego mostrar transacciones
                 items(transactions) { transaction ->
@@ -173,42 +172,5 @@ fun MoneyScreen(
     }
 }
 
-
-@Composable
-fun FixedSpendingCard(
-    fixedSpendingWithCategory: FixedSpendingWithCategory,
-    modifier: Modifier = Modifier
-) {
-    val fixedSpending = fixedSpendingWithCategory.fixedSpending
-    val category = fixedSpendingWithCategory.category
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = String.format(Locale.US, "%.2f€", fixedSpending.amount))
-                Text(
-                    text = category.name,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            if (fixedSpending.description != null) {
-                Text(
-                    text = fixedSpending.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
-                )
-            }
-        }
-    }
-}
 
 
