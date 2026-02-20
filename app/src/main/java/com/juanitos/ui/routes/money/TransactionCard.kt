@@ -79,7 +79,7 @@ fun TransactionCard(
         val color = if (transaction.amount > 0) {
             MaterialTheme.colorScheme.error
         } else {
-            MaterialTheme.colorScheme.primaryContainer
+            MaterialTheme.colorScheme.primary
         }
         Card(
             modifier = Modifier.fillMaxWidth(),
