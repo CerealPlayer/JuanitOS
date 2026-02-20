@@ -81,7 +81,7 @@ fun MoneyScreen(
                     }
                     IconButton(onClick = onCategories) {
                         Icon(
-                            painter = painterResource(R.drawable.categories),
+                            painter = painterResource(R.drawable.category),
                             contentDescription = stringResource(R.string.categories)
                         )
                     }
