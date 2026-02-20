@@ -77,7 +77,7 @@ fun TransactionCard(
         }
     ) {
         val color = if (transaction.amount > 0) {
-            MaterialTheme.colorScheme.errorContainer
+            MaterialTheme.colorScheme.error
         } else {
             MaterialTheme.colorScheme.primaryContainer
         }
