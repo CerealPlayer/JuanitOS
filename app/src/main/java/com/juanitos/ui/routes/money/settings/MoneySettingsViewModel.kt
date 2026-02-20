@@ -39,7 +39,7 @@ class MoneySettingsViewModel(
     fun setIncomeInput(input: String) {
         _uiState.value = _uiState.value.copy(
             incomeInput = input,
-            isIncomeValid = input.toDoubleOrNull() != null && input.toDouble() > 0,
+            isIncomeValid = parseQtDouble(input) != null,
             isIncomeEdited = true,
             errorMessage = null
         )
