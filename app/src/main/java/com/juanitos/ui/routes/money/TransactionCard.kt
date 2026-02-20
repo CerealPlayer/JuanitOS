@@ -76,10 +76,15 @@ fun TransactionCard(
             }
         }
     ) {
+        val color = if (transaction.amount > 0) {
+            MaterialTheme.colorScheme.errorContainer
+        } else {
+            MaterialTheme.colorScheme.primaryContainer
+        }
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                containerColor = color
             )
         ) {
             Column(
