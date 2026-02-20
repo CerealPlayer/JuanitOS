@@ -6,6 +6,7 @@ import com.juanitos.data.money.entities.Category
 import com.juanitos.data.money.entities.FixedSpending
 import com.juanitos.data.money.repositories.CategoryRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
+import com.juanitos.lib.parseQtDouble
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -47,7 +48,7 @@ class NewFixedSpendingViewModel(
     fun setAmountInput(input: String) {
         _uiState.value = _uiState.value.copy(
             amountInput = input,
-            isAmountValid = input.toDoubleOrNull() != null && input.toDouble() > 0,
+            isAmountValid = parseQtDouble(input) != null,
             errorMessage = null
         )
     }
@@ -62,7 +63,7 @@ class NewFixedSpendingViewModel(
 
     fun saveFixedSpending(onSuccess: () -> Unit) {
         val state = _uiState.value
-        val amount = state.amountInput.toDoubleOrNull()
+        val amount = parseQtDouble(state.amountInput)
         val category = state.categoryId
         if (amount == null || amount <= 0) {
             _uiState.value = state.copy(isAmountValid = false, errorMessage = "Invalid amount")

@@ -8,6 +8,7 @@ import com.juanitos.data.money.entities.relations.CurrentCycleWithDetails
 import com.juanitos.data.money.repositories.CategoryRepository
 import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.TransactionRepository
+import com.juanitos.lib.parseQtDouble
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -57,7 +58,7 @@ class NewTransactionViewModel(
     fun setAmountInput(input: String) {
         _uiState.value = _uiState.value.copy(
             amountInput = input,
-            isAmountValid = input.toDoubleOrNull() != null && input.toDouble() > 0,
+            isAmountValid = parseQtDouble(input) != null,
             errorMessage = null
         )
     }
@@ -72,7 +73,7 @@ class NewTransactionViewModel(
 
     fun saveTransaction(onSuccess: () -> Unit) {
         val state = uiState.value
-        val amount = state.amountInput.toDoubleOrNull()
+        val amount = parseQtDouble(state.amountInput)
         val category = state.categoryId
         val cycleId = state.currentCycleId
         if (amount == null || amount <= 0) {

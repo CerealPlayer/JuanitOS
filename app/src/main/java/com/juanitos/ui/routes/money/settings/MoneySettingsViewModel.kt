@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.money.entities.Cycle
 import com.juanitos.data.money.repositories.CycleRepository
+import com.juanitos.lib.parseQtDouble
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,7 +47,7 @@ class MoneySettingsViewModel(
 
     fun createNewCycle(onNavigateUp: () -> Unit) {
         val input = _uiState.value.incomeInput
-        val income = input.toDoubleOrNull()
+        val income = parseQtDouble(input)
         if (income == null || income <= 0) {
             _uiState.value =
                 _uiState.value.copy(isIncomeValid = false, errorMessage = "Ingreso inválido")
