@@ -20,6 +20,7 @@
     <string name="amount">Amount</string>
     <string name="category">Category</string>
     <string name="categories">Categories</string>
+    <string name="add_category">Add category</string>
     <string name="new_category">New category</string>
     <string name="name">Name</string>
     <string name="description">Description</string>

@@ -47,7 +47,11 @@ fun JuanitOSNavGraph(
             MoneySettingsScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = NewTransactionDestination.route.route) {
-            NewTransactionScreen(onNavigateUp = { navController.navigateUp() })
+            NewTransactionScreen(onNavigateUp = { navController.navigateUp() }, onNewCategory = {
+                navController.navigate(
+                    NewCategoryDestination.route.route
+                )
+            })
         }
         composable(route = FixedSpendingsDestination.route.route) {
             FixedSpendingsScreen(
@@ -55,7 +59,11 @@ fun JuanitOSNavGraph(
                 onNewFixedSpending = { navController.navigate(NewFixedSpendingDestination.route.route) })
         }
         composable(route = NewFixedSpendingDestination.route.route) {
-            NewFixedSpendingScreen(onNavigateUp = { navController.navigateUp() })
+            NewFixedSpendingScreen(onNavigateUp = { navController.navigateUp() }, onNewCategory = {
+                navController.navigate(
+                    NewCategoryDestination.route.route
+                )
+            })
         }
         composable(route = CategoriesDestination.route.route) {
             CategoriesScreen(

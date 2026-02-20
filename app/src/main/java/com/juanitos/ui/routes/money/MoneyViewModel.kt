@@ -51,7 +51,11 @@ class MoneyViewModel(
             state.copy(cycle = cycle, summary = summary)
         }.combine(createFixedSpendingsFlow()) { state, fixedSpendings ->
             val totalFixedSpendings = fixedSpendings.sumOf { it.fixedSpending.amount }
-            val updatedSummary = state.summary.copy(totalFixedSpendings = totalFixedSpendings)
+            val remainingAfterFixed = state.summary.remaining - totalFixedSpendings
+            val updatedSummary = state.summary.copy(
+                totalFixedSpendings = totalFixedSpendings,
+                remaining = remainingAfterFixed
+            )
             state.copy(summary = updatedSummary, fixedSpendings = fixedSpendings)
         }
         .stateIn(

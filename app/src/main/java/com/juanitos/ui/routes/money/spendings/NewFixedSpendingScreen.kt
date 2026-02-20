@@ -29,6 +29,7 @@ object NewFixedSpendingDestination : NavigationDestination {
 @Composable
 fun NewFixedSpendingScreen(
     onNavigateUp: () -> Unit,
+    onNewCategory: () -> Unit,
     viewModel: NewFixedSpendingViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState.collectAsState().value
@@ -50,7 +51,8 @@ fun NewFixedSpendingScreen(
             )
             CategoriesSearch(
                 categories = uiState.categories,
-                onItemSelect = { viewModel.setCategoryInput(it.id) }
+                onItemSelect = { viewModel.setCategoryInput(it.id) },
+                onAddCategory = onNewCategory
             )
             OutlinedTextField(
                 value = uiState.descriptionInput,

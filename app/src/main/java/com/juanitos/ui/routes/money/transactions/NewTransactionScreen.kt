@@ -29,6 +29,7 @@ object NewTransactionDestination : NavigationDestination {
 @Composable
 fun NewTransactionScreen(
     onNavigateUp: () -> Unit,
+    onNewCategory: () -> Unit,
     viewModel: NewTransactionViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState.collectAsState().value
@@ -50,7 +51,8 @@ fun NewTransactionScreen(
             )
             CategoriesSearch(
                 categories = uiState.categories,
-                onItemSelect = { viewModel.setCategoryId(it.id) }
+                onItemSelect = { viewModel.setCategoryId(it.id) },
+                onAddCategory = onNewCategory
             )
             OutlinedTextField(
                 value = uiState.descriptionInput,
