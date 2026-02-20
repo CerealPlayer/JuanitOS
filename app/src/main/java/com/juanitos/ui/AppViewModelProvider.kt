@@ -27,7 +27,8 @@ object AppViewModelProvider {
         initializer {
             NewTransactionViewModel(
                 juanitOSApplication().container.transactionRepository,
-                juanitOSApplication().container.cycleRepository
+                juanitOSApplication().container.cycleRepository,
+                juanitOSApplication().container.categoryRepository
             )
         }
         initializer {

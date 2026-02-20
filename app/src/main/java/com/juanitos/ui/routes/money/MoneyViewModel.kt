@@ -33,7 +33,7 @@ class MoneyViewModel(private val cycleRepository: CycleRepository) : ViewModel()
         .combine(createCycleFlow()) { state, cycle ->
             val summary = if (cycle != null) {
                 val totalIncome = cycle.cycle.totalIncome
-                val totalTransactions = cycle.transactions.sumOf { it.amount }
+                val totalTransactions = cycle.transactions.sumOf { it.transaction.amount }
                 val remaining = totalIncome - totalTransactions
                 MoneySummary(
                     totalIncome = totalIncome,

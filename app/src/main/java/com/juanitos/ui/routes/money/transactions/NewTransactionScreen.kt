@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.commons.FormColumn
+import com.juanitos.ui.commons.categories_search.CategoriesSearch
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
@@ -47,12 +48,9 @@ fun NewTransactionScreen(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
-            OutlinedTextField(
-                value = uiState.categoryInput,
-                onValueChange = { viewModel.setCategoryInput(it) },
-                label = { Text(text = stringResource(R.string.category)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+            CategoriesSearch(
+                categories = uiState.categories,
+                onItemSelect = { viewModel.setCategoryId(it.id) }
             )
             OutlinedTextField(
                 value = uiState.descriptionInput,

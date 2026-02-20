@@ -94,8 +94,8 @@ fun FixedSpendingCard(fixedSpending: FixedSpendingWithCategory) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                Text(text = String.format(Locale.US, "%.2f€", fixedSpending.fixedSpending.amount))
                 Text(text = fixedSpending.category.name)
-                Text(text = String.format(Locale.US, "%.2f", fixedSpending.fixedSpending.amount))
             }
             if (!fixedSpending.fixedSpending.description.isNullOrBlank()) {
                 Text(

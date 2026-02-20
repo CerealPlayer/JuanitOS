@@ -13,5 +13,5 @@ data class CurrentCycleWithDetails(
         parentColumn = "id",
         entityColumn = "cycle_id"
     )
-    val transactions: List<Transaction>,
+    val transactions: List<TransactionWithCategory>,
 )
