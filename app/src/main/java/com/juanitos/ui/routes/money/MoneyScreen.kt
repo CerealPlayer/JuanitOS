@@ -155,13 +155,13 @@ fun MoneyScreen(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
                 // Mostrar gastos fijos primero
-                items(fixedSpendings) { fixedSpending ->
+                items(fixedSpendings, key = { "fs-${it.fixedSpending.id}" }) { fixedSpending ->
                     FixedSpendingCard(
                         fixedSpendingWithCategory = fixedSpending
                     )
                 }
                 // Luego mostrar transacciones
-                items(transactions) { transaction ->
+                items(transactions, key = { "t-${it.transaction.id}" }) { transaction ->
                     TransactionCard(
                         transactionWithCategory = transaction,
                         onDelete = { viewModel.deleteTransaction(it.transaction) }
