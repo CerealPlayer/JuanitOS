@@ -15,6 +15,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import com.juanitos.R
 import com.juanitos.data.money.entities.Category
@@ -24,7 +26,9 @@ import com.juanitos.data.money.entities.Category
 fun CategoriesSearch(
     categories: List<Category>,
     onItemSelect: (Category) -> Unit,
-    onAddCategory: () -> Unit
+    onAddCategory: () -> Unit,
+    categoryFocusRequester: FocusRequester? = null,
+    nextFieldFocusRequester: FocusRequester? = null
 ) {
     var query by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
@@ -52,6 +56,9 @@ fun CategoriesSearch(
                 .menuAnchor(
                     ExposedDropdownMenuAnchorType.PrimaryEditable
                 )
+                .then(
+                    categoryFocusRequester?.let { Modifier.focusRequester(it) } ?: Modifier
+                )
         )
         ExposedDropdownMenu(
             expanded = expanded,
@@ -69,6 +76,7 @@ fun CategoriesSearch(
                         query = category.name
                         onItemSelect(category)
                         expanded = false
+                        nextFieldFocusRequester?.requestFocus()
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                 )

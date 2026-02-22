@@ -1,6 +1,7 @@
 package com.juanitos.ui.routes.money.transactions
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +17,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
@@ -40,6 +42,8 @@ fun NewTransactionScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val amountFocusRequester = remember { FocusRequester() }
+    val categoryFocusRequester = remember { FocusRequester() }
+    val descriptionFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
         amountFocusRequester.requestFocus()
@@ -62,19 +66,35 @@ fun NewTransactionScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(amountFocusRequester),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { categoryFocusRequester.requestFocus() }
+                )
             )
             CategoriesSearch(
                 categories = uiState.categories,
                 onItemSelect = { viewModel.setCategoryId(it.id) },
-                onAddCategory = onNewCategory
+                onAddCategory = onNewCategory,
+                categoryFocusRequester = categoryFocusRequester,
+                nextFieldFocusRequester = descriptionFocusRequester
             )
             OutlinedTextField(
                 value = uiState.descriptionInput,
                 onValueChange = { viewModel.setDescriptionInput(it) },
                 label = { Text(text = stringResource(R.string.description_optional)) },
                 singleLine = false,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(descriptionFocusRequester),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = { viewModel.saveTransaction(onSuccess = onNavigateUp) }
+                )
             )
             if (uiState.errorMessage != null) {
                 Text(text = uiState.errorMessage, color = Color.Red)
