@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +25,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -98,16 +99,25 @@ fun TransactionCard(
             }
         }
     ) {
-        val color = if (transaction.amount > 0) {
+        val accentColor = if (transaction.amount > 0) {
             MaterialTheme.colorScheme.error
         } else {
             MaterialTheme.colorScheme.primary
         }
+        val accentWidth = 6.dp
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = color
-            )
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .drawWithContent {
+                    drawContent()
+                    drawLine(
+                        color = accentColor,
+                        start = Offset(accentWidth.toPx() / 2, 0f),
+                        end = Offset(accentWidth.toPx() / 2, size.height),
+                        strokeWidth = accentWidth.toPx()
+                    )
+                },
         ) {
             Column(
                 modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
