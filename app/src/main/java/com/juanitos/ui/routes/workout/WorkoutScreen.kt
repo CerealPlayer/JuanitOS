@@ -40,6 +40,7 @@ object WorkoutDestination : NavigationDestination {
 @Composable
 fun WorkoutScreen(
     onNavigateUp: () -> Unit,
+    onNewWorkout: () -> Unit,
     onExercises: () -> Unit,
     viewModel: WorkoutViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -64,7 +65,7 @@ fun WorkoutScreen(
                     }
                 },
                 floatingActionButton = {
-                    FloatingActionButton(onClick = { /* TODO: navigate to new workout screen */ }) {
+                    FloatingActionButton(onClick = onNewWorkout) {
                         Add()
                     }
                 }

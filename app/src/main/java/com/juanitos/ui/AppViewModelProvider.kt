@@ -12,6 +12,7 @@ import com.juanitos.ui.routes.money.categories.NewCategoryViewModel
 import com.juanitos.ui.routes.money.spendings.FixedSpendingsViewModel
 import com.juanitos.ui.routes.money.spendings.NewFixedSpendingViewModel
 import com.juanitos.ui.routes.money.transactions.NewTransactionViewModel
+import com.juanitos.ui.routes.workout.NewWorkoutViewModel
 import com.juanitos.ui.routes.workout.WorkoutViewModel
 import com.juanitos.ui.routes.workout.exercises.ExercisesViewModel
 import com.juanitos.ui.routes.workout.exercises.NewExerciseViewModel
@@ -67,6 +68,14 @@ object AppViewModelProvider {
         initializer {
             WorkoutViewModel(
                 juanitOSApplication().container.workoutRepository
+            )
+        }
+        initializer {
+            NewWorkoutViewModel(
+                juanitOSApplication().container.workoutRepository,
+                juanitOSApplication().container.workoutExerciseRepository,
+                juanitOSApplication().container.workoutSetRepository,
+                juanitOSApplication().container.exerciseDefinitionRepository
             )
         }
         initializer {

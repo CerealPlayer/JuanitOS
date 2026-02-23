@@ -54,4 +54,19 @@
     <string name="duration_seconds">Duration (seconds)</string>
     <string name="weight_kg">Weight (kg)</string>
     <string name="confirm_delete_workout">Delete workout?</string>
+    <string name="add_set">Add set</string>
+    <string name="bodyweight">Bodyweight</string>
+    <string name="no_exercises_defined">No exercises defined yet. Go to Exercises to add some.</string>
+    <string name="select_exercise">Select exercise</string>
+    <string name="kg_format">%1$.1f kg</string>
+    <string name="reps_format">× %1$d reps</string>
+    <string name="duration_format">%1$d s</string>
+    <string name="set_label">Set %1$d</string>
+    <string name="save_workout">Save workout</string>
+    <string name="workout_notes_hint">Notes (optional)</string>
+    <string name="discard_workout">Discard workout?</string>
+    <string name="discard_workout_message">This workout and all its logged sets will be permanently deleted.</string>
+    <string name="keep_editing">Keep editing</string>
+    <string name="discard">Discard</string>
+    <string name="done">Done</string>
 </resources>

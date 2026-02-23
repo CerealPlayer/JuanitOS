@@ -21,6 +21,8 @@ import com.juanitos.ui.routes.money.spendings.NewFixedSpendingDestination
 import com.juanitos.ui.routes.money.spendings.NewFixedSpendingScreen
 import com.juanitos.ui.routes.money.transactions.NewTransactionDestination
 import com.juanitos.ui.routes.money.transactions.NewTransactionScreen
+import com.juanitos.ui.routes.workout.NewWorkoutDestination
+import com.juanitos.ui.routes.workout.NewWorkoutScreen
 import com.juanitos.ui.routes.workout.WorkoutDestination
 import com.juanitos.ui.routes.workout.WorkoutScreen
 import com.juanitos.ui.routes.workout.exercises.ExercisesDestination
@@ -83,8 +85,12 @@ fun JuanitOSNavGraph(
         composable(route = WorkoutDestination.route.route) {
             WorkoutScreen(
                 onNavigateUp = { navController.navigateUp() },
+                onNewWorkout = { navController.navigate(NewWorkoutDestination.route.route) },
                 onExercises = { navController.navigate(ExercisesDestination.route.route) }
             )
+        }
+        composable(route = NewWorkoutDestination.route.route) {
+            NewWorkoutScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = ExercisesDestination.route.route) {
             ExercisesScreen(
