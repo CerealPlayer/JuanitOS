@@ -2,13 +2,16 @@
 
 ## Project Overview
 
-**JuanitOS** is an Android personal management application built with Kotlin and Jetpack Compose. It
-tracks two main domains:
+**JuanitOS** is an Android personal management application built with Kotlin and Jetpack Compose.
+Currently implements:
 
-- **Food Module**: Track daily food intake with ingredients, batch foods, and calorie management
-- **Money Module**: Manage income, transactions, and fixed spending organized by cycles
+- **Money Module**: Manage income, transactions, categories, and fixed spending organized by cycles
+    - Track spending across cycles with start/end dates
+    - Categorize transactions and fixed spending
+    - View money summary with custom chart visualization
+- **Food Module**: Planned but not yet implemented (route stub exists)
 
-The app uses Room database (schema version 16) with offline-first architecture and local-only data (
+The app uses Room database (schema version 19) with offline-first architecture and local-only data (
 no backend).
 
 ---
@@ -19,36 +22,55 @@ no backend).
 
 ```
 data/
-  ├── food/
-  │   ├── daos/ (Room DAOs for each entity)
-  │   ├── entities/ (Food, Ingredient, BatchFood, etc.)
-  │   ├── offline/ (OfflineFoodRepository, etc.)
-  │   └── repositories/ (Repository interfaces)
   ├── money/
-  │   ├── daos/ (CycleDao, TransactionDao, FixedSpendingDao)
-  │   ├── entities/ (Cycle, Transaction, FixedSpending)
-  │   ├── offline/ (Offline implementations)
+  │   ├── daos/ (CategoryDao, CycleDao, FixedSpendingDao, TransactionDao)
+  │   ├── entities/
+  │   │   ├── Category, Cycle, Transaction, FixedSpending
+  │   │   └── relations/ (CurrentCycleWithDetails, TransactionWithCategory, FixedSpendingWithCategory)
+  │   ├── offline/ (OfflineCategoryRepository, OfflineCycleRepository, etc.)
   │   └── repositories/ (Repository interfaces)
-  ├── AppContainer.kt (Dependency injection interface)
-  ├── AppDataContainer.kt (DI implementation with lazy initialization)
-  └── JuanitOSDatabase.kt (Room database with 5 migrations: 9→10→11→12→13→14)
+  ├── migrations/
+  │   └── Migrations.kt (5 migrations: 9→10→11→12→13→14)
+  ├── AppContainer.kt (DI interface - 4 Money repositories)
+  └── JuanitOSDatabase.kt (Room DB v19, 4 entities, 5 migrations)
 
 ui/
   ├── routes/
-  │   ├── food/settings, batch, ingredients, track, new_food
-  │   └── money/transactions, spendings, settings
+  │   ├── HomeScreen.kt (Money summary with chart)
+  │   ├── HomeViewModel.kt
+  │   └── money/
+  │       ├── MoneyScreen.kt (Main money dashboard)
+  │       ├── MoneyViewModel.kt
+  │       ├── FixedSpendingCard.kt, TransactionCard.kt (Reusable cards)
+  │       ├── transactions/ (NewTransactionScreen, ViewModel)
+  │       ├── spendings/ (FixedSpendingsScreen, NewFixedSpendingScreen, ViewModels)
+  │       ├── categories/ (CategoriesScreen, NewCategoryScreen, ViewModels)
+  │       └── settings/ (MoneySettings, ViewModel)
   ├── navigation/
   │   ├── JuanitOSNavGraph.kt (Composable navigation)
-  │   ├── Routes.kt (Enum with route definitions and parameter builders)
+  │   ├── JuanitOSTopAppBar.kt (Top app bar component)
+  │   ├── Routes.kt (Enum with 9 route definitions)
   │   └── NavigationDestination.kt (Interface for typed destinations)
-  ├── AppViewModelProvider.kt (ViewModelFactory with all VM definitions)
-  └── commons/ (Shared composables like FormColumn, QtDialog, Search)
+  ├── commons/
+  │   ├── MoneySummaryChart.kt (Custom bar chart visualization)
+  │   ├── DeleteConfirmationDialog.kt
+  │   ├── FormColumn.kt
+  │   ├── search/ (Generic Search composable)
+  │   └── categories_search/ (CategoriesSearch composable)
+  ├── icons/ (Add, ArrowBack, Delete, MoreVert, Search, Settings)
+  ├── theme/ (Color, Theme, Type)
+  └── AppViewModelProvider.kt (Factory with 8 ViewModels)
+
+lib/
+  ├── InputUiState.kt (Generic input state with value, touched, isValid)
+  ├── dates.kt (Date utility functions)
+  └── validation.kt (validateQtInt and other validators)
 ```
 
 ### Dependency Injection Pattern
 
-- **AppContainer** interface defines all repositories
-- **AppDataContainer** implements with lazy-initialized repositories
+- **AppContainer** interface defines all repositories (4 Money repositories)
+- **AppDataContainer** (in AppContainer.kt) implements with lazy-initialized repositories
 - **AppViewModelProvider** uses viewModelFactory with `juanitOSApplication()` to access container
 - All repositories are stateless, singleton instances
 
@@ -90,14 +112,26 @@ class MyViewModel(private val repository: MyRepository) : ViewModel() {
 ### Navigation with Typed Routes
 
 ```kotlin
-// Routes.kt - Define parameter builders
-fun createFoodDetailsRoute(foodId: Int) = "food/$foodId"
+// Routes.kt - Define route enum
+enum class Routes(val route: String) {
+    Home("home"),
+    Money("money"),
+    NewTransaction("new_transaction")
+}
 
-// Routes.kt - Navgraph uses typed enum and navArgument
-navArgument("foodId") { type = NavType.IntType }
+// Destination object with route and title
+object MoneyDestination : NavigationDestination {
+    override val route = Routes.Money.route
+    override val titleRes = R.string.money_title
+}
 
-// ViewModels receive SavedStateHandle to extract params
-val foodId = savedStateHandle.get<Int>("foodId") ?: throw IllegalArgumentException("foodId not found")
+// JuanitOSNavGraph - Register composable routes
+composable(Routes.Money.route) {
+    MoneyScreen(onNavigateToSettings = { navController.navigate(Routes.MoneySettings.route) })
+}
+
+// ViewModels without parameters don't need SavedStateHandle
+// If route parameters needed, extract from SavedStateHandle
 ```
 
 ### UI State Data Classes
@@ -105,24 +139,40 @@ val foodId = savedStateHandle.get<Int>("foodId") ?: throw IllegalArgumentExcepti
 Each screen has a dedicated UiState data class:
 
 - Contains form inputs, validation states, error messages, loading flags
-- Example:
-  `NewTransactionUiState(amountInput: String, isAmountValid: Boolean, currentCycleId: Int?, ...)`
+- Example: `NewTransactionUiState(amount: InputUiState, categoryId: Int?, ...)`
+- For form inputs, use `InputUiState(value, touched, isValid)` from `lib/InputUiState.kt`
 - Screens receive UiState via `.collectAsState()` from ViewModel
+- Complex screens may have nested data classes like `MoneySummary` for aggregated data
 
 ---
 
 ## Database & Migrations
 
-### Current Schema (version 16)
+### Current Schema (version 19)
 
-Entities: Setting, Food, FoodIngredient, Ingredient, BatchFood, BatchFoodIngredient, Cycle,
-Transaction, FixedSpending
+**Entities (4 Money entities):**
+
+- **Cycle** - Payment cycles with start/end dates and total income
+- **Transaction** - One-time transactions linked to cycles and categories
+- **FixedSpending** - Recurring spending with active/deleted state
+- **Category** - Categories for organizing transactions and fixed spending
+
+**Entity Relations (3):**
+
+- **CurrentCycleWithDetails** - Cycle + List<TransactionWithCategory>
+- **FixedSpendingWithCategory** - FixedSpending + Category
+- **TransactionWithCategory** - Transaction + Category
+
+**Note:** Food module entities mentioned in migrations (foods, batch_foods, ingredients,
+food_ingredients, batch_food_ingredients) but currently not in active schema.
 
 ### Migration Pattern
 
-- Store migrations in `data/migrations/` (MIGRATION_9_10, MIGRATION_10_11, etc.)
+- Store migrations in `data/migrations/Migrations.kt` (MIGRATION_9_10 through MIGRATION_13_14)
 - Use `fallbackToDestructiveMigration(false)` to prevent data loss
 - New migrations must be added to `JuanitOSDatabase.addMigrations()`
+- **Existing migrations cover Food module tables** that are not in current active schema (v14→v19
+  gap indicates potential schema changes)
 
 ---
 
@@ -137,12 +187,15 @@ Transaction, FixedSpending
 ## Key Dependencies
 
 - **Kotlin 2.3.0** with Compose compiler plugin
-- **Jetpack Compose 2026.01.00** for UI
+- **Jetpack Compose BOM 2026.01.00** for UI
 - **Room 2.8.4** for database with KSP annotation processing
 - **Navigation Compose 2.9.6** for typed navigation
 - **KSP 2.3.4** for Room code generation
 - **Material3 1.4.0** for design system
-- **Vico 2.4.1** for charts (imported but usage not visible in current structure)
+- **Lifecycle Runtime KTX 2.10.0** for coroutines and ViewModels
+- **Activity Compose 1.12.2** for activity integration
+- **Core KTX 1.17.0** for Android extensions
+- **Vico 2.4.1** for charts (imported but not actively used; custom charts in MoneySummaryChart.kt)
 
 ---
 
@@ -167,33 +220,89 @@ Transaction, FixedSpending
 
 ---
 
+## Current Implementation Scope
+
+### Implemented Modules
+
+**Money Module** (Complete)
+
+- **8 Screens**: Home, Money, MoneySettings, NewTransaction, FixedSpendings, NewFixedSpending,
+  Categories, NewCategory
+- **4 Entities**: Cycle, Transaction, FixedSpending, Category
+- **4 Repositories**: CycleRepository, TransactionRepository, FixedSpendingRepository,
+  CategoryRepository
+- **8 ViewModels**: All screens have dedicated ViewModels with StateFlow pattern
+- **Features**:
+    - Cycle management with start/end dates and income tracking
+    - Transaction tracking with category assignment
+    - Fixed spending with active/inactive state
+    - Category management for organizing spending
+    - Custom bar chart visualization (MoneySummaryChart)
+    - Search functionality for categories
+    - Delete confirmation dialogs
+
+**Food Module** (Not Implemented)
+
+- Route stub exists in `Routes.kt` but no screens, entities, or repositories implemented
+- Legacy migration files reference food-related tables (foods, batch_foods, ingredients) but these
+  are not in current schema
+
+### Common Components
+
+- **Custom Icons**: 6 Material icons (Add, ArrowBack, Delete, MoreVert, Search, Settings) in
+  `ui/icons/`
+- **Reusable Composables**:
+    - `MoneySummaryChart.kt` - Custom bar chart with income/expenses/remaining
+    - `DeleteConfirmationDialog.kt` - Confirmation dialog for deletions
+    - `FormColumn.kt` - Form layout wrapper
+    - `Search.kt` - Generic search component
+    - `CategoriesSearch.kt` - Category-specific search
+    - `TransactionCard.kt`, `FixedSpendingCard.kt` - List item cards
+- **Utilities**:
+    - `lib/InputUiState.kt` - Generic input state (value, touched, isValid)
+    - `lib/dates.kt` - Date formatting and manipulation
+    - `lib/validation.kt` - Input validators
+
+---
+
 ## Developer Workflows
 
 ### Adding a New Screen
 
-1. Create screen destination in `ui/routes/{module}/{screen}/`
-2. Define `{Screen}Destination` with route and titleRes
-3. Create `{Screen}ViewModel` injecting required repositories
-4. Add ViewModel to `AppViewModelProvider.Factory`
-5. Create composable screen function in `{Screen}Screen.kt`
-6. Add navigation in `JuanitOSNavGraph` with route and arguments
+1. Create screen composable in `ui/routes/{module}/{feature}/`
+2. Define `{Screen}Destination` object with route from Routes enum and titleRes
+3. Create `{Screen}ViewModel` injecting required repositories from AppContainer
+4. Add ViewModel initializer to `AppViewModelProvider.Factory`
+5. Create composable screen function in `{Screen}Screen.kt` (may include card components)
+6. Add navigation entry in `JuanitOSNavGraph` with route from Routes enum
 7. Wire navigation callback in parent screen
 
 ### Adding a New Entity
 
-1. Create entity data class in `data/{module}/entities/`
-2. Create DAO interface in `data/{module}/daos/`
-3. Implement DAO methods with @Query annotations
-4. Create repository interface in `data/{module}/repositories/`
-5. Implement offline repository in `data/{module}/offline/`
-6. Add to `AppContainer` and `AppDataContainer`
-7. Create migration if modifying schema
+1. Create entity data class in `data/{module}/entities/` with Room annotations
+2. Create DAO interface in `data/{module}/daos/` with @Dao annotation
+3. Implement DAO methods with @Query, @Insert, @Update, @Delete annotations
+4. Create repository interface in `data/{module}/repositories/` with Flow return types
+5. Implement offline repository in `data/{module}/offline/` delegating to DAO
+6. Add repository property to `AppContainer` interface
+7. Implement lazy initialization in `AppDataContainer` class
+8. Add entity to `JuanitOSDatabase @Database` entities array
+9. Create abstract DAO getter in `JuanitOSDatabase`
+10. Increment database version and create migration if needed
 
 ### Form Input Validation
 
-- Use utility functions: `validateQtInt()`, custom validators in `lib/validation.kt`
-- Store validation state in UiState (isAmountValid, isIncomeValid, etc.)
-- Validators should return Boolean; errors stored as optional String in UiState
+- Use utility functions from `lib/validation.kt`: `validateQtInt()`, etc.
+- Store validation state using `InputUiState(value, touched, isValid)` from `lib/InputUiState.kt`
+- Validators should return Boolean; errors stored as optional String in UiState if needed
+- Mark fields as `touched` when user interacts, validate only when touched
+
+### Creating Reusable Card Components
+
+- Create `{Entity}Card.kt` in same directory as screen for list items
+- Example: `TransactionCard.kt`, `FixedSpendingCard.kt`
+- Cards typically include entity display data and optional action callbacks (delete, edit)
+- Used within LazyColumn in list screens
 
 ---
 
@@ -203,10 +312,13 @@ Transaction, FixedSpending
 
 - **Screen classes**: `{Feature}Screen.kt` with `@Composable` function and `{Feature}Destination`
   object
-- **ViewModels**: `{Feature}ViewModel.kt` (e.g., `NewFoodViewModel`, `FoodSettingsViewModel`)
-- **UiState classes**: Nested in ViewModel file or separate with `data class {Feature}UiState`
-- **Offline repositories**: Prefix `Offline` (e.g., `OfflineFoodRepository`)
-- **DAOs**: Suffix `Dao` (e.g., `FoodDao`, `IngredientDao`)
+- **ViewModels**: `{Feature}ViewModel.kt` (e.g., `NewTransactionViewModel`,
+  `MoneySettingsViewModel`)
+- **UiState classes**: Defined in ViewModel file with `data class {Feature}UiState`
+- **Card components**: `{Entity}Card.kt` for reusable list items (e.g., `TransactionCard.kt`)
+- **Offline repositories**: Prefix `Offline` (e.g., `OfflineCycleRepository`)
+- **DAOs**: Suffix `Dao` (e.g., `CycleDao`, `CategoryDao`)
+- **Entity relations**: Suffix `With{RelatedEntity}` (e.g., `TransactionWithCategory`)
 
 ### Constants
 
@@ -221,12 +333,34 @@ Transaction, FixedSpending
 
 ---
 
+## All Screens & Routes
+
+| Route                  | Screen File                                | ViewModel                 | Purpose                                          |
+|------------------------|--------------------------------------------|---------------------------|--------------------------------------------------|
+| **home**               | HomeScreen.kt                              | HomeViewModel             | Dashboard with money summary chart               |
+| **food**               | _(Not implemented)_                        | -                         | Placeholder route only                           |
+| **money**              | money/MoneyScreen.kt                       | MoneyViewModel            | Main money dashboard with transactions/spendings |
+| **money_settings**     | money/settings/MoneySettings.kt            | MoneySettingsViewModel    | Cycle management settings                        |
+| **new_transaction**    | money/transactions/NewTransactionScreen.kt | NewTransactionViewModel   | Create new transaction                           |
+| **fixed_spending**     | money/spendings/FixedSpendingsScreen.kt    | FixedSpendingsViewModel   | List all fixed spendings                         |
+| **new_fixed_spending** | money/spendings/NewFixedSpendingScreen.kt  | NewFixedSpendingViewModel | Create new fixed spending                        |
+| **categories**         | money/categories/CategoriesScreen.kt       | CategoriesViewModel       | List and manage categories                       |
+| **new_category**       | money/categories/NewCategoryScreen.kt      | NewCategoryViewModel      | Create new category                              |
+
+**Navigation Pattern**: All routes registered in `JuanitOSNavGraph.kt` using Routes enum values. No
+parameterized routes currently in use.
+
+---
+
 ## Common Gotchas
 
-1. **SavedStateHandle for nav params**: Always extract with null-coalescing and throw
-   IllegalArgumentException if not found
+1. **SavedStateHandle for nav params**: Currently no routes use parameters; if adding parameterized
+   routes, extract with null-coalescing and throw IllegalArgumentException if not found
 2. **Flow vs StateFlow**: Queries return Flow, ViewModels convert to StateFlow with stateIn()
 3. **Database migrations**: Must be added to JuanitOSDatabase.addMigrations() or they won't run
 4. **Lazy repository initialization**: Use `by lazy { OfflineXRepository(...) }` in AppDataContainer
 5. **Combine operator**: Order matters; final state is determined by last combine's copy()
+6. **InputUiState usage**: Use for form fields instead of separate value/touched/isValid properties
+7. **Food module status**: Route defined but implementation removed; migrations reference legacy
+   food tables (v9-14) that are not in current active schema (v19)
 

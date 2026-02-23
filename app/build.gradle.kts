@@ -6,6 +6,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        create("test-release") {
+            storeFile = file("C:\\Users\\juanm\\Development\\test-release")
+            storePassword = "testrel"
+            keyAlias = "key0"
+            keyPassword = "testrel"
+        }
+    }
     namespace = "com.juanitos"
     compileSdk = 36
 
@@ -26,6 +34,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("test-release")
         }
     }
     compileOptions {
