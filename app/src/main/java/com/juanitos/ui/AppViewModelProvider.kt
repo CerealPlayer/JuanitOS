@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.juanitos.JuanitOSApplication
+import com.juanitos.ui.routes.HomeViewModel
 import com.juanitos.ui.routes.money.MoneyViewModel
 import com.juanitos.ui.routes.money.categories.CategoriesViewModel
 import com.juanitos.ui.routes.money.categories.NewCategoryViewModel
@@ -14,6 +15,12 @@ import com.juanitos.ui.routes.money.transactions.NewTransactionViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
+        initializer {
+            HomeViewModel(
+                juanitOSApplication().container.cycleRepository,
+                juanitOSApplication().container.fixedSpendingRepository,
+            )
+        }
         initializer {
             MoneyViewModel(
                 juanitOSApplication().container.cycleRepository,
