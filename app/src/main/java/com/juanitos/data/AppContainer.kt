@@ -9,12 +9,24 @@ import com.juanitos.data.money.repositories.CategoryRepository
 import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
 import com.juanitos.data.money.repositories.TransactionRepository
+import com.juanitos.data.workout.offline.OfflineExerciseDefinitionRepository
+import com.juanitos.data.workout.offline.OfflineWorkoutExerciseRepository
+import com.juanitos.data.workout.offline.OfflineWorkoutRepository
+import com.juanitos.data.workout.offline.OfflineWorkoutSetRepository
+import com.juanitos.data.workout.repositories.ExerciseDefinitionRepository
+import com.juanitos.data.workout.repositories.WorkoutExerciseRepository
+import com.juanitos.data.workout.repositories.WorkoutRepository
+import com.juanitos.data.workout.repositories.WorkoutSetRepository
 
 interface AppContainer {
     val cycleRepository: CycleRepository
     val transactionRepository: TransactionRepository
     val fixedSpendingRepository: FixedSpendingRepository
     val categoryRepository: CategoryRepository
+    val exerciseDefinitionRepository: ExerciseDefinitionRepository
+    val workoutRepository: WorkoutRepository
+    val workoutExerciseRepository: WorkoutExerciseRepository
+    val workoutSetRepository: WorkoutSetRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -34,6 +46,26 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val categoryRepository: CategoryRepository by lazy {
         OfflineCategoryRepository(
             categoryDao = JuanitOSDatabase.getDatabase(context).categoryDao()
+        )
+    }
+    override val exerciseDefinitionRepository: ExerciseDefinitionRepository by lazy {
+        OfflineExerciseDefinitionRepository(
+            exerciseDefinitionDao = JuanitOSDatabase.getDatabase(context).exerciseDefinitionDao()
+        )
+    }
+    override val workoutRepository: WorkoutRepository by lazy {
+        OfflineWorkoutRepository(
+            workoutDao = JuanitOSDatabase.getDatabase(context).workoutDao()
+        )
+    }
+    override val workoutExerciseRepository: WorkoutExerciseRepository by lazy {
+        OfflineWorkoutExerciseRepository(
+            workoutExerciseDao = JuanitOSDatabase.getDatabase(context).workoutExerciseDao()
+        )
+    }
+    override val workoutSetRepository: WorkoutSetRepository by lazy {
+        OfflineWorkoutSetRepository(
+            workoutSetDao = JuanitOSDatabase.getDatabase(context).workoutSetDao()
         )
     }
 }

@@ -22,6 +22,7 @@ import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
 import com.juanitos.ui.routes.money.MoneyDestination
+import com.juanitos.ui.routes.workout.WorkoutDestination
 
 object HomeDestination : NavigationDestination {
     override val route = Routes.Home
@@ -50,6 +51,12 @@ fun HomeScreen(
                 Icon(
                     painter = painterResource(R.drawable.subapp_money),
                     contentDescription = stringResource(R.string.money)
+                )
+            }
+            IconButton(onClick = { onNavigateTo(WorkoutDestination.route) }) {
+                Icon(
+                    painter = painterResource(R.drawable.subapp_workout),
+                    contentDescription = stringResource(R.string.workout)
                 )
             }
         })

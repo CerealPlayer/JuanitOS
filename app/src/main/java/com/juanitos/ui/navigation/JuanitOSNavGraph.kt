@@ -21,6 +21,12 @@ import com.juanitos.ui.routes.money.spendings.NewFixedSpendingDestination
 import com.juanitos.ui.routes.money.spendings.NewFixedSpendingScreen
 import com.juanitos.ui.routes.money.transactions.NewTransactionDestination
 import com.juanitos.ui.routes.money.transactions.NewTransactionScreen
+import com.juanitos.ui.routes.workout.WorkoutDestination
+import com.juanitos.ui.routes.workout.WorkoutScreen
+import com.juanitos.ui.routes.workout.exercises.ExercisesDestination
+import com.juanitos.ui.routes.workout.exercises.ExercisesScreen
+import com.juanitos.ui.routes.workout.exercises.NewExerciseDestination
+import com.juanitos.ui.routes.workout.exercises.NewExerciseScreen
 
 @Composable
 fun JuanitOSNavGraph(
@@ -73,6 +79,21 @@ fun JuanitOSNavGraph(
         }
         composable(route = NewCategoryDestination.route.route) {
             NewCategoryScreen(onNavigateUp = { navController.navigateUp() })
+        }
+        composable(route = WorkoutDestination.route.route) {
+            WorkoutScreen(
+                onNavigateUp = { navController.navigateUp() },
+                onExercises = { navController.navigate(ExercisesDestination.route.route) }
+            )
+        }
+        composable(route = ExercisesDestination.route.route) {
+            ExercisesScreen(
+                onNavigateUp = { navController.navigateUp() },
+                onNewExercise = { navController.navigate(NewExerciseDestination.route.route) }
+            )
+        }
+        composable(route = NewExerciseDestination.route.route) {
+            NewExerciseScreen(onNavigateUp = { navController.navigateUp() })
         }
     }
 }

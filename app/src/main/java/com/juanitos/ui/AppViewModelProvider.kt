@@ -12,6 +12,9 @@ import com.juanitos.ui.routes.money.categories.NewCategoryViewModel
 import com.juanitos.ui.routes.money.spendings.FixedSpendingsViewModel
 import com.juanitos.ui.routes.money.spendings.NewFixedSpendingViewModel
 import com.juanitos.ui.routes.money.transactions.NewTransactionViewModel
+import com.juanitos.ui.routes.workout.WorkoutViewModel
+import com.juanitos.ui.routes.workout.exercises.ExercisesViewModel
+import com.juanitos.ui.routes.workout.exercises.NewExerciseViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -59,6 +62,21 @@ object AppViewModelProvider {
         initializer {
             NewCategoryViewModel(
                 juanitOSApplication().container.categoryRepository
+            )
+        }
+        initializer {
+            WorkoutViewModel(
+                juanitOSApplication().container.workoutRepository
+            )
+        }
+        initializer {
+            ExercisesViewModel(
+                juanitOSApplication().container.exerciseDefinitionRepository
+            )
+        }
+        initializer {
+            NewExerciseViewModel(
+                juanitOSApplication().container.exerciseDefinitionRepository
             )
         }
     }

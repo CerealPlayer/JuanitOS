@@ -9,5 +9,8 @@ enum class Routes(val route: String) {
     FixedSpending("fixed_spending"),
     NewFixedSpending("new_fixed_spending"),
     Categories("categories"),
-    NewCategory("new_category");
+    NewCategory("new_category"),
+    Workout("workout"),
+    Exercises("exercises"),
+    NewExercise("new_exercise_definition");
 }
