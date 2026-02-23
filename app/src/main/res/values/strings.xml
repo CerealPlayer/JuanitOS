@@ -13,6 +13,7 @@
     <string name="current_cycle">Current cycle</string>
     <string name="end_cycle">End cycle</string>
     <string name="create_cycle">Create cycle</string>
+    <string name="money_summary_title">Finance summary</string>
     <string name="income_input_label">Total income</string>
     <string name="new_transaction">New transaction</string>
     <string name="fixed_spendings">Fixed spending\'s</string>
@@ -28,6 +29,7 @@
     <string name="total_income">Total income</string>
     <string name="total_fixed_spendings">Total fixed spendings</string>
     <string name="total_transactions">Total transactions</string>
+    <string name="total_spent">Total spent</string>
     <string name="remaining_money">Remaining money</string>
     <string name="uncategorized">Uncategorized</string>
     <string name="delete">Delete</string>
