@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
 fun WorkoutCard(
     workout: Workout,
     onDelete: (Workout) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val dismissState = rememberSwipeToDismissBoxState()
@@ -85,7 +86,7 @@ fun WorkoutCard(
             }
         }
     ) {
-        Card(modifier = Modifier.fillMaxWidth()) {
+        Card(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
             Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))) {
                 Text(
                     text = formatDbDatetimeToShortDate(workout.date).ifBlank { workout.date },

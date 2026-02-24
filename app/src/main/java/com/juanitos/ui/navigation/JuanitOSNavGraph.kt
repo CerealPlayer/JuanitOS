@@ -3,8 +3,10 @@ package com.juanitos.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.juanitos.ui.routes.HomeDestination
 import com.juanitos.ui.routes.HomeScreen
 import com.juanitos.ui.routes.money.MoneyDestination
@@ -24,6 +26,8 @@ import com.juanitos.ui.routes.money.transactions.NewTransactionScreen
 import com.juanitos.ui.routes.workout.NewWorkoutDestination
 import com.juanitos.ui.routes.workout.NewWorkoutScreen
 import com.juanitos.ui.routes.workout.WorkoutDestination
+import com.juanitos.ui.routes.workout.WorkoutDetailDestination
+import com.juanitos.ui.routes.workout.WorkoutDetailScreen
 import com.juanitos.ui.routes.workout.WorkoutScreen
 import com.juanitos.ui.routes.workout.exercises.ExercisesDestination
 import com.juanitos.ui.routes.workout.exercises.ExercisesScreen
@@ -86,11 +90,20 @@ fun JuanitOSNavGraph(
             WorkoutScreen(
                 onNavigateUp = { navController.navigateUp() },
                 onNewWorkout = { navController.navigate(NewWorkoutDestination.route.route) },
-                onExercises = { navController.navigate(ExercisesDestination.route.route) }
+                onExercises = { navController.navigate(ExercisesDestination.route.route) },
+                onWorkoutClick = { workoutId ->
+                    navController.navigate("workout_detail/$workoutId")
+                },
             )
         }
         composable(route = NewWorkoutDestination.route.route) {
             NewWorkoutScreen(onNavigateUp = { navController.navigateUp() })
+        }
+        composable(
+            route = WorkoutDetailDestination.route.route,
+            arguments = listOf(navArgument("workoutId") { type = NavType.IntType }),
+        ) {
+            WorkoutDetailScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = ExercisesDestination.route.route) {
             ExercisesScreen(

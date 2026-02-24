@@ -9,7 +9,7 @@ interface WorkoutRepository {
     suspend fun update(workout: Workout)
     suspend fun delete(workout: Workout)
     fun getById(id: Int): Flow<Workout>
-    fun getByIdWithExercises(id: Int): Flow<WorkoutWithExercises>
+    fun getByIdWithExercises(id: Int): Flow<WorkoutWithExercises?>
     fun getAll(): Flow<List<Workout>>
     fun getAllWithExercises(): Flow<List<WorkoutWithExercises>>
 }

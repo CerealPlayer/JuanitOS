@@ -40,6 +40,7 @@ fun WorkoutScreen(
     onNavigateUp: () -> Unit,
     onNewWorkout: () -> Unit,
     onExercises: () -> Unit,
+    onWorkoutClick: (Int) -> Unit,
     viewModel: WorkoutViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState.collectAsState()
@@ -95,7 +96,8 @@ fun WorkoutScreen(
                 items(workouts, key = { it.id }) { workout ->
                     WorkoutCard(
                         workout = workout,
-                        onDelete = { viewModel.deleteWorkout(it) }
+                        onDelete = { viewModel.deleteWorkout(it) },
+                        onClick = { onWorkoutClick(workout.id) },
                     )
                 }
             }

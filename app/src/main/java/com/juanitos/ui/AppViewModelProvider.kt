@@ -1,6 +1,7 @@
 package com.juanitos.ui
 
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -13,6 +14,7 @@ import com.juanitos.ui.routes.money.spendings.FixedSpendingsViewModel
 import com.juanitos.ui.routes.money.spendings.NewFixedSpendingViewModel
 import com.juanitos.ui.routes.money.transactions.NewTransactionViewModel
 import com.juanitos.ui.routes.workout.NewWorkoutViewModel
+import com.juanitos.ui.routes.workout.WorkoutDetailViewModel
 import com.juanitos.ui.routes.workout.WorkoutViewModel
 import com.juanitos.ui.routes.workout.exercises.ExercisesViewModel
 import com.juanitos.ui.routes.workout.exercises.NewExerciseViewModel
@@ -76,6 +78,12 @@ object AppViewModelProvider {
                 juanitOSApplication().container.workoutExerciseRepository,
                 juanitOSApplication().container.workoutSetRepository,
                 juanitOSApplication().container.exerciseDefinitionRepository
+            )
+        }
+        initializer {
+            WorkoutDetailViewModel(
+                savedStateHandle = createSavedStateHandle(),
+                workoutRepository = juanitOSApplication().container.workoutRepository,
             )
         }
         initializer {

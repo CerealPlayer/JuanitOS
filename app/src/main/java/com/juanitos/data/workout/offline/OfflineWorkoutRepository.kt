@@ -13,7 +13,7 @@ data class OfflineWorkoutRepository(
     override suspend fun update(workout: Workout) = workoutDao.update(workout)
     override suspend fun delete(workout: Workout) = workoutDao.delete(workout)
     override fun getById(id: Int): Flow<Workout> = workoutDao.getById(id)
-    override fun getByIdWithExercises(id: Int): Flow<WorkoutWithExercises> =
+    override fun getByIdWithExercises(id: Int): Flow<WorkoutWithExercises?> =
         workoutDao.getByIdWithExercises(id)
 
     override fun getAll(): Flow<List<Workout>> = workoutDao.getAll()
