@@ -2,14 +2,12 @@ package com.juanitos.ui.routes.workout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -95,14 +93,10 @@ fun WorkoutScreen(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
                 items(workouts, key = { it.id }) { workout ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))) {
-                            Text(text = workout.date)
-                            if (!workout.notes.isNullOrBlank()) {
-                                Text(text = workout.notes)
-                            }
-                        }
-                    }
+                    WorkoutCard(
+                        workout = workout,
+                        onDelete = { viewModel.deleteWorkout(it) }
+                    )
                 }
             }
         }

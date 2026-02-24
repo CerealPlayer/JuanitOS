@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class ExercisesUiState(
     val exercises: List<ExerciseDefinition> = emptyList(),
@@ -23,6 +24,12 @@ class ExercisesViewModel(
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = ExercisesUiState()
         )
+
+    fun deleteExercise(exercise: ExerciseDefinition) {
+        viewModelScope.launch {
+            exerciseDefinitionRepository.delete(exercise)
+        }
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
