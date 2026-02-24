@@ -1,4 +1,4 @@
-package com.juanitos.ui.routes.workout
+package com.juanitos.ui.routes.workout.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

@@ -26,9 +26,9 @@ import com.juanitos.ui.routes.money.transactions.NewTransactionScreen
 import com.juanitos.ui.routes.workout.NewWorkoutDestination
 import com.juanitos.ui.routes.workout.NewWorkoutScreen
 import com.juanitos.ui.routes.workout.WorkoutDestination
-import com.juanitos.ui.routes.workout.WorkoutDetailDestination
-import com.juanitos.ui.routes.workout.WorkoutDetailScreen
 import com.juanitos.ui.routes.workout.WorkoutScreen
+import com.juanitos.ui.routes.workout.detail.WorkoutDetailDestination
+import com.juanitos.ui.routes.workout.detail.WorkoutDetailScreen
 import com.juanitos.ui.routes.workout.exercises.ExercisesDestination
 import com.juanitos.ui.routes.workout.exercises.ExercisesScreen
 import com.juanitos.ui.routes.workout.exercises.NewExerciseDestination

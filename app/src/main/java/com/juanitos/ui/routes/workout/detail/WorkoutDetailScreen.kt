@@ -1,4 +1,4 @@
-package com.juanitos.ui.routes.workout
+package com.juanitos.ui.routes.workout.detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +41,7 @@ import com.juanitos.ui.icons.MoreVert
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
+import com.juanitos.ui.routes.workout.NewWorkoutViewModel
 
 object WorkoutDetailDestination : NavigationDestination {
     override val route = Routes.WorkoutDetail
@@ -166,7 +167,7 @@ private fun WorkoutDetailExerciseCard(exerciseWithSets: WorkoutExerciseWithSets)
             )
             Text(
                 text = stringResource(
-                    if (exerciseType == NewWorkoutViewModel.TYPE_REPS) R.string.exercise_type_reps
+                    if (exerciseType == NewWorkoutViewModel.Companion.TYPE_REPS) R.string.exercise_type_reps
                     else R.string.exercise_type_duration
                 ),
                 style = MaterialTheme.typography.labelSmall,
@@ -211,7 +212,7 @@ private fun WorkoutDetailSetRow(setNumber: Int, set: WorkoutSet, exerciseType: S
             modifier = Modifier.weight(1f),
         )
         Text(
-            text = if (exerciseType == NewWorkoutViewModel.TYPE_REPS)
+            text = if (exerciseType == NewWorkoutViewModel.Companion.TYPE_REPS)
                 stringResource(R.string.reps_format, set.reps ?: 0)
             else
                 stringResource(R.string.duration_format, set.durationSeconds ?: 0),
