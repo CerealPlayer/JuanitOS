@@ -52,6 +52,7 @@
     <string name="exercise_type_duration">Duration</string>
     <string name="exercise_type">Exercise type</string>
     <string name="sets">Sets</string>
+    <string name="delete_set">Delete set</string>
     <string name="reps">Reps</string>
     <string name="duration_seconds">Duration (seconds)</string>
     <string name="weight_kg">Weight (kg)</string>

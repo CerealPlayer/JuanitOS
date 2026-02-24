@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,6 +37,8 @@ data class EditWorkoutUiState(
     val errorMessage: String? = null,
     val showSaveDialog: Boolean = false,
     val notesInput: String = "",
+    val nextExerciseGroupId: Int = 1,
+    val nextSetId: Int = 1,
 )
 
 class EditWorkoutViewModel(
@@ -51,37 +54,14 @@ class EditWorkoutViewModel(
 
     val uiState: StateFlow<EditWorkoutUiState> = combine(
         _state,
-        workoutRepository.getByIdWithExercises(workoutId),
         exerciseDefinitionRepository.getAll()
-    ) { state, workoutWithExercises, allExercises ->
-        val groups = workoutWithExercises?.exercises
-            ?.sortedBy { it.workoutExercise.position }
-            ?.map { exerciseWithSets ->
-                ExerciseGroup(
-                    exercise = exerciseWithSets.exerciseDefinition,
-                    workoutExerciseId = exerciseWithSets.workoutExercise.id,
-                    sets = exerciseWithSets.sets
-                        .sortedBy { it.position }
-                        .mapIndexed { index, set ->
-                            SetDisplay(
-                                setNumber = index + 1,
-                                weightKg = set.weightKg,
-                                reps = set.reps,
-                                durationSeconds = set.durationSeconds
-                            )
-                        }
-                )
-            }
-            ?: emptyList()
+    ) { state, allExercises ->
         val selectedExercise = state.selectedExercise?.let { selected ->
             allExercises.find { it.id == selected.id }
         } ?: allExercises.firstOrNull()
 
         state.copy(
-            workout = workoutWithExercises?.workout,
-            workoutId = workoutWithExercises?.workout?.id ?: state.workoutId,
             allExercises = allExercises,
-            exerciseGroups = groups,
             selectedExercise = selectedExercise,
         )
     }.stateIn(
@@ -89,6 +69,48 @@ class EditWorkoutViewModel(
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
         initialValue = EditWorkoutUiState(workoutId = workoutId)
     )
+
+    init {
+        loadWorkout()
+    }
+
+    private fun loadWorkout() {
+        viewModelScope.launch {
+            val workoutWithExercises = workoutRepository.getByIdWithExercises(workoutId).first()
+            val groups = workoutWithExercises?.exercises
+                ?.sortedBy { it.workoutExercise.position }
+                ?.map { exerciseWithSets ->
+                    ExerciseGroup(
+                        id = exerciseWithSets.workoutExercise.id,
+                        exercise = exerciseWithSets.exerciseDefinition,
+                        sets = exerciseWithSets.sets
+                            .sortedBy { it.position }
+                            .mapIndexed { index, set ->
+                                SetDisplay(
+                                    id = set.id,
+                                    setNumber = index + 1,
+                                    weightKg = set.weightKg,
+                                    reps = set.reps,
+                                    durationSeconds = set.durationSeconds
+                                )
+                            }
+                    )
+                }
+                ?: emptyList()
+            val maxGroupId = groups.maxOfOrNull { it.id } ?: 0
+            val maxSetId = groups.flatMap { it.sets }.maxOfOrNull { it.id } ?: 0
+            _state.update {
+                it.copy(
+                    workout = workoutWithExercises?.workout,
+                    workoutId = workoutWithExercises?.workout?.id ?: workoutId,
+                    notesInput = workoutWithExercises?.workout?.notes.orEmpty(),
+                    exerciseGroups = groups,
+                    nextExerciseGroupId = maxGroupId + 1,
+                    nextSetId = maxSetId + 1
+                )
+            }
+        }
+    }
 
     fun selectExercise(exercise: ExerciseDefinition) {
         _state.update { it.copy(selectedExercise = exercise, errorMessage = null) }
@@ -105,7 +127,6 @@ class EditWorkoutViewModel(
     fun addSet() {
         val current = uiState.value
         val exercise = current.selectedExercise ?: return
-        val currentWorkoutId = current.workoutId ?: return
         val repsOrDuration = current.repsOrDurationInput.toIntOrNull()
         if (repsOrDuration == null || repsOrDuration <= 0) {
             val label = if (exercise.type == NewWorkoutViewModel.TYPE_REPS) "reps" else "duration"
@@ -114,28 +135,61 @@ class EditWorkoutViewModel(
         }
         val weightKg = current.weightInput.toDoubleOrNull()?.takeIf { it > 0.0 }
 
-        _state.update { it.copy(isSavingSet = true, errorMessage = null) }
-        viewModelScope.launch {
-            val existingGroup = current.exerciseGroups.find { it.exercise.id == exercise.id }
-            val workoutExerciseId =
-                existingGroup?.workoutExerciseId ?: workoutExerciseRepository.insert(
-                    WorkoutExercise(
-                        workoutId = currentWorkoutId,
-                        exerciseDefinitionId = exercise.id,
-                        position = current.exerciseGroups.size
-                    )
-                ).toInt()
-            val existingSets = existingGroup?.sets?.size ?: 0
-            workoutSetRepository.insert(
-                WorkoutSet(
-                    workoutExerciseId = workoutExerciseId,
-                    reps = if (exercise.type == NewWorkoutViewModel.TYPE_REPS) repsOrDuration else null,
-                    durationSeconds = if (exercise.type == NewWorkoutViewModel.TYPE_DURATION) repsOrDuration else null,
-                    weightKg = weightKg,
-                    position = existingSets
-                )
+        val reps = if (exercise.type == NewWorkoutViewModel.TYPE_REPS) repsOrDuration else null
+        val duration =
+            if (exercise.type == NewWorkoutViewModel.TYPE_DURATION) repsOrDuration else null
+        _state.update { state ->
+            val existingGroup = state.exerciseGroups.find { it.exercise.id == exercise.id }
+            val setId = state.nextSetId
+            val newSet = SetDisplay(
+                id = setId,
+                setNumber = (existingGroup?.sets?.size ?: 0) + 1,
+                weightKg = weightKg,
+                reps = reps,
+                durationSeconds = duration
             )
-            _state.update { it.copy(isSavingSet = false) }
+            val updatedGroups = if (existingGroup != null) {
+                state.exerciseGroups.map { group ->
+                    if (group.id == existingGroup.id) group.copy(sets = group.sets + newSet) else group
+                }
+            } else {
+                state.exerciseGroups + ExerciseGroup(
+                    id = state.nextExerciseGroupId,
+                    exercise = exercise,
+                    sets = listOf(newSet)
+                )
+            }
+            state.copy(
+                exerciseGroups = updatedGroups,
+                nextSetId = setId + 1,
+                nextExerciseGroupId = if (existingGroup == null) state.nextExerciseGroupId + 1 else state.nextExerciseGroupId,
+                errorMessage = null
+            )
+        }
+    }
+
+    fun deleteSet(exerciseGroupId: Int, setId: Int) {
+        _state.update { state ->
+            val updatedGroups = state.exerciseGroups.mapNotNull { group ->
+                if (group.id != exerciseGroupId) return@mapNotNull group
+                val remainingSets = group.sets.filterNot { it.id == setId }
+                if (remainingSets.isEmpty()) {
+                    null
+                } else {
+                    group.copy(
+                        sets = remainingSets.mapIndexed { index, set ->
+                            set.copy(setNumber = index + 1)
+                        }
+                    )
+                }
+            }
+            state.copy(exerciseGroups = updatedGroups)
+        }
+    }
+
+    fun deleteExercise(exerciseGroupId: Int) {
+        _state.update { state ->
+            state.copy(exerciseGroups = state.exerciseGroups.filterNot { it.id == exerciseGroupId })
         }
     }
 
@@ -160,6 +214,31 @@ class EditWorkoutViewModel(
         val current = uiState.value
         val currentWorkout = current.workout ?: run { onSuccess(); return }
         viewModelScope.launch {
+            val existingExercises =
+                workoutExerciseRepository.getByWorkoutIdWithSets(currentWorkout.id).first()
+            existingExercises.forEach { existing ->
+                workoutExerciseRepository.delete(existing.workoutExercise)
+            }
+            current.exerciseGroups.forEachIndexed { exerciseIndex, group ->
+                val newWorkoutExerciseId = workoutExerciseRepository.insert(
+                    WorkoutExercise(
+                        workoutId = currentWorkout.id,
+                        exerciseDefinitionId = group.exercise.id,
+                        position = exerciseIndex
+                    )
+                ).toInt()
+                group.sets.forEachIndexed { setIndex, set ->
+                    workoutSetRepository.insert(
+                        WorkoutSet(
+                            workoutExerciseId = newWorkoutExerciseId,
+                            reps = set.reps,
+                            durationSeconds = set.durationSeconds,
+                            weightKg = set.weightKg,
+                            position = setIndex
+                        )
+                    )
+                }
+            }
             workoutRepository.update(
                 currentWorkout.copy(
                     notes = current.notesInput.ifBlank { null },

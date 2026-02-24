@@ -1,7 +1,9 @@
 package com.juanitos.ui.routes.workout.edit
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,25 +12,37 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,12 +52,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
 import com.juanitos.ui.AppViewModelProvider
+import com.juanitos.ui.commons.DeleteConfirmationDialog
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
+import com.juanitos.ui.routes.workout.ExerciseGroup
 import com.juanitos.ui.routes.workout.NewWorkoutViewModel
 import com.juanitos.ui.routes.workout.SetDisplay
 import com.juanitos.ui.routes.workout.components.WorkoutQuickAddPanel
+import kotlinx.coroutines.launch
 
 object EditWorkoutDestination : NavigationDestination {
     override val route = Routes.EditWorkout
@@ -131,26 +148,14 @@ fun EditWorkoutScreen(
                     top = innerPadding.calculateTopPadding() + dimensionResource(R.dimen.padding_small),
                     bottom = innerPadding.calculateBottomPadding() + dimensionResource(R.dimen.padding_small)
                 ),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
-                uiState.exerciseGroups.forEach { group ->
-                    item(key = "header-${group.exercise.id}") {
-                        Text(
-                            text = group.exercise.name,
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(
-                                top = dimensionResource(R.dimen.padding_small),
-                                bottom = 2.dp
-                            )
-                        )
-                    }
-                    items(
-                        group.sets,
-                        key = { "set-${group.exercise.id}-${it.setNumber}" }
-                    ) { set ->
-                        SetRow(set = set, exerciseType = group.exercise.type)
-                    }
+                items(uiState.exerciseGroups, key = { it.id }) { group ->
+                    ExerciseCard(
+                        group = group,
+                        onDeleteExercise = { viewModel.deleteExercise(group.id) },
+                        onDeleteSet = { setId -> viewModel.deleteSet(group.id, setId) }
+                    )
                 }
                 item { Spacer(modifier = Modifier.height(4.dp)) }
             }
@@ -188,8 +193,102 @@ fun EditWorkoutScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SetRow(set: SetDisplay, exerciseType: String) {
+private fun ExerciseCard(
+    group: ExerciseGroup,
+    onDeleteExercise: () -> Unit,
+    onDeleteSet: (Int) -> Unit,
+) {
+    val dismissState = rememberSwipeToDismissBoxState()
+    val showDeleteExerciseDialog = remember { mutableStateOf(false) }
+    val pendingSetDeletion = remember { mutableStateOf<Int?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(dismissState.currentValue) {
+        if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+            showDeleteExerciseDialog.value = true
+        }
+    }
+
+    if (showDeleteExerciseDialog.value) {
+        DeleteConfirmationDialog(
+            title = stringResource(R.string.confirm_delete_exercise),
+            onConfirm = onDeleteExercise,
+            onDismiss = {
+                showDeleteExerciseDialog.value = false
+                coroutineScope.launch { dismissState.reset() }
+            }
+        )
+    }
+
+    val setIdToDelete = pendingSetDeletion.value
+    if (setIdToDelete != null) {
+        DeleteConfirmationDialog(
+            title = stringResource(R.string.delete),
+            onConfirm = { onDeleteSet(setIdToDelete) },
+            onDismiss = { pendingSetDeletion.value = null }
+        )
+    }
+
+    SwipeToDismissBox(
+        state = dismissState,
+        modifier = Modifier.fillMaxWidth(),
+        enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = true,
+        backgroundContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.Red),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.delete),
+                    contentDescription = stringResource(R.string.delete),
+                    tint = Color.White,
+                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_medium))
+                )
+            }
+        }
+    ) {
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))) {
+                Text(
+                    text = group.exercise.name,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = stringResource(
+                        if (group.exercise.type == NewWorkoutViewModel.TYPE_REPS) R.string.exercise_type_reps
+                        else R.string.exercise_type_duration
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (group.sets.isNotEmpty()) {
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                    group.sets.forEach { set ->
+                        SetRow(
+                            set = set,
+                            exerciseType = group.exercise.type,
+                            onDeleteClick = { pendingSetDeletion.value = set.id }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SetRow(
+    set: SetDisplay,
+    exerciseType: String,
+    onDeleteClick: () -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -222,5 +321,12 @@ private fun SetRow(set: SetDisplay, exerciseType: String) {
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium
         )
+        IconButton(onClick = onDeleteClick, modifier = Modifier.size(24.dp)) {
+            Icon(
+                painterResource(R.drawable.close),
+                contentDescription = stringResource(R.string.delete_set),
+                modifier = Modifier.size(16.dp)
+            )
+        }
     }
 }

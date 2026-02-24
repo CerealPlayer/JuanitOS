@@ -22,6 +22,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 data class SetDisplay(
+    val id: Int,
     val setNumber: Int,
     val weightKg: Double?,
     val reps: Int?,
@@ -29,8 +30,8 @@ data class SetDisplay(
 )
 
 data class ExerciseGroup(
+    val id: Int,
     val exercise: ExerciseDefinition,
-    val workoutExerciseId: Int,
     val sets: List<SetDisplay>,
 )
 
@@ -39,8 +40,6 @@ data class NewWorkoutUiState(
     val startTime: String? = null,
     val allExercises: List<ExerciseDefinition> = emptyList(),
     val exerciseGroups: List<ExerciseGroup> = emptyList(),
-    // map of exerciseDefinitionId -> workoutExerciseId for dedup
-    val workoutExerciseIds: Map<Int, Int> = emptyMap(),
     val workoutId: Int? = null,
     val selectedExercise: ExerciseDefinition? = null,
     val weightInput: String = "0",
@@ -53,6 +52,8 @@ data class NewWorkoutUiState(
     val notesInput: String = "",
     // Discard dialog
     val showDiscardDialog: Boolean = false,
+    val nextExerciseGroupId: Int = 1,
+    val nextSetId: Int = 1,
 )
 
 class NewWorkoutViewModel(
@@ -114,8 +115,6 @@ class NewWorkoutViewModel(
     fun addSet() {
         val current = uiState.value
         val exercise = current.selectedExercise ?: return
-        val workoutId = current.workoutId ?: return
-
         val repsOrDuration = current.repsOrDurationInput.toIntOrNull()
         if (repsOrDuration == null || repsOrDuration <= 0) {
             val label = if (exercise.type == TYPE_REPS) "reps" else "duration"
@@ -125,70 +124,60 @@ class NewWorkoutViewModel(
 
         val weightKg = current.weightInput.toDoubleOrNull()?.takeIf { it > 0.0 }
 
-        _state.update { it.copy(isSavingSet = true, errorMessage = null) }
-
-        viewModelScope.launch {
-            try {
-                val workoutExerciseId = current.workoutExerciseIds[exercise.id] ?: run {
-                    val position = current.exerciseGroups.size
-                    workoutExerciseRepository.insert(
-                        WorkoutExercise(
-                            workoutId = workoutId,
-                            exerciseDefinitionId = exercise.id,
-                            position = position
-                        )
-                    ).toInt()
+        val reps = if (exercise.type == TYPE_REPS) repsOrDuration else null
+        val duration = if (exercise.type == TYPE_DURATION) repsOrDuration else null
+        _state.update { state ->
+            val existingGroup = state.exerciseGroups.find { it.exercise.id == exercise.id }
+            val setId = state.nextSetId
+            val newSet = SetDisplay(
+                id = setId,
+                setNumber = (existingGroup?.sets?.size ?: 0) + 1,
+                weightKg = weightKg,
+                reps = reps,
+                durationSeconds = duration,
+            )
+            val updatedGroups = if (existingGroup != null) {
+                state.exerciseGroups.map { group ->
+                    if (group.id == existingGroup.id) group.copy(sets = group.sets + newSet) else group
                 }
-
-                val existingSets = current.exerciseGroups
-                    .find { it.exercise.id == exercise.id }?.sets?.size ?: 0
-
-                workoutSetRepository.insert(
-                    WorkoutSet(
-                        workoutExerciseId = workoutExerciseId,
-                        reps = if (exercise.type == TYPE_REPS) repsOrDuration else null,
-                        durationSeconds = if (exercise.type == TYPE_DURATION) repsOrDuration else null,
-                        weightKg = weightKg,
-                        position = existingSets
-                    )
+            } else {
+                state.exerciseGroups + ExerciseGroup(
+                    id = state.nextExerciseGroupId,
+                    exercise = exercise,
+                    sets = listOf(newSet)
                 )
+            }
+            state.copy(
+                exerciseGroups = updatedGroups,
+                nextSetId = setId + 1,
+                nextExerciseGroupId = if (existingGroup == null) state.nextExerciseGroupId + 1 else state.nextExerciseGroupId,
+                errorMessage = null,
+            )
+        }
+    }
 
-                val newSet = SetDisplay(
-                    setNumber = existingSets + 1,
-                    weightKg = weightKg,
-                    reps = if (exercise.type == TYPE_REPS) repsOrDuration else null,
-                    durationSeconds = if (exercise.type == TYPE_DURATION) repsOrDuration else null,
-                )
-
-                _state.update { s ->
-                    val newIds = s.workoutExerciseIds + (exercise.id to workoutExerciseId)
-                    val existingGroup = s.exerciseGroups.find { it.exercise.id == exercise.id }
-                    val newGroups = if (existingGroup != null) {
-                        s.exerciseGroups.map { g ->
-                            if (g.exercise.id == exercise.id) g.copy(sets = g.sets + newSet) else g
+    fun deleteSet(exerciseGroupId: Int, setId: Int) {
+        _state.update { state ->
+            val updatedGroups = state.exerciseGroups.mapNotNull { group ->
+                if (group.id != exerciseGroupId) return@mapNotNull group
+                val remainingSets = group.sets.filterNot { it.id == setId }
+                if (remainingSets.isEmpty()) {
+                    null
+                } else {
+                    group.copy(
+                        sets = remainingSets.mapIndexed { index, set ->
+                            set.copy(setNumber = index + 1)
                         }
-                    } else {
-                        s.exerciseGroups + ExerciseGroup(
-                            exercise = exercise,
-                            workoutExerciseId = workoutExerciseId,
-                            sets = listOf(newSet)
-                        )
-                    }
-                    s.copy(
-                        exerciseGroups = newGroups,
-                        workoutExerciseIds = newIds,
-                        isSavingSet = false,
-                        // keep repsOrDurationInput for quick repeats, keep weightInput
-                    )
-                }
-            } catch (e: Exception) {
-                _state.update {
-                    it.copy(
-                        isSavingSet = false,
-                        errorMessage = e.message ?: "Error adding set"
                     )
                 }
             }
+            state.copy(exerciseGroups = updatedGroups)
+        }
+    }
+
+    fun deleteExercise(exerciseGroupId: Int) {
+        _state.update { state ->
+            state.copy(exerciseGroups = state.exerciseGroups.filterNot { it.id == exerciseGroupId })
         }
     }
 
@@ -212,6 +201,26 @@ class NewWorkoutViewModel(
         val endTime = LocalTime.now().format(TIME_FORMATTER)
         viewModelScope.launch {
             try {
+                current.exerciseGroups.forEachIndexed { exerciseIndex, group ->
+                    val workoutExerciseId = workoutExerciseRepository.insert(
+                        WorkoutExercise(
+                            workoutId = workoutId,
+                            exerciseDefinitionId = group.exercise.id,
+                            position = exerciseIndex
+                        )
+                    ).toInt()
+                    group.sets.forEachIndexed { setIndex, set ->
+                        workoutSetRepository.insert(
+                            WorkoutSet(
+                                workoutExerciseId = workoutExerciseId,
+                                reps = set.reps,
+                                durationSeconds = set.durationSeconds,
+                                weightKg = set.weightKg,
+                                position = setIndex
+                            )
+                        )
+                    }
+                }
                 workoutRepository.update(
                     Workout(
                         id = workoutId,
