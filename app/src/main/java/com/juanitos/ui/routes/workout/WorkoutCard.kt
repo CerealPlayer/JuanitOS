@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.juanitos.R
 import com.juanitos.data.workout.entities.Workout
 import com.juanitos.lib.formatDbDatetimeToShortDate
+import com.juanitos.lib.formatTimeToShort
 import com.juanitos.ui.commons.DeleteConfirmationDialog
 import kotlinx.coroutines.launch
 
@@ -90,6 +91,21 @@ fun WorkoutCard(
                     text = formatDbDatetimeToShortDate(workout.date).ifBlank { workout.date },
                     style = MaterialTheme.typography.titleSmall
                 )
+                val startTime = formatTimeToShort(workout.startTime)
+                val endTime = formatTimeToShort(workout.endTime)
+                if (startTime.isNotBlank() || endTime.isNotBlank()) {
+                    val timeText = when {
+                        startTime.isNotBlank() && endTime.isNotBlank() -> "$startTime – $endTime"
+                        startTime.isNotBlank() -> startTime
+                        else -> endTime
+                    }
+                    Text(
+                        text = timeText,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
                 if (!workout.notes.isNullOrBlank()) {
                     Text(
                         text = workout.notes,

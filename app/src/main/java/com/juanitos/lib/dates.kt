@@ -24,6 +24,15 @@ fun formatDbDatetimeToShortDate(datetime: String?): String {
 }
 
 /**
+ * Formats a stored time string ("HH:mm:ss") to a short display format ("HH:mm").
+ * Returns empty string if input is null or blank.
+ */
+fun formatTimeToShort(time: String?): String {
+    if (time.isNullOrBlank()) return ""
+    return time.trim().take(5) // "HH:mm" from "HH:mm:ss"
+}
+
+/**
  * Convierte un datetime de Room (formato "yyyy-MM-dd HH:mm:ss") a LocalDate.
  *
  * Ejemplo: "2026-01-14 18:30:01" -> LocalDate(2026, 1, 14)

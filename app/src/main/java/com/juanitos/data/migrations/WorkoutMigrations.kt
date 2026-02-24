@@ -56,3 +56,10 @@ val MIGRATION_19_20 = object : Migration(19, 20) {
         database.execSQL("CREATE INDEX IF NOT EXISTS index_workout_sets_workout_exercise_id ON workout_sets(workout_exercise_id)")
     }
 }
+
+val MIGRATION_20_21 = object : Migration(20, 21) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE workouts ADD COLUMN start_time TEXT")
+        database.execSQL("ALTER TABLE workouts ADD COLUMN end_time TEXT")
+    }
+}

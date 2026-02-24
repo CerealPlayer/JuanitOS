@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 data class SetDisplay(
     val setNumber: Int,
@@ -34,6 +36,7 @@ data class ExerciseGroup(
 
 data class NewWorkoutUiState(
     val date: String = "",
+    val startTime: String? = null,
     val allExercises: List<ExerciseDefinition> = emptyList(),
     val exerciseGroups: List<ExerciseGroup> = emptyList(),
     // map of exerciseDefinitionId -> workoutExerciseId for dedup
@@ -81,8 +84,18 @@ class NewWorkoutViewModel(
     init {
         viewModelScope.launch {
             val date = LocalDate.now().toString()
-            val workoutId = workoutRepository.insert(Workout(date = date)).toInt()
-            _state.update { it.copy(workoutId = workoutId, date = date, isReady = true) }
+            val startTime = LocalTime.now().format(TIME_FORMATTER)
+            val workoutId = workoutRepository.insert(
+                Workout(date = date, startTime = startTime)
+            ).toInt()
+            _state.update {
+                it.copy(
+                    workoutId = workoutId,
+                    date = date,
+                    startTime = startTime,
+                    isReady = true
+                )
+            }
         }
     }
 
@@ -196,12 +209,15 @@ class NewWorkoutViewModel(
     fun saveWorkout(onSuccess: () -> Unit) {
         val current = _state.value
         val workoutId = current.workoutId ?: run { onSuccess(); return }
+        val endTime = LocalTime.now().format(TIME_FORMATTER)
         viewModelScope.launch {
             try {
                 workoutRepository.update(
                     Workout(
                         id = workoutId,
                         date = current.date,
+                        startTime = current.startTime,
+                        endTime = endTime,
                         notes = current.notesInput.ifBlank { null }
                     )
                 )
@@ -239,5 +255,6 @@ class NewWorkoutViewModel(
         private const val TIMEOUT_MILLIS = 5_000L
         const val TYPE_REPS = "reps"
         const val TYPE_DURATION = "duration"
+        private val TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss")
     }
 }

@@ -10,6 +10,10 @@ data class Workout(
     var id: Int = 0,
     val date: String,
     val notes: String? = null,
+    @ColumnInfo(name = "start_time")
+    val startTime: String? = null,
+    @ColumnInfo(name = "end_time")
+    val endTime: String? = null,
     @ColumnInfo(name = "created_at", defaultValue = "(datetime('now', 'localtime'))")
     val createdAt: String? = null,
 )

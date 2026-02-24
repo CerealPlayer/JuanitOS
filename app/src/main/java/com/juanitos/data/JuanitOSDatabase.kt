@@ -9,6 +9,7 @@ import com.juanitos.data.migrations.MIGRATION_11_12
 import com.juanitos.data.migrations.MIGRATION_12_13
 import com.juanitos.data.migrations.MIGRATION_13_14
 import com.juanitos.data.migrations.MIGRATION_19_20
+import com.juanitos.data.migrations.MIGRATION_20_21
 import com.juanitos.data.migrations.MIGRATION_9_10
 import com.juanitos.data.money.daos.CategoryDao
 import com.juanitos.data.money.daos.CycleDao
@@ -32,7 +33,7 @@ import com.juanitos.data.workout.entities.WorkoutSet
         Cycle::class, Transaction::class, FixedSpending::class, Category::class,
         ExerciseDefinition::class, Workout::class, WorkoutExercise::class, WorkoutSet::class
     ],
-    version = 20,
+    version = 21,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
@@ -58,7 +59,8 @@ abstract class JuanitOSDatabase : RoomDatabase() {
                         MIGRATION_11_12,
                         MIGRATION_12_13,
                         MIGRATION_13_14,
-                        MIGRATION_19_20
+                        MIGRATION_19_20,
+                        MIGRATION_20_21
                     )
                     .fallbackToDestructiveMigration(false)
                     .build().also { Instance = it }
