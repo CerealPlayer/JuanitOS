@@ -1,6 +1,5 @@
-package com.juanitos.ui.routes.workout
+package com.juanitos.ui.routes.workout.edit
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,10 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +29,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,34 +41,26 @@ import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
+import com.juanitos.ui.routes.workout.NewWorkoutViewModel
+import com.juanitos.ui.routes.workout.SetDisplay
 import com.juanitos.ui.routes.workout.components.WorkoutQuickAddPanel
 
-object NewWorkoutDestination : NavigationDestination {
-    override val route = Routes.NewWorkout
-    override val titleRes = R.string.new_workout
+object EditWorkoutDestination : NavigationDestination {
+    override val route = Routes.EditWorkout
+    override val titleRes = R.string.edit_workout
+
+    fun createRoute(workoutId: Int): String = "edit_workout/$workoutId"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewWorkoutScreen(
+fun EditWorkoutScreen(
     onNavigateUp: () -> Unit,
-    viewModel: NewWorkoutViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: EditWorkoutViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val listState = rememberLazyListState()
-    val focusManager = LocalFocusManager.current
 
-    // Intercept system back gesture / hardware back button
-    BackHandler {
-        focusManager.clearFocus()
-        if (uiState.exerciseGroups.isEmpty()) {
-            viewModel.discardWorkout(onNavigateUp)
-        } else {
-            viewModel.openDiscardDialog()
-        }
-    }
-
-    // Scroll to end when a new set is added
     val totalSets = uiState.exerciseGroups.sumOf { it.sets.size }
     LaunchedEffect(totalSets) {
         if (uiState.exerciseGroups.isNotEmpty()) {
@@ -81,24 +69,13 @@ fun NewWorkoutScreen(
         }
     }
 
-    // Intercept top-bar back arrow
-    val handleBack: () -> Unit = {
-        focusManager.clearFocus()
-        if (uiState.exerciseGroups.isEmpty()) {
-            viewModel.discardWorkout(onNavigateUp)
-        } else {
-            viewModel.openDiscardDialog()
-        }
-    }
-
     Scaffold(
-        // Opt out of automatic inset handling; the bottomBar manages its own insets
         contentWindowInsets = WindowInsets(0),
         topBar = {
             JuanitOSTopAppBar(
-                title = stringResource(NewWorkoutDestination.titleRes),
+                title = stringResource(EditWorkoutDestination.titleRes),
                 canNavigateBack = true,
-                navigateUp = handleBack,
+                navigateUp = onNavigateUp,
                 actions = {
                     IconButton(
                         onClick = { viewModel.openSaveDialog() },
@@ -124,10 +101,7 @@ fun NewWorkoutScreen(
                 onSelectExercise = { viewModel.selectExercise(it) },
                 onWeightChange = { viewModel.setWeightInput(it) },
                 onRepsOrDurationChange = { viewModel.setRepsOrDurationInput(it) },
-                onAddSet = {
-                    focusManager.clearFocus()
-                    viewModel.addSet()
-                }
+                onAddSet = { viewModel.addSet() }
             )
         }
     ) { innerPadding ->
@@ -183,7 +157,6 @@ fun NewWorkoutScreen(
         }
     }
 
-    // ── Save dialog ──────────────────────────────────────────────────────────
     if (uiState.showSaveDialog) {
         AlertDialog(
             onDismissRequest = { viewModel.closeSaveDialog() },
@@ -196,7 +169,9 @@ fun NewWorkoutScreen(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = false,
                     maxLines = 4,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    )
                 )
             },
             confirmButton = {
@@ -207,30 +182,6 @@ fun NewWorkoutScreen(
             dismissButton = {
                 TextButton(onClick = { viewModel.closeSaveDialog() }) {
                     Text(stringResource(R.string.cancel))
-                }
-            }
-        )
-    }
-
-    // ── Discard dialog ───────────────────────────────────────────────────────
-    if (uiState.showDiscardDialog) {
-        AlertDialog(
-            onDismissRequest = { viewModel.closeDiscardDialog() },
-            title = { Text(stringResource(R.string.discard_workout)) },
-            text = { Text(stringResource(R.string.discard_workout_message)) },
-            confirmButton = {
-                Button(
-                    onClick = { viewModel.discardWorkout(onNavigateUp) },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    )
-                ) {
-                    Text(stringResource(R.string.discard))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { viewModel.closeDiscardDialog() }) {
-                    Text(stringResource(R.string.keep_editing))
                 }
             }
         )

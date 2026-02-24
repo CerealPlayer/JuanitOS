@@ -12,6 +12,7 @@ enum class Routes(val route: String) {
     NewCategory("new_category"),
     Workout("workout"),
     NewWorkout("new_workout"),
+    EditWorkout("edit_workout/{workoutId}"),
     Exercises("exercises"),
     NewExercise("new_exercise_definition"),
     WorkoutDetail("workout_detail/{workoutId}");

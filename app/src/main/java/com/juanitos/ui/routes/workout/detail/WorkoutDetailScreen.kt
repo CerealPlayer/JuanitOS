@@ -52,6 +52,7 @@ object WorkoutDetailDestination : NavigationDestination {
 @Composable
 fun WorkoutDetailScreen(
     onNavigateUp: () -> Unit,
+    onEditWorkout: (Int) -> Unit,
     viewModel: WorkoutDetailViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val uiState = viewModel.uiState.collectAsState()
@@ -85,6 +86,13 @@ fun WorkoutDetailScreen(
                             expanded = showMenu.value,
                             onDismissRequest = { showMenu.value = false },
                         ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.edit)) },
+                                onClick = {
+                                    showMenu.value = false
+                                    workoutWithExercises?.workout?.id?.let(onEditWorkout)
+                                },
+                            )
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.delete)) },
                                 onClick = {

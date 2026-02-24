@@ -33,6 +33,7 @@
     <string name="remaining_money">Remaining money</string>
     <string name="uncategorized">Uncategorized</string>
     <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="delete_confirmation_message">Are you sure you want to delete this item? This action cannot be undone.</string>
@@ -41,6 +42,7 @@
     <string name="workout">Workout</string>
     <string name="workouts">Workouts</string>
     <string name="new_workout">New workout</string>
+    <string name="edit_workout">Edit workout</string>
     <string name="no_workouts">No workouts yet</string>
     <string name="workout_date">Date</string>
     <string name="workout_notes">Notes (optional)</string>

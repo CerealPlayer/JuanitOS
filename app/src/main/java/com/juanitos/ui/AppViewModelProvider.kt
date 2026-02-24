@@ -16,6 +16,7 @@ import com.juanitos.ui.routes.money.transactions.NewTransactionViewModel
 import com.juanitos.ui.routes.workout.NewWorkoutViewModel
 import com.juanitos.ui.routes.workout.WorkoutViewModel
 import com.juanitos.ui.routes.workout.detail.WorkoutDetailViewModel
+import com.juanitos.ui.routes.workout.edit.EditWorkoutViewModel
 import com.juanitos.ui.routes.workout.exercises.ExercisesViewModel
 import com.juanitos.ui.routes.workout.exercises.NewExerciseViewModel
 
@@ -84,6 +85,15 @@ object AppViewModelProvider {
             WorkoutDetailViewModel(
                 savedStateHandle = createSavedStateHandle(),
                 workoutRepository = juanitOSApplication().container.workoutRepository,
+            )
+        }
+        initializer {
+            EditWorkoutViewModel(
+                savedStateHandle = createSavedStateHandle(),
+                workoutRepository = juanitOSApplication().container.workoutRepository,
+                workoutExerciseRepository = juanitOSApplication().container.workoutExerciseRepository,
+                workoutSetRepository = juanitOSApplication().container.workoutSetRepository,
+                exerciseDefinitionRepository = juanitOSApplication().container.exerciseDefinitionRepository
             )
         }
         initializer {
