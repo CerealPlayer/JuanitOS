@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlin.math.abs
 
 data class ExerciseProgressPoint(
     val workoutDate: String,
@@ -49,17 +50,25 @@ class ExerciseProgressViewModel(
                 if (sets.isEmpty()) {
                     null
                 } else {
+                    val maxWeight = sets.mapNotNull { it.weightKg }.maxOrNull()
+                    val setsAtMaxWeight = if (maxWeight == null) {
+                        sets.filter { it.weightKg == null }
+                    } else {
+                        sets.filter { set ->
+                            set.weightKg != null && abs(set.weightKg - maxWeight) < 0.0001
+                        }
+                    }
                     ExerciseProgressPoint(
                         workoutDate = workout.workout.date,
                         workoutId = workout.workout.id,
-                        weightKg = sets.mapNotNull { it.weightKg }.maxOrNull(),
+                        weightKg = maxWeight,
                         reps = if (exercise.type == NewWorkoutViewModel.TYPE_REPS) {
-                            sets.mapNotNull { it.reps }.maxOrNull()
+                            setsAtMaxWeight.mapNotNull { it.reps }.maxOrNull()
                         } else {
                             null
                         },
                         durationSeconds = if (exercise.type == NewWorkoutViewModel.TYPE_DURATION) {
-                            sets.mapNotNull { it.durationSeconds }.maxOrNull()
+                            setsAtMaxWeight.mapNotNull { it.durationSeconds }.maxOrNull()
                         } else {
                             null
                         },
