@@ -21,14 +21,22 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.juanitos.R
 import com.juanitos.data.workout.entities.ExerciseDefinition
@@ -48,6 +56,43 @@ fun WorkoutQuickAddPanel(
     onAddSet: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+    var weightFieldValue by remember { mutableStateOf(TextFieldValue(weightInput)) }
+    var repsOrDurationFieldValue by remember { mutableStateOf(TextFieldValue(repsOrDurationInput)) }
+    var weightFieldFocused by remember { mutableStateOf(false) }
+    var repsOrDurationFieldFocused by remember { mutableStateOf(false) }
+
+    LaunchedEffect(weightInput) {
+        if (weightInput != weightFieldValue.text) {
+            weightFieldValue =
+                TextFieldValue(weightInput, selection = TextRange(weightInput.length))
+        }
+    }
+
+    LaunchedEffect(repsOrDurationInput) {
+        if (repsOrDurationInput != repsOrDurationFieldValue.text) {
+            repsOrDurationFieldValue = TextFieldValue(
+                repsOrDurationInput,
+                selection = TextRange(repsOrDurationInput.length)
+            )
+        }
+    }
+
+    LaunchedEffect(weightFieldFocused) {
+        if (weightFieldFocused) {
+            weightFieldValue = weightFieldValue.copy(
+                selection = TextRange(0, weightFieldValue.text.length)
+            )
+        }
+    }
+
+    LaunchedEffect(repsOrDurationFieldFocused) {
+        if (repsOrDurationFieldFocused) {
+            repsOrDurationFieldValue = repsOrDurationFieldValue.copy(
+                selection = TextRange(0, repsOrDurationFieldValue.text.length)
+            )
+        }
+    }
+
     Surface(tonalElevation = 8.dp, shadowElevation = 8.dp) {
         Column(
             modifier = Modifier
@@ -95,8 +140,11 @@ fun WorkoutQuickAddPanel(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(
-                        value = weightInput,
-                        onValueChange = onWeightChange,
+                        value = weightFieldValue,
+                        onValueChange = {
+                            weightFieldValue = it
+                            onWeightChange(it.text)
+                        },
                         label = { Text(stringResource(R.string.weight_kg)) },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Decimal,
@@ -106,11 +154,18 @@ fun WorkoutQuickAddPanel(
                             onNext = { focusManager.moveFocus(FocusDirection.Next) }
                         ),
                         singleLine = true,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .onFocusChanged { state ->
+                                weightFieldFocused = state.isFocused
+                            }
                     )
                     OutlinedTextField(
-                        value = repsOrDurationInput,
-                        onValueChange = onRepsOrDurationChange,
+                        value = repsOrDurationFieldValue,
+                        onValueChange = {
+                            repsOrDurationFieldValue = it
+                            onRepsOrDurationChange(it.text)
+                        },
                         label = { Text(inputLabel) },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -120,7 +175,11 @@ fun WorkoutQuickAddPanel(
                             onDone = { focusManager.clearFocus(); onAddSet() }
                         ),
                         singleLine = true,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .onFocusChanged { state ->
+                                repsOrDurationFieldFocused = state.isFocused
+                            }
                     )
                     Button(
                         onClick = onAddSet,

@@ -197,7 +197,7 @@ class EditWorkoutViewModel(
         _state.update {
             it.copy(
                 showSaveDialog = true,
-                notesInput = if (it.notesInput.isBlank()) uiState.value.workout?.notes.orEmpty() else it.notesInput
+                notesInput = it.notesInput.ifBlank { uiState.value.workout?.notes.orEmpty() }
             )
         }
     }
