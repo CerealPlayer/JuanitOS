@@ -1,6 +1,7 @@
 package com.juanitos.ui.routes.workout.exercises
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +60,7 @@ object ExercisesDestination : NavigationDestination {
 fun ExercisesScreen(
     onNavigateUp: () -> Unit,
     onNewExercise: () -> Unit,
+    onExerciseClick: (Int) -> Unit,
     viewModel: ExercisesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val exercises = viewModel.uiState.collectAsState().value.exercises
@@ -95,6 +97,7 @@ fun ExercisesScreen(
             items(exercises, key = { it.id }) { exercise ->
                 ExerciseCard(
                     exercise = exercise,
+                    onClick = { onExerciseClick(exercise.id) },
                     onDelete = { viewModel.deleteExercise(it) }
                 )
             }
@@ -106,6 +109,7 @@ fun ExercisesScreen(
 @Composable
 fun ExerciseCard(
     exercise: ExerciseDefinition,
+    onClick: () -> Unit,
     onDelete: (ExerciseDefinition) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -153,7 +157,9 @@ fun ExerciseCard(
         }
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )

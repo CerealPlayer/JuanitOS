@@ -17,6 +17,7 @@ import com.juanitos.ui.routes.workout.NewWorkoutViewModel
 import com.juanitos.ui.routes.workout.WorkoutViewModel
 import com.juanitos.ui.routes.workout.detail.WorkoutDetailViewModel
 import com.juanitos.ui.routes.workout.edit.EditWorkoutViewModel
+import com.juanitos.ui.routes.workout.exercises.ExerciseProgressViewModel
 import com.juanitos.ui.routes.workout.exercises.ExercisesViewModel
 import com.juanitos.ui.routes.workout.exercises.NewExerciseViewModel
 
@@ -99,6 +100,13 @@ object AppViewModelProvider {
         initializer {
             ExercisesViewModel(
                 juanitOSApplication().container.exerciseDefinitionRepository
+            )
+        }
+        initializer {
+            ExerciseProgressViewModel(
+                savedStateHandle = createSavedStateHandle(),
+                exerciseDefinitionRepository = juanitOSApplication().container.exerciseDefinitionRepository,
+                workoutRepository = juanitOSApplication().container.workoutRepository
             )
         }
         initializer {

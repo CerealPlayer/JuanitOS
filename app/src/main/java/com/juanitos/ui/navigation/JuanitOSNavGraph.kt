@@ -31,6 +31,8 @@ import com.juanitos.ui.routes.workout.detail.WorkoutDetailDestination
 import com.juanitos.ui.routes.workout.detail.WorkoutDetailScreen
 import com.juanitos.ui.routes.workout.edit.EditWorkoutDestination
 import com.juanitos.ui.routes.workout.edit.EditWorkoutScreen
+import com.juanitos.ui.routes.workout.exercises.ExerciseProgressDestination
+import com.juanitos.ui.routes.workout.exercises.ExerciseProgressScreen
 import com.juanitos.ui.routes.workout.exercises.ExercisesDestination
 import com.juanitos.ui.routes.workout.exercises.ExercisesScreen
 import com.juanitos.ui.routes.workout.exercises.NewExerciseDestination
@@ -121,8 +123,17 @@ fun JuanitOSNavGraph(
         composable(route = ExercisesDestination.route.route) {
             ExercisesScreen(
                 onNavigateUp = { navController.navigateUp() },
-                onNewExercise = { navController.navigate(NewExerciseDestination.route.route) }
+                onNewExercise = { navController.navigate(NewExerciseDestination.route.route) },
+                onExerciseClick = { exerciseId ->
+                    navController.navigate(ExerciseProgressDestination.createRoute(exerciseId))
+                }
             )
+        }
+        composable(
+            route = ExerciseProgressDestination.route.route,
+            arguments = listOf(navArgument("exerciseId") { type = NavType.IntType }),
+        ) {
+            ExerciseProgressScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = NewExerciseDestination.route.route) {
             NewExerciseScreen(onNavigateUp = { navController.navigateUp() })

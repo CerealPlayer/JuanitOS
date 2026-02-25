@@ -47,6 +47,7 @@
     <string name="workout_date">Date</string>
     <string name="workout_notes">Notes (optional)</string>
     <string name="exercise_definitions">Exercises</string>
+    <string name="exercise_progress">Exercise progress</string>
     <string name="new_exercise">New exercise</string>
     <string name="exercise_type_reps">Reps</string>
     <string name="exercise_type_duration">Duration</string>
@@ -61,7 +62,12 @@
     <string name="add_set">Add set</string>
     <string name="bodyweight">Bodyweight</string>
     <string name="no_exercises_defined">No exercises defined yet. Go to Exercises to add some.</string>
+    <string name="no_workouts_recorded_for_exercise">No workouts recorded for this exercise</string>
     <string name="select_exercise">Select exercise</string>
+    <string name="weight_progress">Weight progress</string>
+    <string name="reps_progress">Reps progress</string>
+    <string name="duration_progress">Duration progress</string>
+    <string name="progress_workout_list_label">Recorded workouts</string>
     <string name="kg_format">%1$.1f kg</string>
     <string name="reps_format">× %1$d reps</string>
     <string name="duration_format">%1$d s</string>
