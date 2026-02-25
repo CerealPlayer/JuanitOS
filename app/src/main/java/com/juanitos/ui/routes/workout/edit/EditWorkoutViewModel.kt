@@ -11,6 +11,7 @@ import com.juanitos.data.workout.repositories.ExerciseDefinitionRepository
 import com.juanitos.data.workout.repositories.WorkoutExerciseRepository
 import com.juanitos.data.workout.repositories.WorkoutRepository
 import com.juanitos.data.workout.repositories.WorkoutSetRepository
+import com.juanitos.lib.parseQtDouble
 import com.juanitos.ui.routes.workout.ExerciseGroup
 import com.juanitos.ui.routes.workout.NewWorkoutViewModel
 import com.juanitos.ui.routes.workout.SetDisplay
@@ -133,7 +134,7 @@ class EditWorkoutViewModel(
             _state.update { it.copy(errorMessage = "Enter a valid $label value") }
             return
         }
-        val weightKg = current.weightInput.toDoubleOrNull()?.takeIf { it > 0.0 }
+        val weightKg = parseQtDouble(current.weightInput)?.takeIf { it > 0.0 }
 
         val reps = if (exercise.type == NewWorkoutViewModel.TYPE_REPS) repsOrDuration else null
         val duration =

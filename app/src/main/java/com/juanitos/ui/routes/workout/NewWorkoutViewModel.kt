@@ -10,6 +10,7 @@ import com.juanitos.data.workout.repositories.ExerciseDefinitionRepository
 import com.juanitos.data.workout.repositories.WorkoutExerciseRepository
 import com.juanitos.data.workout.repositories.WorkoutRepository
 import com.juanitos.data.workout.repositories.WorkoutSetRepository
+import com.juanitos.lib.parseQtDouble
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -122,7 +123,7 @@ class NewWorkoutViewModel(
             return
         }
 
-        val weightKg = current.weightInput.toDoubleOrNull()?.takeIf { it > 0.0 }
+        val weightKg = parseQtDouble(current.weightInput)?.takeIf { it > 0.0 }
 
         val reps = if (exercise.type == TYPE_REPS) repsOrDuration else null
         val duration = if (exercise.type == TYPE_DURATION) repsOrDuration else null
