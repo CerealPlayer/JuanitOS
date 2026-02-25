@@ -28,12 +28,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
 import com.juanitos.data.workout.entities.ExerciseDefinition
-import com.juanitos.lib.formatDbDatetimeToShortDate
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
 import com.juanitos.ui.routes.workout.NewWorkoutViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 object ExerciseProgressDestination : NavigationDestination {
@@ -74,9 +75,7 @@ fun ExerciseProgressScreen(
 
         val exercise = uiState.exercise ?: return@Scaffold
         val isRepsExercise = exercise.type == NewWorkoutViewModel.TYPE_REPS
-        val pointLabels = uiState.points.map {
-            formatDbDatetimeToShortDate(it.workoutDate).ifBlank { it.workoutDate }
-        }
+        val pointLabels = uiState.points.map { formatWorkoutLabel(it.workoutDate) }
         val weightSeries = uiState.points.mapNotNull { it.weightKg?.toFloat() }
         val repsSeries = uiState.points.mapNotNull { it.reps?.toFloat() }
         val durationSeries = uiState.points.mapNotNull { it.durationSeconds?.toFloat() }
@@ -130,7 +129,7 @@ fun ExerciseProgressScreen(
             }
             items(uiState.points, key = { "${it.workoutDate}-${it.workoutId}" }) { point ->
                 Text(
-                    text = formatDbDatetimeToShortDate(point.workoutDate).ifBlank { point.workoutDate },
+                    text = formatWorkoutLabel(point.workoutDate),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
@@ -286,4 +285,13 @@ private fun formatAxisValue(value: Float): String {
         value
     )
 }
+
+private fun formatWorkoutLabel(workoutDate: String): String {
+    val datePart = workoutDate.trim().substringBefore(" ")
+    return runCatching {
+        LocalDate.parse(datePart).format(WORKOUT_LABEL_FORMATTER)
+    }.getOrElse { workoutDate }
+}
+
+private val WORKOUT_LABEL_FORMATTER = DateTimeFormatter.ofPattern("EEE dd MMM", Locale.ENGLISH)
 
