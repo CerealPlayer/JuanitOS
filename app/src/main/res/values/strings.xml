@@ -66,6 +66,7 @@
     <string name="select_exercise">Select exercise</string>
     <string name="weight_progress">Weight progress</string>
     <string name="reps_progress">Reps progress</string>
+    <string name="sets_progress">Sets progress</string>
     <string name="duration_progress">Duration progress</string>
     <string name="progress_workout_list_label">Recorded workouts</string>
     <string name="kg_format">%1$.1f kg</string>

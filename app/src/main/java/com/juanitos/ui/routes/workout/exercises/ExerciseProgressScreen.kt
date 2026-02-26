@@ -74,11 +74,9 @@ fun ExerciseProgressScreen(
         }
 
         val exercise = uiState.exercise ?: return@Scaffold
-        val isRepsExercise = exercise.type == NewWorkoutViewModel.TYPE_REPS
         val pointLabels = uiState.points.map { formatWorkoutLabel(it.workoutDate) }
         val weightSeries = uiState.points.mapNotNull { it.weightKg?.toFloat() }
-        val repsSeries = uiState.points.mapNotNull { it.reps?.toFloat() }
-        val durationSeries = uiState.points.mapNotNull { it.durationSeconds?.toFloat() }
+        val setsSeries = uiState.points.map { it.sets.toFloat() }
 
         LazyColumn(
             modifier = Modifier
@@ -103,20 +101,11 @@ fun ExerciseProgressScreen(
                     )
                 }
             }
-            if (isRepsExercise && repsSeries.isNotEmpty()) {
+            if (setsSeries.isNotEmpty()) {
                 item {
                     ExerciseProgressChartCard(
-                        title = stringResource(R.string.reps_progress),
-                        values = repsSeries,
-                        labels = pointLabels,
-                    )
-                }
-            }
-            if (!isRepsExercise && durationSeries.isNotEmpty()) {
-                item {
-                    ExerciseProgressChartCard(
-                        title = stringResource(R.string.duration_progress),
-                        values = durationSeries,
+                        title = stringResource(R.string.sets_progress),
+                        values = setsSeries,
                         labels = pointLabels,
                     )
                 }

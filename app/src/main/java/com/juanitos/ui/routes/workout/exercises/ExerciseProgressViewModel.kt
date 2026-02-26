@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.juanitos.data.workout.entities.ExerciseDefinition
 import com.juanitos.data.workout.repositories.ExerciseDefinitionRepository
 import com.juanitos.data.workout.repositories.WorkoutRepository
-import com.juanitos.ui.routes.workout.NewWorkoutViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -17,8 +16,7 @@ data class ExerciseProgressPoint(
     val workoutDate: String,
     val workoutId: Int,
     val weightKg: Double?,
-    val reps: Int?,
-    val durationSeconds: Int?,
+    val sets: Int,
 )
 
 data class ExerciseProgressUiState(
@@ -62,16 +60,7 @@ class ExerciseProgressViewModel(
                         workoutDate = workout.workout.date,
                         workoutId = workout.workout.id,
                         weightKg = maxWeight,
-                        reps = if (exercise.type == NewWorkoutViewModel.TYPE_REPS) {
-                            setsAtMaxWeight.mapNotNull { it.reps }.maxOrNull()
-                        } else {
-                            null
-                        },
-                        durationSeconds = if (exercise.type == NewWorkoutViewModel.TYPE_DURATION) {
-                            setsAtMaxWeight.mapNotNull { it.durationSeconds }.maxOrNull()
-                        } else {
-                            null
-                        },
+                        sets = setsAtMaxWeight.size,
                     )
                 }
             }
