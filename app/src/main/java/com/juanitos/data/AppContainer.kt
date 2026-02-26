@@ -1,6 +1,10 @@
 package com.juanitos.data
 
 import android.content.Context
+import com.juanitos.data.habit.offline.OfflineHabitEntryRepository
+import com.juanitos.data.habit.offline.OfflineHabitRepository
+import com.juanitos.data.habit.repositories.HabitEntryRepository
+import com.juanitos.data.habit.repositories.HabitRepository
 import com.juanitos.data.money.offline.OfflineCategoryRepository
 import com.juanitos.data.money.offline.OfflineCycleRepository
 import com.juanitos.data.money.offline.OfflineFixedSpendingRepository
@@ -27,6 +31,8 @@ interface AppContainer {
     val workoutRepository: WorkoutRepository
     val workoutExerciseRepository: WorkoutExerciseRepository
     val workoutSetRepository: WorkoutSetRepository
+    val habitRepository: HabitRepository
+    val habitEntryRepository: HabitEntryRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -66,6 +72,16 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val workoutSetRepository: WorkoutSetRepository by lazy {
         OfflineWorkoutSetRepository(
             workoutSetDao = JuanitOSDatabase.getDatabase(context).workoutSetDao()
+        )
+    }
+    override val habitRepository: HabitRepository by lazy {
+        OfflineHabitRepository(
+            habitDao = JuanitOSDatabase.getDatabase(context).habitDao()
+        )
+    }
+    override val habitEntryRepository: HabitEntryRepository by lazy {
+        OfflineHabitEntryRepository(
+            habitEntryDao = JuanitOSDatabase.getDatabase(context).habitEntryDao()
         )
     }
 }

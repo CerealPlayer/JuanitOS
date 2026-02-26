@@ -21,6 +21,7 @@ import com.juanitos.ui.commons.MoneySummaryChart
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
+import com.juanitos.ui.routes.habit.HabitsDestination
 import com.juanitos.ui.routes.money.MoneyDestination
 import com.juanitos.ui.routes.workout.WorkoutDestination
 
@@ -57,6 +58,12 @@ fun HomeScreen(
                 Icon(
                     painter = painterResource(R.drawable.subapp_workout),
                     contentDescription = stringResource(R.string.workout)
+                )
+            }
+            IconButton(onClick = { onNavigateTo(HabitsDestination.route) }) {
+                Icon(
+                    painter = painterResource(R.drawable.subapp_habits),
+                    contentDescription = stringResource(R.string.habits)
                 )
             }
         })

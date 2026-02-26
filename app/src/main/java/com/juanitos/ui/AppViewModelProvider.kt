@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.juanitos.JuanitOSApplication
 import com.juanitos.ui.routes.HomeViewModel
+import com.juanitos.ui.routes.habit.HabitsViewModel
 import com.juanitos.ui.routes.money.MoneyViewModel
 import com.juanitos.ui.routes.money.categories.CategoriesViewModel
 import com.juanitos.ui.routes.money.categories.NewCategoryViewModel
@@ -112,6 +113,12 @@ object AppViewModelProvider {
         initializer {
             NewExerciseViewModel(
                 juanitOSApplication().container.exerciseDefinitionRepository
+            )
+        }
+        initializer {
+            HabitsViewModel(
+                juanitOSApplication().container.habitRepository,
+                juanitOSApplication().container.habitEntryRepository,
             )
         }
     }

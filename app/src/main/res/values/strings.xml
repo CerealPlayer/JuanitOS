@@ -80,4 +80,8 @@
     <string name="keep_editing">Keep editing</string>
     <string name="discard">Discard</string>
     <string name="done">Done</string>
+    <string name="habits">Habits</string>
+    <string name="no_habits">No habits defined yet</string>
+    <string name="habit_completed">Completed</string>
+    <string name="habit_not_completed">Not completed</string>
 </resources>

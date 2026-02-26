@@ -4,12 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.juanitos.data.habit.daos.HabitDao
+import com.juanitos.data.habit.daos.HabitEntryDao
+import com.juanitos.data.habit.entities.Habit
+import com.juanitos.data.habit.entities.HabitEntry
 import com.juanitos.data.migrations.MIGRATION_10_11
 import com.juanitos.data.migrations.MIGRATION_11_12
 import com.juanitos.data.migrations.MIGRATION_12_13
 import com.juanitos.data.migrations.MIGRATION_13_14
 import com.juanitos.data.migrations.MIGRATION_19_20
 import com.juanitos.data.migrations.MIGRATION_20_21
+import com.juanitos.data.migrations.MIGRATION_21_22
 import com.juanitos.data.migrations.MIGRATION_9_10
 import com.juanitos.data.money.daos.CategoryDao
 import com.juanitos.data.money.daos.CycleDao
@@ -31,9 +36,10 @@ import com.juanitos.data.workout.entities.WorkoutSet
 @Database(
     entities = [
         Cycle::class, Transaction::class, FixedSpending::class, Category::class,
-        ExerciseDefinition::class, Workout::class, WorkoutExercise::class, WorkoutSet::class
+        ExerciseDefinition::class, Workout::class, WorkoutExercise::class, WorkoutSet::class,
+        Habit::class, HabitEntry::class
     ],
-    version = 21,
+    version = 22,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
@@ -45,6 +51,8 @@ abstract class JuanitOSDatabase : RoomDatabase() {
     abstract fun workoutDao(): WorkoutDao
     abstract fun workoutExerciseDao(): WorkoutExerciseDao
     abstract fun workoutSetDao(): WorkoutSetDao
+    abstract fun habitDao(): HabitDao
+    abstract fun habitEntryDao(): HabitEntryDao
 
     companion object {
         @Volatile
@@ -60,7 +68,8 @@ abstract class JuanitOSDatabase : RoomDatabase() {
                         MIGRATION_12_13,
                         MIGRATION_13_14,
                         MIGRATION_19_20,
-                        MIGRATION_20_21
+                        MIGRATION_20_21,
+                        MIGRATION_21_22
                     )
                     .fallbackToDestructiveMigration(false)
                     .build().also { Instance = it }
