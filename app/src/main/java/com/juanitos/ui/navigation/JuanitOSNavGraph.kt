@@ -11,6 +11,8 @@ import com.juanitos.ui.routes.HomeDestination
 import com.juanitos.ui.routes.HomeScreen
 import com.juanitos.ui.routes.habit.HabitsDestination
 import com.juanitos.ui.routes.habit.HabitsScreen
+import com.juanitos.ui.routes.habit.NewHabitDestination
+import com.juanitos.ui.routes.habit.NewHabitScreen
 import com.juanitos.ui.routes.money.MoneyDestination
 import com.juanitos.ui.routes.money.MoneyScreen
 import com.juanitos.ui.routes.money.categories.CategoriesDestination
@@ -141,7 +143,13 @@ fun JuanitOSNavGraph(
             NewExerciseScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = HabitsDestination.route.route) {
-            HabitsScreen(onNavigateUp = { navController.navigateUp() })
+            HabitsScreen(
+                onNavigateUp = { navController.navigateUp() },
+                onNewHabit = { navController.navigate(NewHabitDestination.route.route) }
+            )
+        }
+        composable(route = NewHabitDestination.route.route) {
+            NewHabitScreen(onNavigateUp = { navController.navigateUp() })
         }
     }
 }

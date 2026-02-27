@@ -17,5 +17,6 @@ enum class Routes(val route: String) {
     ExerciseProgress("exercise_progress/{exerciseId}"),
     NewExercise("new_exercise_definition"),
     WorkoutDetail("workout_detail/{workoutId}"),
-    Habits("habits");
+    Habits("habits"),
+    NewHabit("new_habit");
 }
