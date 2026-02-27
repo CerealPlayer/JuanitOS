@@ -1,5 +1,6 @@
 package com.juanitos.ui.routes.habit
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,11 +16,13 @@ import com.juanitos.data.habit.entities.relations.HabitWithEntries
 @Composable
 fun HabitCard(
     habitWithEntries: HabitWithEntries,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .padding(bottom = dimensionResource(R.dimen.padding_small))
     ) {
         Column(

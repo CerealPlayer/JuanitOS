@@ -35,6 +35,7 @@ object HabitsDestination : NavigationDestination {
 fun HabitsScreen(
     onNavigateUp: () -> Unit,
     onNewHabit: () -> Unit,
+    onHabitClick: (Int) -> Unit,
     viewModel: HabitsViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val uiState = viewModel.uiState.collectAsState()
@@ -80,7 +81,10 @@ fun HabitsScreen(
                     )
             ) {
                 items(uiState.value.habitsWithEntries, key = { it.habit.id }) { habitWithEntries ->
-                    HabitCard(habitWithEntries = habitWithEntries)
+                    HabitCard(
+                        habitWithEntries = habitWithEntries,
+                        onClick = { onHabitClick(habitWithEntries.habit.id) },
+                    )
                 }
             }
         }

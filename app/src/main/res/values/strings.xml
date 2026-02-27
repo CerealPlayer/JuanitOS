@@ -85,4 +85,9 @@
     <string name="habit_completed">Completed</string>
     <string name="habit_not_completed">Not completed</string>
     <string name="new_habit">New habit</string>
+    <string name="habit_detail">Habit detail</string>
+    <string name="habit_not_found">Habit not found</string>
+    <string name="habit_activity_this_month">Recent activity</string>
+    <string name="habit_no_activity_this_month">No completed activity in this range</string>
+    <string name="mark_habit_complete_today">Mark habit complete today</string>
 </resources>

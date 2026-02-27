@@ -13,6 +13,8 @@ import com.juanitos.ui.routes.habit.HabitsDestination
 import com.juanitos.ui.routes.habit.HabitsScreen
 import com.juanitos.ui.routes.habit.NewHabitDestination
 import com.juanitos.ui.routes.habit.NewHabitScreen
+import com.juanitos.ui.routes.habit.detail.HabitDetailDestination
+import com.juanitos.ui.routes.habit.detail.HabitDetailScreen
 import com.juanitos.ui.routes.money.MoneyDestination
 import com.juanitos.ui.routes.money.MoneyScreen
 import com.juanitos.ui.routes.money.categories.CategoriesDestination
@@ -145,11 +147,20 @@ fun JuanitOSNavGraph(
         composable(route = HabitsDestination.route.route) {
             HabitsScreen(
                 onNavigateUp = { navController.navigateUp() },
-                onNewHabit = { navController.navigate(NewHabitDestination.route.route) }
+                onNewHabit = { navController.navigate(NewHabitDestination.route.route) },
+                onHabitClick = { habitId ->
+                    navController.navigate(HabitDetailDestination.createRoute(habitId))
+                }
             )
         }
         composable(route = NewHabitDestination.route.route) {
             NewHabitScreen(onNavigateUp = { navController.navigateUp() })
+        }
+        composable(
+            route = HabitDetailDestination.route.route,
+            arguments = listOf(navArgument("habitId") { type = NavType.IntType }),
+        ) {
+            HabitDetailScreen(onNavigateUp = { navController.navigateUp() })
         }
     }
 }

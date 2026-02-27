@@ -27,4 +27,8 @@ interface HabitDao {
     @Transaction
     @Query("SELECT * FROM habits ORDER BY created_at ASC")
     fun getAllWithEntries(): Flow<List<HabitWithEntries>>
+
+    @Transaction
+    @Query("SELECT * FROM habits WHERE id = :habitId LIMIT 1")
+    fun getByIdWithEntries(habitId: Int): Flow<HabitWithEntries?>
 }

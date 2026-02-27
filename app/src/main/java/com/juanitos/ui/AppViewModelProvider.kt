@@ -9,6 +9,7 @@ import com.juanitos.JuanitOSApplication
 import com.juanitos.ui.routes.HomeViewModel
 import com.juanitos.ui.routes.habit.HabitsViewModel
 import com.juanitos.ui.routes.habit.NewHabitViewModel
+import com.juanitos.ui.routes.habit.detail.HabitDetailViewModel
 import com.juanitos.ui.routes.money.MoneyViewModel
 import com.juanitos.ui.routes.money.categories.CategoriesViewModel
 import com.juanitos.ui.routes.money.categories.NewCategoryViewModel
@@ -125,6 +126,13 @@ object AppViewModelProvider {
         initializer {
             NewHabitViewModel(
                 juanitOSApplication().container.habitRepository,
+            )
+        }
+        initializer {
+            HabitDetailViewModel(
+                savedStateHandle = createSavedStateHandle(),
+                habitRepository = juanitOSApplication().container.habitRepository,
+                habitEntryRepository = juanitOSApplication().container.habitEntryRepository,
             )
         }
     }
