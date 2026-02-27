@@ -7,13 +7,18 @@ import com.juanitos.data.habit.repositories.HabitRepository
 import kotlinx.coroutines.flow.Flow
 
 class OfflineHabitRepository(private val habitDao: HabitDao) : HabitRepository {
-    override suspend fun insert(habit: Habit): Long = habitDao.insert(habit)
+    override suspend fun insert(habit: Habit): Long = habitDao.insert(
+        name = habit.name,
+        description = habit.description,
+    )
     override suspend fun update(habit: Habit) = habitDao.update(habit)
     override suspend fun delete(habit: Habit) = habitDao.delete(habit)
     override fun getAll(): Flow<List<Habit>> = habitDao.getAll()
     override fun getAllWithEntries(): Flow<List<HabitWithEntries>> = habitDao.getAllWithEntries()
     override fun getNewestWithEntries(limit: Int): Flow<List<HabitWithEntries>> =
         habitDao.getNewestWithEntries(limit)
+    override fun getNewestActiveWithEntries(limit: Int): Flow<List<HabitWithEntries>> =
+        habitDao.getNewestActiveWithEntries(limit)
     override fun getByIdWithEntries(habitId: Int): Flow<HabitWithEntries?> =
         habitDao.getByIdWithEntries(habitId)
 }

@@ -30,3 +30,9 @@ val MIGRATION_21_22 = object : Migration(21, 22) {
         database.execSQL("CREATE INDEX IF NOT EXISTS index_habit_entries_habit_id ON habit_entries(habit_id)")
     }
 }
+
+val MIGRATION_22_23 = object : Migration(22, 23) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE habits ADD COLUMN completed_at TEXT")
+    }
+}

@@ -12,4 +12,6 @@ data class Habit(
     val description: String? = null,
     @ColumnInfo(name = "created_at", defaultValue = "(datetime('now', 'localtime'))")
     val createdAt: String? = null,
+    @ColumnInfo(name = "completed_at")
+    val completedAt: String? = null,
 )

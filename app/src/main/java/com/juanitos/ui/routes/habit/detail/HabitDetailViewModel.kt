@@ -71,6 +71,28 @@ class HabitDetailViewModel(
         }
     }
 
+    fun markHabitAsCompleted() {
+        viewModelScope.launch {
+            val habit = uiState.value.habit ?: return@launch
+            if (habit.completedAt != null) return@launch
+            habitRepository.update(habit.copy(completedAt = LocalDate.now().toString()))
+        }
+    }
+
+    fun unmarkHabitAsCompleted() {
+        viewModelScope.launch {
+            val habit = uiState.value.habit ?: return@launch
+            if (habit.completedAt == null) return@launch
+            habitRepository.update(habit.copy(completedAt = null))
+        }
+    }
+
+    fun deleteHabit(habit: Habit) {
+        viewModelScope.launch {
+            habitRepository.delete(habit)
+        }
+    }
+
     companion object {
         const val TIMEOUT_MILLIS = 5_000L
         const val WEEKS_TO_KEEP = 26

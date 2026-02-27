@@ -15,14 +15,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
@@ -31,7 +36,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
+import com.juanitos.lib.formatDbDatetimeToShortDate
 import com.juanitos.ui.AppViewModelProvider
+import com.juanitos.ui.commons.DeleteConfirmationDialog
+import com.juanitos.ui.icons.MoreVert
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
@@ -50,6 +58,20 @@ fun HabitDetailScreen(
     viewModel: HabitDetailViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val uiState = viewModel.uiState.collectAsState().value
+    val showMenu = remember { mutableStateOf(false) }
+    val showDeleteConfirmation = remember { mutableStateOf(false) }
+    val habit = uiState.habit
+
+    if (showDeleteConfirmation.value && habit != null) {
+        DeleteConfirmationDialog(
+            title = stringResource(R.string.confirm_delete_habit),
+            onConfirm = {
+                onNavigateUp()
+                viewModel.deleteHabit(habit)
+            },
+            onDismiss = { showDeleteConfirmation.value = false },
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -57,6 +79,42 @@ fun HabitDetailScreen(
                 title = stringResource(HabitDetailDestination.titleRes),
                 canNavigateBack = true,
                 navigateUp = onNavigateUp,
+                actions = {
+                    Box {
+                        IconButton(onClick = { showMenu.value = true }) {
+                            MoreVert()
+                        }
+                        DropdownMenu(
+                            expanded = showMenu.value,
+                            onDismissRequest = { showMenu.value = false },
+                        ) {
+                            if (habit?.completedAt == null) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.mark_habit_as_completed)) },
+                                    onClick = {
+                                        showMenu.value = false
+                                        viewModel.markHabitAsCompleted()
+                                    },
+                                )
+                            } else {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.unmark_habit_as_completed)) },
+                                    onClick = {
+                                        showMenu.value = false
+                                        viewModel.unmarkHabitAsCompleted()
+                                    },
+                                )
+                            }
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.delete)) },
+                                onClick = {
+                                    showMenu.value = false
+                                    showDeleteConfirmation.value = true
+                                },
+                            )
+                        }
+                    }
+                },
             )
         },
         bottomBar = {
@@ -73,7 +131,6 @@ fun HabitDetailScreen(
             )
         }
     ) { innerPadding ->
-        val habit = uiState.habit
         if (habit == null) {
             Box(
                 modifier = Modifier
@@ -97,9 +154,23 @@ fun HabitDetailScreen(
         ) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))) {
+                    val createdAt = formatDbDatetimeToShortDate(habit.createdAt)
+                        .ifBlank { habit.createdAt.orEmpty() }
+                        .ifBlank { stringResource(R.string.habit_unknown_date) }
+                    val completedAt = formatDbDatetimeToShortDate(habit.completedAt)
+                        .ifBlank { habit.completedAt.orEmpty() }
                     Text(
                         text = habit.name,
                         style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        text = if (completedAt.isNotBlank()) {
+                            stringResource(R.string.habit_lifecycle_from_to, createdAt, completedAt)
+                        } else {
+                            stringResource(R.string.habit_lifecycle_from, createdAt)
+                        },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     if (!habit.description.isNullOrBlank()) {
                         Text(

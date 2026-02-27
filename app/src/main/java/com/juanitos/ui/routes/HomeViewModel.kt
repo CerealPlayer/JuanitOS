@@ -86,7 +86,7 @@ class HomeViewModel(
     }
 
     private fun createNewestHabitsFlow(): Flow<List<HomeHabitPreview>> {
-        return habitRepository.getNewestWithEntries(HABIT_PREVIEW_LIMIT).map { habits ->
+        return habitRepository.getNewestActiveWithEntries(HABIT_PREVIEW_LIMIT).map { habits ->
             habits.map { habitWithEntries ->
                 HomeHabitPreview(
                     habitId = habitWithEntries.habit.id,

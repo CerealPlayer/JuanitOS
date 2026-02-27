@@ -10,8 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import com.juanitos.R
 import com.juanitos.data.habit.entities.relations.HabitWithEntries
+import com.juanitos.lib.formatDbDatetimeToShortDate
 
 @Composable
 fun HabitCard(
@@ -30,9 +32,23 @@ fun HabitCard(
                 .fillMaxWidth()
                 .padding(dimensionResource(R.dimen.padding_medium))
         ) {
+            val createdAt = formatDbDatetimeToShortDate(habitWithEntries.habit.createdAt)
+                .ifBlank { habitWithEntries.habit.createdAt.orEmpty() }
+                .ifBlank { stringResource(R.string.habit_unknown_date) }
+            val completedAt = formatDbDatetimeToShortDate(habitWithEntries.habit.completedAt)
+                .ifBlank { habitWithEntries.habit.completedAt.orEmpty() }
             Text(
                 text = habitWithEntries.habit.name,
                 style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = if (completedAt.isNotBlank()) {
+                    stringResource(R.string.habit_lifecycle_from_to, createdAt, completedAt)
+                } else {
+                    stringResource(R.string.habit_lifecycle_from, createdAt)
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             if (!habitWithEntries.habit.description.isNullOrBlank()) {
                 Text(

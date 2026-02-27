@@ -90,4 +90,10 @@
     <string name="habit_activity_this_month">Recent activity</string>
     <string name="habit_no_activity_this_month">No completed activity in this range</string>
     <string name="mark_habit_complete_today">Mark habit complete today</string>
+    <string name="mark_habit_as_completed">Mark as complete</string>
+    <string name="unmark_habit_as_completed">Resume habit</string>
+    <string name="confirm_delete_habit">Delete habit?</string>
+    <string name="habit_lifecycle_from">From %1$s</string>
+    <string name="habit_lifecycle_from_to">From %1$s to %2$s</string>
+    <string name="habit_unknown_date">unknown date</string>
 </resources>

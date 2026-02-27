@@ -2,7 +2,6 @@ package com.juanitos.data.habit.daos
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -12,8 +11,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HabitDao {
-    @Insert
-    suspend fun insert(habit: Habit): Long
+    @Query("INSERT INTO habits (name, description) VALUES (:name, :description)")
+    suspend fun insert(name: String, description: String?): Long
 
     @Update
     suspend fun update(habit: Habit)
@@ -31,6 +30,10 @@ interface HabitDao {
     @Transaction
     @Query("SELECT * FROM habits ORDER BY datetime(created_at) DESC, id DESC LIMIT :limit")
     fun getNewestWithEntries(limit: Int): Flow<List<HabitWithEntries>>
+
+    @Transaction
+    @Query("SELECT * FROM habits WHERE completed_at IS NULL ORDER BY datetime(created_at) DESC, id DESC LIMIT :limit")
+    fun getNewestActiveWithEntries(limit: Int): Flow<List<HabitWithEntries>>
 
     @Transaction
     @Query("SELECT * FROM habits WHERE id = :habitId LIMIT 1")
