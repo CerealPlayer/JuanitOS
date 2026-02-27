@@ -10,5 +10,6 @@ interface HabitRepository {
     suspend fun delete(habit: Habit)
     fun getAll(): Flow<List<Habit>>
     fun getAllWithEntries(): Flow<List<HabitWithEntries>>
+    fun getNewestWithEntries(limit: Int): Flow<List<HabitWithEntries>>
     fun getByIdWithEntries(habitId: Int): Flow<HabitWithEntries?>
 }

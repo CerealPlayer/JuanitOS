@@ -30,6 +30,7 @@ object AppViewModelProvider {
             HomeViewModel(
                 juanitOSApplication().container.cycleRepository,
                 juanitOSApplication().container.fixedSpendingRepository,
+                juanitOSApplication().container.habitRepository,
             )
         }
         initializer {

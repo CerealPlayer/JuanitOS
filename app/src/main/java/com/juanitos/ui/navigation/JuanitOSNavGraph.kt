@@ -54,7 +54,12 @@ fun JuanitOSNavGraph(
         modifier = modifier
     ) {
         composable(route = HomeDestination.route.route) {
-            HomeScreen(onNavigateTo = { navController.navigate(it.route) })
+            HomeScreen(
+                onNavigateTo = { navController.navigate(it.route) },
+                onNavigateToHabitDetail = { habitId ->
+                    navController.navigate(HabitDetailDestination.createRoute(habitId))
+                }
+            )
         }
         composable(route = MoneyDestination.route.route) {
             MoneyScreen(

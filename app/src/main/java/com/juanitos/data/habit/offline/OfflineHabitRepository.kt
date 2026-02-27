@@ -12,6 +12,8 @@ class OfflineHabitRepository(private val habitDao: HabitDao) : HabitRepository {
     override suspend fun delete(habit: Habit) = habitDao.delete(habit)
     override fun getAll(): Flow<List<Habit>> = habitDao.getAll()
     override fun getAllWithEntries(): Flow<List<HabitWithEntries>> = habitDao.getAllWithEntries()
+    override fun getNewestWithEntries(limit: Int): Flow<List<HabitWithEntries>> =
+        habitDao.getNewestWithEntries(limit)
     override fun getByIdWithEntries(habitId: Int): Flow<HabitWithEntries?> =
         habitDao.getByIdWithEntries(habitId)
 }

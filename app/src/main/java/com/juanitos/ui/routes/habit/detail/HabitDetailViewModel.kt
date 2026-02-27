@@ -38,36 +38,11 @@ class HabitDetailViewModel(
     val uiState: StateFlow<HabitDetailUiState> =
         habitRepository.getByIdWithEntries(habitId)
             .map { habitWithEntries ->
-                val currentDate = LocalDate.now()
-                val gridEnd = currentDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
-                val gridStart = gridEnd
-                    .minusWeeks(WEEKS_TO_KEEP.toLong() - 1)
-                    .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-
-                val completedDates = habitWithEntries?.entries
-                    ?.asSequence()
-                    ?.filter { it.completed }
-                    ?.map { it.date }
-                    ?.toSet()
-                    ?: emptySet()
-
-                val weekColumns = mutableListOf<List<HabitActivityCell>>()
-                var weekStart = gridStart
-                while (!weekStart.isAfter(gridEnd)) {
-                    weekColumns += (0..6).map { dayOffset ->
-                        val day = weekStart.plusDays(dayOffset.toLong())
-                        HabitActivityCell(
-                            date = day,
-                            isFutureDate = day.isAfter(currentDate),
-                            isCompleted = !day.isAfter(currentDate) && completedDates.contains(day.toString()),
-                        )
-                    }
-                    weekStart = weekStart.plusWeeks(1)
-                }
-
                 HabitDetailUiState(
                     habit = habitWithEntries?.habit,
-                    weekColumns = weekColumns,
+                    weekColumns = buildHabitActivityWeekColumns(
+                        entries = habitWithEntries?.entries ?: emptyList(),
+                    ),
                 )
             }
             .stateIn(
@@ -100,4 +75,37 @@ class HabitDetailViewModel(
         const val TIMEOUT_MILLIS = 5_000L
         const val WEEKS_TO_KEEP = 26
     }
+}
+
+fun buildHabitActivityWeekColumns(
+    entries: List<HabitEntry>,
+    currentDate: LocalDate = LocalDate.now(),
+    weeksToKeep: Int = HabitDetailViewModel.WEEKS_TO_KEEP,
+): List<List<HabitActivityCell>> {
+    val gridEnd = currentDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+    val gridStart = gridEnd
+        .minusWeeks(weeksToKeep.toLong() - 1)
+        .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+
+    val completedDates = entries
+        .asSequence()
+        .filter { it.completed }
+        .map { it.date }
+        .toSet()
+
+    val weekColumns = mutableListOf<List<HabitActivityCell>>()
+    var weekStart = gridStart
+    while (!weekStart.isAfter(gridEnd)) {
+        weekColumns += (0..6).map { dayOffset ->
+            val day = weekStart.plusDays(dayOffset.toLong())
+            HabitActivityCell(
+                date = day,
+                isFutureDate = day.isAfter(currentDate),
+                isCompleted = !day.isAfter(currentDate) && completedDates.contains(day.toString()),
+            )
+        }
+        weekStart = weekStart.plusWeeks(1)
+    }
+
+    return weekColumns
 }

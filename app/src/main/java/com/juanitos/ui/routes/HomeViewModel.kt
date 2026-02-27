@@ -2,10 +2,13 @@ package com.juanitos.ui.routes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juanitos.data.habit.repositories.HabitRepository
 import com.juanitos.data.money.entities.relations.CurrentCycleWithDetails
 import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
 import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
+import com.juanitos.ui.routes.habit.detail.HabitActivityCell
+import com.juanitos.ui.routes.habit.detail.buildHabitActivityWeekColumns
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,12 +27,20 @@ data class MoneySummary(
 
 data class HomeUiState(
     val summary: MoneySummary = MoneySummary(),
+    val habitsPreview: List<HomeHabitPreview> = emptyList(),
+)
+
+data class HomeHabitPreview(
+    val habitId: Int,
+    val name: String,
+    val weekColumns: List<List<HabitActivityCell>> = emptyList(),
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(
     private val cycleRepository: CycleRepository,
-    private val fixedSpendingRepository: FixedSpendingRepository
+    private val fixedSpendingRepository: FixedSpendingRepository,
+    private val habitRepository: HabitRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState
@@ -55,6 +66,8 @@ class HomeViewModel(
                 remaining = remainingAfterFixed
             )
             state.copy(summary = updatedSummary)
+        }.combine(createNewestHabitsFlow()) { state, habits ->
+            state.copy(habitsPreview = habits)
         }
         .stateIn(
             scope = viewModelScope,
@@ -72,8 +85,21 @@ class HomeViewModel(
         }
     }
 
+    private fun createNewestHabitsFlow(): Flow<List<HomeHabitPreview>> {
+        return habitRepository.getNewestWithEntries(HABIT_PREVIEW_LIMIT).map { habits ->
+            habits.map { habitWithEntries ->
+                HomeHabitPreview(
+                    habitId = habitWithEntries.habit.id,
+                    name = habitWithEntries.habit.name,
+                    weekColumns = buildHabitActivityWeekColumns(habitWithEntries.entries),
+                )
+            }
+        }
+    }
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
+        private const val HABIT_PREVIEW_LIMIT = 3
     }
 }
 
