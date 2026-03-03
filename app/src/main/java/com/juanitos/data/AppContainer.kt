@@ -1,7 +1,13 @@
 package com.juanitos.data
 
 import android.content.Context
+import com.juanitos.data.climbing.offline.OfflineClimbingBoulderAttemptRepository
+import com.juanitos.data.climbing.offline.OfflineClimbingBoulderRepository
+import com.juanitos.data.climbing.offline.OfflineClimbingMediaRepository
 import com.juanitos.data.climbing.offline.OfflineClimbingWorkoutRepository
+import com.juanitos.data.climbing.repositories.ClimbingBoulderAttemptRepository
+import com.juanitos.data.climbing.repositories.ClimbingBoulderRepository
+import com.juanitos.data.climbing.repositories.ClimbingMediaRepository
 import com.juanitos.data.climbing.repositories.ClimbingWorkoutRepository
 import com.juanitos.data.habit.offline.OfflineHabitEntryRepository
 import com.juanitos.data.habit.offline.OfflineHabitRepository
@@ -36,6 +42,9 @@ interface AppContainer {
     val habitRepository: HabitRepository
     val habitEntryRepository: HabitEntryRepository
     val climbingWorkoutRepository: ClimbingWorkoutRepository
+    val climbingBoulderRepository: ClimbingBoulderRepository
+    val climbingMediaRepository: ClimbingMediaRepository
+    val climbingBoulderAttemptRepository: ClimbingBoulderAttemptRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -90,6 +99,22 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val climbingWorkoutRepository: ClimbingWorkoutRepository by lazy {
         OfflineClimbingWorkoutRepository(
             climbingWorkoutDao = JuanitOSDatabase.getDatabase(context).climbingWorkoutDao()
+        )
+    }
+    override val climbingBoulderRepository: ClimbingBoulderRepository by lazy {
+        OfflineClimbingBoulderRepository(
+            climbingBoulderDao = JuanitOSDatabase.getDatabase(context).climbingBoulderDao()
+        )
+    }
+    override val climbingMediaRepository: ClimbingMediaRepository by lazy {
+        OfflineClimbingMediaRepository(
+            climbingMediaDao = JuanitOSDatabase.getDatabase(context).climbingMediaDao()
+        )
+    }
+    override val climbingBoulderAttemptRepository: ClimbingBoulderAttemptRepository by lazy {
+        OfflineClimbingBoulderAttemptRepository(
+            climbingBoulderAttemptDao = JuanitOSDatabase.getDatabase(context)
+                .climbingBoulderAttemptDao()
         )
     }
 }

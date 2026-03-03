@@ -20,3 +20,50 @@ val MIGRATION_23_24 = object : Migration(23, 24) {
         )
     }
 }
+
+val MIGRATION_24_25 = object : Migration(24, 25) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS climbing_media (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                file_path TEXT NOT NULL,
+                mime_type TEXT NOT NULL,
+                created_at TEXT DEFAULT (datetime('now', 'localtime'))
+            )
+            """.trimIndent()
+        )
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS climbing_boulders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                grade TEXT NOT NULL,
+                style TEXT,
+                picture_media_id INTEGER,
+                created_at TEXT DEFAULT (datetime('now', 'localtime')),
+                FOREIGN KEY(picture_media_id) REFERENCES climbing_media(id) ON DELETE SET NULL
+            )
+            """.trimIndent()
+        )
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS climbing_boulder_attempts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                climbing_workout_id INTEGER NOT NULL,
+                climbing_boulder_id INTEGER NOT NULL,
+                video_media_id INTEGER,
+                notes TEXT,
+                created_at TEXT DEFAULT (datetime('now', 'localtime')),
+                FOREIGN KEY(climbing_workout_id) REFERENCES climbing_workouts(id) ON DELETE CASCADE,
+                FOREIGN KEY(climbing_boulder_id) REFERENCES climbing_boulders(id) ON DELETE RESTRICT,
+                FOREIGN KEY(video_media_id) REFERENCES climbing_media(id) ON DELETE RESTRICT
+            )
+            """.trimIndent()
+        )
+
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_climbing_boulders_picture_media_id ON climbing_boulders(picture_media_id)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_climbing_boulder_attempts_climbing_workout_id ON climbing_boulder_attempts(climbing_workout_id)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_climbing_boulder_attempts_climbing_boulder_id ON climbing_boulder_attempts(climbing_boulder_id)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_climbing_boulder_attempts_video_media_id ON climbing_boulder_attempts(video_media_id)")
+    }
+}
