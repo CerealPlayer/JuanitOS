@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.juanitos.data.climbing.daos.ClimbingWorkoutDao
+import com.juanitos.data.climbing.entities.ClimbingWorkout
 import com.juanitos.data.habit.daos.HabitDao
 import com.juanitos.data.habit.daos.HabitEntryDao
 import com.juanitos.data.habit.entities.Habit
@@ -16,6 +18,7 @@ import com.juanitos.data.migrations.MIGRATION_19_20
 import com.juanitos.data.migrations.MIGRATION_20_21
 import com.juanitos.data.migrations.MIGRATION_21_22
 import com.juanitos.data.migrations.MIGRATION_22_23
+import com.juanitos.data.migrations.MIGRATION_23_24
 import com.juanitos.data.migrations.MIGRATION_9_10
 import com.juanitos.data.money.daos.CategoryDao
 import com.juanitos.data.money.daos.CycleDao
@@ -38,9 +41,9 @@ import com.juanitos.data.workout.entities.WorkoutSet
     entities = [
         Cycle::class, Transaction::class, FixedSpending::class, Category::class,
         ExerciseDefinition::class, Workout::class, WorkoutExercise::class, WorkoutSet::class,
-        Habit::class, HabitEntry::class
+        Habit::class, HabitEntry::class, ClimbingWorkout::class
     ],
-    version = 23,
+    version = 24,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
@@ -54,6 +57,7 @@ abstract class JuanitOSDatabase : RoomDatabase() {
     abstract fun workoutSetDao(): WorkoutSetDao
     abstract fun habitDao(): HabitDao
     abstract fun habitEntryDao(): HabitEntryDao
+    abstract fun climbingWorkoutDao(): ClimbingWorkoutDao
 
     companion object {
         @Volatile
@@ -71,7 +75,8 @@ abstract class JuanitOSDatabase : RoomDatabase() {
                         MIGRATION_19_20,
                         MIGRATION_20_21,
                         MIGRATION_21_22,
-                        MIGRATION_22_23
+                        MIGRATION_22_23,
+                        MIGRATION_23_24
                     )
                     .fallbackToDestructiveMigration(false)
                     .build().also { Instance = it }

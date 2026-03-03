@@ -1,6 +1,8 @@
 package com.juanitos.data
 
 import android.content.Context
+import com.juanitos.data.climbing.offline.OfflineClimbingWorkoutRepository
+import com.juanitos.data.climbing.repositories.ClimbingWorkoutRepository
 import com.juanitos.data.habit.offline.OfflineHabitEntryRepository
 import com.juanitos.data.habit.offline.OfflineHabitRepository
 import com.juanitos.data.habit.repositories.HabitEntryRepository
@@ -33,6 +35,7 @@ interface AppContainer {
     val workoutSetRepository: WorkoutSetRepository
     val habitRepository: HabitRepository
     val habitEntryRepository: HabitEntryRepository
+    val climbingWorkoutRepository: ClimbingWorkoutRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -82,6 +85,11 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val habitEntryRepository: HabitEntryRepository by lazy {
         OfflineHabitEntryRepository(
             habitEntryDao = JuanitOSDatabase.getDatabase(context).habitEntryDao()
+        )
+    }
+    override val climbingWorkoutRepository: ClimbingWorkoutRepository by lazy {
+        OfflineClimbingWorkoutRepository(
+            climbingWorkoutDao = JuanitOSDatabase.getDatabase(context).climbingWorkoutDao()
         )
     }
 }

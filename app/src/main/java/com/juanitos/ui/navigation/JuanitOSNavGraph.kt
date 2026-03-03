@@ -9,6 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.juanitos.ui.routes.HomeDestination
 import com.juanitos.ui.routes.HomeScreen
+import com.juanitos.ui.routes.climbing.ClimbingDestination
+import com.juanitos.ui.routes.climbing.ClimbingScreen
 import com.juanitos.ui.routes.habit.HabitsDestination
 import com.juanitos.ui.routes.habit.HabitsScreen
 import com.juanitos.ui.routes.habit.NewHabitDestination
@@ -60,6 +62,9 @@ fun JuanitOSNavGraph(
                     navController.navigate(HabitDetailDestination.createRoute(habitId))
                 }
             )
+        }
+        composable(route = ClimbingDestination.route.route) {
+            ClimbingScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = MoneyDestination.route.route) {
             MoneyScreen(
