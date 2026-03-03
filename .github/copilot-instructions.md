@@ -21,7 +21,7 @@ Currently implements:
   - View habit details with a contribution-style activity grid
 - **Food Module**: Planned but not yet implemented (route stub exists)
 
-The app uses Room database (schema version 22) with offline-first architecture and local-only data (
+The app uses Room database (schema version 23) with offline-first architecture and local-only data (
 no backend).
 
 ---
@@ -56,9 +56,9 @@ data/
   ├── migrations/
   │   ├── Migrations.kt (5 migrations: 9→10→11→12→13→14)
   │   ├── WorkoutMigrations.kt (2 migrations: 19→20→21)
-  │   └── HabitMigrations.kt (1 migration: 21→22)
+  │   └── HabitMigrations.kt (2 migrations: 21→22→23)
   ├── AppContainer.kt (DI interface - 4 Money + 4 Workout + 2 Habit repositories)
-  └── JuanitOSDatabase.kt (Room DB v22, 10 entities, 8 migrations)
+  └── JuanitOSDatabase.kt (Room DB v23, 10 entities, 9 migrations)
 
 ui/
   ├── routes/
@@ -196,7 +196,7 @@ Each screen has a dedicated UiState data class:
 
 ## Database & Migrations
 
-### Current Schema (version 22)
+### Current Schema (version 23)
 
 **Entities (4 Money + 4 Workout + 2 Habit entities):**
 
@@ -205,11 +205,11 @@ Each screen has a dedicated UiState data class:
 - **FixedSpending** - Recurring spending with active/deleted state
 - **Category** - Categories for organizing transactions and fixed spending
 - **ExerciseDefinition** - Reusable exercise definitions (name, muscle group, etc.)
-- **Workout** - A workout session with startTime and endTime (stored as epoch ms, formatted via
-  `lib/dates.kt`)
+- **Workout** - A workout session with optional startTime/endTime stored as text columns
+  (`start_time`, `end_time`) and formatted via `lib/dates.kt`
 - **WorkoutExercise** - An exercise instance within a workout (links Workout ↔ ExerciseDefinition)
 - **WorkoutSet** - A set within a WorkoutExercise (reps, weight, etc.)
-- **Habit** - Habit metadata (name, optional description, active state)
+- **Habit** - Habit metadata (name, optional description, created/completed lifecycle dates)
 - **HabitEntry** - Per-day completion entries linked to habits
 
 **Entity Relations (6):**
@@ -228,7 +228,7 @@ food_ingredients, batch_food_ingredients) but currently not in active schema.
 
 - Money migrations: `data/migrations/Migrations.kt` (MIGRATION_9_10 through MIGRATION_13_14)
 - Workout migrations: `data/migrations/WorkoutMigrations.kt` (MIGRATION_19_20, MIGRATION_20_21)
-- Habit migrations: `data/migrations/HabitMigrations.kt` (MIGRATION_21_22)
+- Habit migrations: `data/migrations/HabitMigrations.kt` (MIGRATION_21_22, MIGRATION_22_23)
 - Use `fallbackToDestructiveMigration(false)` to prevent data loss
 - New migrations must be added to `JuanitOSDatabase.addMigrations()`
 - **Existing migrations cover Food module tables** that are not in current active schema (v14→v19
@@ -238,22 +238,22 @@ food_ingredients, batch_food_ingredients) but currently not in active schema.
 
 ## Testing Notes
 
-- Test directories exist but are empty (`src/test/`, `src/androidTest/`)
+- Starter test files exist: `ExampleUnitTest.kt` and `ExampleInstrumentedTest.kt`
 - Use AndroidJUnitRunner for instrumented tests (configured in build.gradle)
-- No existing test infrastructure to follow
+- Minimal default test infrastructure is present
 
 ---
 
 ## Key Dependencies
 
-- **Kotlin 2.3.0** with Compose compiler plugin
-- **Jetpack Compose BOM 2026.01.00** for UI
+- **Kotlin 2.3.10** with Compose compiler plugin
+- **Jetpack Compose BOM 2026.02.00** for UI
 - **Room 2.8.4** for database with KSP annotation processing
-- **Navigation Compose 2.9.6** for typed navigation
+- **Navigation Compose 2.9.7** for typed navigation
 - **KSP 2.3.4** for Room code generation
 - **Material3 1.4.0** for design system
 - **Lifecycle Runtime KTX 2.10.0** for coroutines and ViewModels
-- **Activity Compose 1.12.2** for activity integration
+- **Activity Compose 1.12.4** for activity integration
 - **Core KTX 1.17.0** for Android extensions
 - **Vico 2.4.1** for charts (imported but not actively used; custom charts in MoneySummaryChart.kt)
 
@@ -263,8 +263,8 @@ food_ingredients, batch_food_ingredients) but currently not in active schema.
 
 ### Gradle Configuration
 
-- `Android Gradle Plugin: 8.13.2`
-- `Target SDK: 35`, `Min SDK: 24`, `Compile SDK: 36`
+- `Android Gradle Plugin: 9.0.1`
+- `Target SDK: 35`, `Min SDK: 26`, `Compile SDK: 36`
 - `Java/Kotlin 11` source/target compatibility
 - JVM args: `-Xmx2048m`
 - Namespace: `com.juanitos`
@@ -316,7 +316,8 @@ food_ingredients, batch_food_ingredients) but currently not in active schema.
   - View workout details and edit existing workouts
   - Quick add panel for adding sets while editing/creating workouts
   - Exercise progress screen with per-exercise history
-  - Track workout start/end time (epoch ms, formatted via `lib/dates.kt`)
+  - Track workout start/end time (stored as `start_time`/`end_time` text, formatted via
+    `lib/dates.kt`)
   - Swipe-to-dismiss with delete confirmation for workouts and exercises
   - `WorkoutCard.kt` reusable card component
 
@@ -465,11 +466,11 @@ food_ingredients, batch_food_ingredients) but currently not in active schema.
 5. **Combine operator**: Order matters; final state is determined by last combine's copy()
 6. **InputUiState usage**: Use for form fields instead of separate value/touched/isValid properties
 7. **Food module status**: Route defined but implementation removed; migrations reference legacy
-   food tables (v9-14) that are not in current active schema (v22)
+   food tables (v9-14) that are not in current active schema (v23)
 8. **Workout migrations**: Stored in `WorkoutMigrations.kt` (separate from money migrations); covers
    v19→20→21 adding workout tables and startTime/endTime to Workout
-9. **Workout time fields**: `Workout.startTime` and `Workout.endTime` are stored as epoch
-   milliseconds (Long); use formatting functions from `lib/dates.kt` to display them
-10. **Habit completions**: Habit entries are daily rows in `HabitEntry`; avoid storing completion
-    state directly on `Habit`
+9. **Workout time fields**: `Workout.startTime` and `Workout.endTime` are stored as nullable
+   text columns (`start_time`, `end_time`) and formatted via `lib/dates.kt`
+10. **Habit lifecycle**: Habit completion lifecycle is tracked with `Habit.completedAt`; daily
+    completion entries are still represented by `HabitEntry`
 
