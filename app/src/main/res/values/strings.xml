@@ -100,9 +100,11 @@
     <string name="new_climbing_workout">New climbing workout</string>
     <string name="initial_notes">Initial notes</string>
     <string name="add_boulder">Add boulder</string>
+    <string name="change_boulder">Change boulder</string>
     <string name="select_boulder">Select boulder</string>
     <string name="new_boulder">New boulder</string>
     <string name="new_boulder_placeholder">New boulder screen (coming next)</string>
+    <string name="selected_boulder_grade">Selected boulder: %1$s</string>
     <string name="grade">Grade</string>
     <string name="style_optional">Style (optional)</string>
     <string name="boulder_picture_optional">Picture (optional)</string>

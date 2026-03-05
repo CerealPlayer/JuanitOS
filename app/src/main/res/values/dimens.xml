@@ -2,4 +2,6 @@
 <resources>
     <dimen name="padding_small">8dp</dimen>
     <dimen name="padding_medium">16dp</dimen>
+    <dimen name="boulder_card_image_height">96dp</dimen>
+    <dimen name="dialog_grid_max_height">360dp</dimen>
 </resources>

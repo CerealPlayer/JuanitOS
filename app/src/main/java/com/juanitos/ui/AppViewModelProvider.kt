@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.juanitos.JuanitOSApplication
 import com.juanitos.ui.routes.HomeViewModel
+import com.juanitos.ui.routes.climbing.NewClimbingWorkoutViewModel
 import com.juanitos.ui.routes.climbing.boulder.NewBoulderViewModel
 import com.juanitos.ui.routes.habit.HabitsViewModel
 import com.juanitos.ui.routes.habit.NewHabitViewModel
@@ -135,6 +136,12 @@ object AppViewModelProvider {
                 savedStateHandle = createSavedStateHandle(),
                 habitRepository = juanitOSApplication().container.habitRepository,
                 habitEntryRepository = juanitOSApplication().container.habitEntryRepository,
+            )
+        }
+        initializer {
+            NewClimbingWorkoutViewModel(
+                climbingBoulderRepository = juanitOSApplication().container.climbingBoulderRepository,
+                climbingMediaRepository = juanitOSApplication().container.climbingMediaRepository,
             )
         }
         initializer {
