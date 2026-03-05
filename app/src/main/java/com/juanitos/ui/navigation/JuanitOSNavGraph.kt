@@ -11,10 +11,10 @@ import com.juanitos.ui.routes.HomeDestination
 import com.juanitos.ui.routes.HomeScreen
 import com.juanitos.ui.routes.climbing.ClimbingDestination
 import com.juanitos.ui.routes.climbing.ClimbingScreen
-import com.juanitos.ui.routes.climbing.NewBoulderDestination
-import com.juanitos.ui.routes.climbing.NewBoulderScreen
 import com.juanitos.ui.routes.climbing.NewClimbingWorkoutDestination
 import com.juanitos.ui.routes.climbing.NewClimbingWorkoutScreen
+import com.juanitos.ui.routes.climbing.boulder.NewBoulderDestination
+import com.juanitos.ui.routes.climbing.boulder.NewBoulderScreen
 import com.juanitos.ui.routes.habit.HabitsDestination
 import com.juanitos.ui.routes.habit.HabitsScreen
 import com.juanitos.ui.routes.habit.NewHabitDestination

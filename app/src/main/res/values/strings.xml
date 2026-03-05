@@ -103,4 +103,9 @@
     <string name="select_boulder">Select boulder</string>
     <string name="new_boulder">New boulder</string>
     <string name="new_boulder_placeholder">New boulder screen (coming next)</string>
+    <string name="grade">Grade</string>
+    <string name="style_optional">Style (optional)</string>
+    <string name="boulder_picture_optional">Picture (optional)</string>
+    <string name="select_image">Select image</string>
+    <string name="remove_image">Remove image</string>
 </resources>

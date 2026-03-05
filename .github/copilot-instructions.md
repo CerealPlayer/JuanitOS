@@ -97,7 +97,7 @@ ui/
   ├── navigation/
   │   ├── JuanitOSNavGraph.kt (Composable navigation)
   │   ├── JuanitOSTopAppBar.kt (Top app bar component)
-  │   ├── Routes.kt (Enum with 19 route definitions)
+  │   ├── Routes.kt (Enum with 25 route definitions)
   │   └── NavigationDestination.kt (Interface for typed destinations)
   ├── commons/
   │   ├── MoneySummaryChart.kt (Custom bar chart visualization)
@@ -107,7 +107,7 @@ ui/
   │   └── categories_search/ (CategoriesSearch composable)
   ├── icons/ (Add, ArrowBack, Delete, MoreVert, Search, Settings)
   ├── theme/ (Color, Theme, Type)
-  └── AppViewModelProvider.kt (Factory with 18 ViewModels)
+  └── AppViewModelProvider.kt (Factory with 19 ViewModels)
 
 lib/
   ├── InputUiState.kt (Generic input state with value, touched, isValid)
@@ -332,6 +332,18 @@ food_ingredients, batch_food_ingredients) but currently not in active schema.
   - View habit detail with monthly activity visualization
   - Mark habits completed from the detail screen
 
+**Climbing Module** (In Progress)
+
+- **3 Screens**: Climbing, NewClimbingWorkout, NewBoulder
+- **4 Entities**: ClimbingWorkout, ClimbingBoulder, ClimbingBoulderAttempt, ClimbingMedia
+- **4 Repositories**: ClimbingWorkoutRepository, ClimbingBoulderRepository,
+  ClimbingBoulderAttemptRepository, ClimbingMediaRepository
+- **1 ViewModel**: NewBoulderViewModel
+- **Features**:
+  - Climbing landing screen with CTA to start a new climbing workout
+  - New climbing workout flow with notes and add-boulder dialog
+  - New boulder screen with grade/style inputs and optional image picker
+
 **Food Module** (Not Implemented)
 
 - Route stub exists in `Routes.kt` but no screens, entities, or repositories implemented
@@ -448,6 +460,9 @@ food_ingredients, batch_food_ingredients) but currently not in active schema.
 | **habits**                         | habit/HabitsScreen.kt                       | HabitsViewModel           | List habits and navigate to habit details        |
 | **new_habit**                      | habit/NewHabitScreen.kt                     | NewHabitViewModel         | Create new habit                                 |
 | **habit_detail/{habitId}**         | habit/detail/HabitDetailScreen.kt           | HabitDetailViewModel      | View habit and mark completion for today         |
+| **climbing**                       | climbing/ClimbingScreen.kt                  | -                         | Climbing landing screen                          |
+| **new_climbing_workout**           | climbing/NewClimbingWorkoutScreen.kt        | -                         | Create climbing workout and add boulders         |
+| **new_boulder**                    | climbing/boulder/NewBoulderScreen.kt        | NewBoulderViewModel       | Create boulder with optional photo               |
 
 **Navigation Pattern**: All routes are registered in `JuanitOSNavGraph.kt` using Routes enum values;
 `workout_detail/{workoutId}`, `edit_workout/{workoutId}`, `exercise_progress/{exerciseId}`, and
