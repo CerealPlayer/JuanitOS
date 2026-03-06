@@ -15,6 +15,8 @@ import com.juanitos.ui.routes.climbing.NewClimbingWorkoutDestination
 import com.juanitos.ui.routes.climbing.NewClimbingWorkoutScreen
 import com.juanitos.ui.routes.climbing.boulder.NewBoulderDestination
 import com.juanitos.ui.routes.climbing.boulder.NewBoulderScreen
+import com.juanitos.ui.routes.climbing.detail.ClimbingWorkoutDetailDestination
+import com.juanitos.ui.routes.climbing.detail.ClimbingWorkoutDetailScreen
 import com.juanitos.ui.routes.habit.HabitsDestination
 import com.juanitos.ui.routes.habit.HabitsScreen
 import com.juanitos.ui.routes.habit.NewHabitDestination
@@ -71,6 +73,9 @@ fun JuanitOSNavGraph(
             ClimbingScreen(
                 onNavigateUp = { navController.navigateUp() },
                 onNewWorkout = { navController.navigate(NewClimbingWorkoutDestination.route.route) },
+                onWorkoutClick = { workoutId ->
+                    navController.navigate(ClimbingWorkoutDetailDestination.createRoute(workoutId))
+                },
             )
         }
         composable(route = NewClimbingWorkoutDestination.route.route) {
@@ -81,6 +86,12 @@ fun JuanitOSNavGraph(
         }
         composable(route = NewBoulderDestination.route.route) {
             NewBoulderScreen(onNavigateUp = { navController.navigateUp() })
+        }
+        composable(
+            route = ClimbingWorkoutDetailDestination.route.route,
+            arguments = listOf(navArgument("workoutId") { type = NavType.IntType }),
+        ) {
+            ClimbingWorkoutDetailScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = MoneyDestination.route.route) {
             MoneyScreen(

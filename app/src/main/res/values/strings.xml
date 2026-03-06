@@ -97,6 +97,10 @@
     <string name="habit_lifecycle_from_to">From %1$s to %2$s</string>
     <string name="habit_unknown_date">unknown date</string>
     <string name="climbing">Climbing</string>
+    <string name="climbing_workout_detail">Climbing workout</string>
+    <string name="no_climbing_workouts">No climbing workouts yet</string>
+    <string name="climbing_boulders_done">Boulders done: %1$d</string>
+    <string name="climbing_workout_detail_placeholder">Climbing workout detail screen (coming next)</string>
     <string name="new_climbing_workout">New climbing workout</string>
     <string name="initial_notes">Initial notes</string>
     <string name="add_boulder">Add boulder</string>

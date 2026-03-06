@@ -22,5 +22,6 @@ enum class Routes(val route: String) {
     HabitDetail("habit_detail/{habitId}"),
     Climbing("climbing"),
     NewClimbingWorkout("new_climbing_workout"),
-    NewBoulder("new_boulder");
+    NewBoulder("new_boulder"),
+    ClimbingWorkoutDetail("climbing_workout_detail/{workoutId}");
 }
