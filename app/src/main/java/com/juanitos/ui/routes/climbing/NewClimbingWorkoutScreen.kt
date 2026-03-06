@@ -71,7 +71,14 @@ fun NewClimbingWorkoutScreen(
     val boulderActionLabel = if (uiState.selectedBoulder == null) {
         stringResource(R.string.add_boulder)
     } else {
-        stringResource(R.string.change_boulder)
+        stringResource(R.string.select_new_boulder)
+    }
+    val bouldersById = remember(uiState.boulders) { uiState.boulders.associateBy { it.id } }
+    val boulderSectionIds = remember(uiState.selectedBoulderIds, uiState.attemptsByBoulderId) {
+        buildList {
+            addAll(uiState.selectedBoulderIds)
+            uiState.attemptsByBoulderId.keys.forEach { if (!contains(it)) add(it) }
+        }
     }
     val galleryPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -100,26 +107,16 @@ fun NewClimbingWorkoutScreen(
                 label = { Text(stringResource(R.string.initial_notes)) },
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(dimensionResource(R.dimen.padding_small)),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = boulderActionLabel,
-                        modifier = Modifier.weight(1f),
-                    )
-                    IconButton(onClick = viewModel::openBoulderDialog) {
-                        Icon(
-                            painter = painterResource(R.drawable.add),
-                            contentDescription = boulderActionLabel
-                        )
-                    }
-                }
+            if (uiState.selectedBoulder == null) {
+                BoulderActionCard(
+                    label = boulderActionLabel,
+                    onClick = viewModel::openBoulderDialog,
+                )
             }
-            uiState.selectedBoulder?.let { selectedBoulder ->
+            boulderSectionIds.forEach { boulderId ->
+                val sectionBoulder = bouldersById[boulderId] ?: return@forEach
+                val sectionAttempts = uiState.attemptsByBoulderId[boulderId].orEmpty()
+                val isSelectedSection = boulderId == uiState.selectedBoulderId
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(
@@ -129,7 +126,7 @@ fun NewClimbingWorkoutScreen(
                         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small)),
                     ) {
                         BoulderImage(
-                            imagePath = selectedBoulder.imagePath,
+                            imagePath = sectionBoulder.imagePath,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(dimensionResource(R.dimen.boulder_card_image_height))
@@ -137,14 +134,14 @@ fun NewClimbingWorkoutScreen(
                         Text(
                             text = stringResource(
                                 R.string.selected_boulder_grade,
-                                selectedBoulder.grade
+                                sectionBoulder.grade
                             ),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
-                uiState.attempts.forEach { attempt ->
+                sectionAttempts.forEach { attempt ->
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(
                             modifier = Modifier
@@ -162,7 +159,7 @@ fun NewClimbingWorkoutScreen(
                                 )
                                 IconButton(
                                     onClick = { viewModel.removeAttempt(attempt.id) },
-                                    enabled = !uiState.isSaving,
+                                    enabled = !uiState.isSaving && isSelectedSection,
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.delete),
@@ -183,40 +180,49 @@ fun NewClimbingWorkoutScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 label = { Text(stringResource(R.string.attempt_notes_optional)) },
                                 minLines = 2,
-                                enabled = !uiState.isSaving,
+                                enabled = !uiState.isSaving && isSelectedSection,
                             )
                         }
                     }
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
                 }
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(dimensionResource(R.dimen.padding_small)),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.add_attempt),
-                            modifier = Modifier.weight(1f),
-                        )
-                        IconButton(
-                            onClick = {
-                                galleryPicker.launch(
-                                    PickVisualMediaRequest(
-                                        mediaType = ActivityResultContracts.PickVisualMedia.VideoOnly
-                                    )
-                                )
-                            },
-                            enabled = !uiState.isSaving,
+                if (isSelectedSection) {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(dimensionResource(R.dimen.padding_small)),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Icon(
-                                painter = painterResource(R.drawable.add),
-                                contentDescription = stringResource(R.string.select_video),
+                            Text(
+                                text = stringResource(R.string.add_attempt),
+                                modifier = Modifier.weight(1f),
                             )
+                            IconButton(
+                                onClick = {
+                                    galleryPicker.launch(
+                                        PickVisualMediaRequest(
+                                            mediaType = ActivityResultContracts.PickVisualMedia.VideoOnly
+                                        )
+                                    )
+                                },
+                                enabled = !uiState.isSaving,
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.add),
+                                    contentDescription = stringResource(R.string.select_video),
+                                )
+                            }
                         }
                     }
                 }
+            }
+            if (uiState.selectedBoulder != null) {
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                BoulderActionCard(
+                    label = boulderActionLabel,
+                    onClick = viewModel::openBoulderDialog,
+                )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
                 val errorMessage = uiState.errorMessage
                 if (errorMessage != null) {
@@ -307,6 +313,32 @@ fun NewClimbingWorkoutScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun BoulderActionCard(
+    label: String,
+    onClick: () -> Unit,
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(R.dimen.padding_small)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = label,
+                modifier = Modifier.weight(1f),
+            )
+            IconButton(onClick = onClick) {
+                Icon(
+                    painter = painterResource(R.drawable.add),
+                    contentDescription = label,
+                )
+            }
+        }
     }
 }
 

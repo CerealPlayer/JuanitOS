@@ -44,7 +44,8 @@ data class NewClimbingWorkoutUiState(
     val showBoulderDialog: Boolean = false,
     val boulders: List<BoulderSelectionUiState> = emptyList(),
     val selectedBoulderId: Int? = null,
-    val attempts: List<ClimbingAttemptUiState> = emptyList(),
+    val selectedBoulderIds: List<Int> = emptyList(),
+    val attemptsByBoulderId: Map<Int, List<ClimbingAttemptUiState>> = emptyMap(),
     val nextAttemptId: Int = 1,
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
@@ -52,8 +53,14 @@ data class NewClimbingWorkoutUiState(
     val selectedBoulder: BoulderSelectionUiState?
         get() = boulders.firstOrNull { it.id == selectedBoulderId }
 
+    val selectedBoulderAttempts: List<ClimbingAttemptUiState>
+        get() = selectedBoulderId?.let { attemptsByBoulderId[it] }.orEmpty()
+
+    val totalAttemptsCount: Int
+        get() = attemptsByBoulderId.values.sumOf { it.size }
+
     val canSave: Boolean
-        get() = selectedBoulderId != null && attempts.isNotEmpty() && !isSaving
+        get() = selectedBoulderId != null && totalAttemptsCount > 0 && !isSaving
 }
 
 class NewClimbingWorkoutViewModel(
@@ -94,6 +101,11 @@ class NewClimbingWorkoutViewModel(
         _uiState.update {
             it.copy(
                 selectedBoulderId = boulderId,
+                selectedBoulderIds = if (it.selectedBoulderIds.contains(boulderId)) {
+                    it.selectedBoulderIds
+                } else {
+                    it.selectedBoulderIds + boulderId
+                },
                 showBoulderDialog = false,
                 errorMessage = null,
             )
@@ -101,11 +113,18 @@ class NewClimbingWorkoutViewModel(
     }
 
     fun addAttemptFromUri(videoUri: Uri) {
+        val selectedBoulderId = _uiState.value.selectedBoulderId ?: run {
+            _uiState.update { it.copy(errorMessage = "Select a boulder before adding an attempt") }
+            return
+        }
         _uiState.update { state ->
+            val currentAttempts = state.attemptsByBoulderId[selectedBoulderId].orEmpty()
             state.copy(
-                attempts = state.attempts + ClimbingAttemptUiState(
-                    id = state.nextAttemptId,
-                    videoUri = videoUri,
+                attemptsByBoulderId = state.attemptsByBoulderId + (
+                        selectedBoulderId to (currentAttempts + ClimbingAttemptUiState(
+                            id = state.nextAttemptId,
+                            videoUri = videoUri,
+                        ))
                 ),
                 nextAttemptId = state.nextAttemptId + 1,
                 errorMessage = null,
@@ -115,14 +134,14 @@ class NewClimbingWorkoutViewModel(
 
     fun setAttemptNotes(attemptId: Int, notes: String) {
         _uiState.update { state ->
+            val selectedBoulderId = state.selectedBoulderId ?: return@update state
+            val currentAttempts = state.attemptsByBoulderId[selectedBoulderId].orEmpty()
             state.copy(
-                attempts = state.attempts.map { attempt ->
-                    if (attempt.id == attemptId) {
-                        attempt.copy(notes = notes)
-                    } else {
-                        attempt
+                attemptsByBoulderId = state.attemptsByBoulderId + (
+                        selectedBoulderId to currentAttempts.map { attempt ->
+                            if (attempt.id == attemptId) attempt.copy(notes = notes) else attempt
                     }
-                },
+                        ),
                 errorMessage = null,
             )
         }
@@ -130,8 +149,15 @@ class NewClimbingWorkoutViewModel(
 
     fun removeAttempt(attemptId: Int) {
         _uiState.update { state ->
+            val selectedBoulderId = state.selectedBoulderId ?: return@update state
+            val currentAttempts = state.attemptsByBoulderId[selectedBoulderId].orEmpty()
+            val updatedAttempts = currentAttempts.filterNot { it.id == attemptId }
             state.copy(
-                attempts = state.attempts.filterNot { it.id == attemptId },
+                attemptsByBoulderId = if (updatedAttempts.isEmpty()) {
+                    state.attemptsByBoulderId - selectedBoulderId
+                } else {
+                    state.attemptsByBoulderId + (selectedBoulderId to updatedAttempts)
+                },
                 errorMessage = null,
             )
         }
@@ -139,12 +165,11 @@ class NewClimbingWorkoutViewModel(
 
     fun saveWorkout(onSuccess: () -> Unit) {
         val state = _uiState.value
-        val selectedBoulderId = state.selectedBoulderId
-        if (selectedBoulderId == null) {
+        if (state.selectedBoulderId == null) {
             _uiState.update { it.copy(errorMessage = "Select a boulder before saving") }
             return
         }
-        if (state.attempts.isEmpty()) {
+        if (state.totalAttemptsCount == 0) {
             _uiState.update { it.copy(errorMessage = "Add at least one attempt") }
             return
         }
@@ -162,16 +187,18 @@ class NewClimbingWorkoutViewModel(
                     )
                 ).toInt()
 
-                state.attempts.forEach { attempt ->
-                    val videoMediaId = saveVideoMedia(attempt)
-                    climbingBoulderAttemptRepository.insert(
-                        ClimbingBoulderAttempt(
-                            climbingWorkoutId = workoutId,
-                            climbingBoulderId = selectedBoulderId,
-                            videoMediaId = videoMediaId,
-                            notes = attempt.notes.trim().ifBlank { null },
+                state.attemptsByBoulderId.forEach { (boulderId, attempts) ->
+                    attempts.forEach { attempt ->
+                        val videoMediaId = saveVideoMedia(attempt)
+                        climbingBoulderAttemptRepository.insert(
+                            ClimbingBoulderAttempt(
+                                climbingWorkoutId = workoutId,
+                                climbingBoulderId = boulderId,
+                                videoMediaId = videoMediaId,
+                                notes = attempt.notes.trim().ifBlank { null },
+                            )
                         )
-                    )
+                    }
                 }
                 _uiState.update { it.copy(isSaving = false) }
                 onSuccess()
