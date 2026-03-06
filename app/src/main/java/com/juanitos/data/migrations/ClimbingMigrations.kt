@@ -67,3 +67,29 @@ val MIGRATION_24_25 = object : Migration(24, 25) {
         db.execSQL("CREATE INDEX IF NOT EXISTS index_climbing_boulder_attempts_video_media_id ON climbing_boulder_attempts(video_media_id)")
     }
 }
+
+val MIGRATION_25_26 = object : Migration(25, 26) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS climbing_workouts_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                date TEXT NOT NULL,
+                start_time TEXT,
+                end_time TEXT,
+                notes TEXT,
+                created_at TEXT DEFAULT (datetime('now', 'localtime'))
+            )
+            """.trimIndent()
+        )
+        db.execSQL(
+            """
+            INSERT INTO climbing_workouts_new (id, date, start_time, end_time, notes, created_at)
+            SELECT id, date, start_time, end_time, notes, created_at
+            FROM climbing_workouts
+            """.trimIndent()
+        )
+        db.execSQL("DROP TABLE climbing_workouts")
+        db.execSQL("ALTER TABLE climbing_workouts_new RENAME TO climbing_workouts")
+    }
+}

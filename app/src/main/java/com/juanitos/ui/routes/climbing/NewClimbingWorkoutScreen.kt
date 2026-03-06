@@ -1,6 +1,11 @@
 package com.juanitos.ui.routes.climbing
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +21,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,7 +40,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,11 +67,16 @@ fun NewClimbingWorkoutScreen(
     viewModel: NewClimbingWorkoutViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     val boulderActionLabel = if (uiState.selectedBoulder == null) {
         stringResource(R.string.add_boulder)
     } else {
         stringResource(R.string.change_boulder)
     }
+    val galleryPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri -> uri?.let(viewModel::addAttemptFromUri) }
+    )
 
     Scaffold(
         topBar = {
@@ -76,6 +91,7 @@ fun NewClimbingWorkoutScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(dimensionResource(R.dimen.padding_small))
+                .verticalScroll(rememberScrollState())
         ) {
             OutlinedTextField(
                 value = uiState.notes,
@@ -126,6 +142,93 @@ fun NewClimbingWorkoutScreen(
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
+                }
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                uiState.attempts.forEach { attempt ->
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(dimensionResource(R.dimen.padding_small)),
+                            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small)),
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.attempt_label, attempt.id),
+                                    modifier = Modifier.weight(1f),
+                                )
+                                IconButton(
+                                    onClick = { viewModel.removeAttempt(attempt.id) },
+                                    enabled = !uiState.isSaving,
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.delete),
+                                        contentDescription = stringResource(R.string.remove_attempt),
+                                    )
+                                }
+                            }
+                            AttemptVideoPreview(
+                                context = context,
+                                videoUri = attempt.videoUri,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(dimensionResource(R.dimen.boulder_card_image_height)),
+                            )
+                            OutlinedTextField(
+                                value = attempt.notes,
+                                onValueChange = { viewModel.setAttemptNotes(attempt.id, it) },
+                                modifier = Modifier.fillMaxWidth(),
+                                label = { Text(stringResource(R.string.attempt_notes_optional)) },
+                                minLines = 2,
+                                enabled = !uiState.isSaving,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                }
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(dimensionResource(R.dimen.padding_small)),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.add_attempt),
+                            modifier = Modifier.weight(1f),
+                        )
+                        IconButton(
+                            onClick = {
+                                galleryPicker.launch(
+                                    PickVisualMediaRequest(
+                                        mediaType = ActivityResultContracts.PickVisualMedia.VideoOnly
+                                    )
+                                )
+                            },
+                            enabled = !uiState.isSaving,
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.add),
+                                contentDescription = stringResource(R.string.select_video),
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                val errorMessage = uiState.errorMessage
+                if (errorMessage != null) {
+                    Text(text = errorMessage, color = Color.Red)
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+                }
+                Button(
+                    onClick = { viewModel.saveWorkout(onNavigateUp) },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = uiState.canSave,
+                ) {
+                    Text(text = stringResource(R.string.save_workout))
                 }
             }
         }
@@ -204,6 +307,37 @@ fun NewClimbingWorkoutScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun AttemptVideoPreview(
+    context: android.content.Context,
+    videoUri: android.net.Uri,
+    modifier: Modifier = Modifier,
+) {
+    val bitmap: Bitmap? = remember(videoUri) {
+        runCatching {
+            MediaMetadataRetriever().use { retriever ->
+                retriever.setDataSource(context, videoUri)
+                retriever.frameAtTime
+            }
+        }.getOrNull()
+    }
+    if (bitmap != null) {
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentDescription = null,
+            modifier = modifier,
+        )
+    } else {
+        Box(modifier = modifier, contentAlignment = Alignment.Center) {
+            Icon(
+                painter = painterResource(R.drawable.media),
+                contentDescription = stringResource(R.string.select_video),
+                modifier = Modifier.size(dimensionResource(R.dimen.padding_medium) * 2),
+            )
+        }
     }
 }
 

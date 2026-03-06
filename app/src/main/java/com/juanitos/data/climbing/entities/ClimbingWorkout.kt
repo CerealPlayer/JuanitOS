@@ -8,7 +8,6 @@ import androidx.room.PrimaryKey
 data class ClimbingWorkout(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
-    val name: String,
     val date: String,
     @ColumnInfo(name = "start_time")
     val startTime: String? = null,

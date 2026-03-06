@@ -110,4 +110,9 @@
     <string name="boulder_picture_optional">Picture (optional)</string>
     <string name="select_image">Select image</string>
     <string name="remove_image">Remove image</string>
+    <string name="add_attempt">Add attempt</string>
+    <string name="select_video">Select video</string>
+    <string name="attempt_label">Attempt %1$d</string>
+    <string name="attempt_notes_optional">Attempt notes (optional)</string>
+    <string name="remove_attempt">Remove attempt</string>
 </resources>

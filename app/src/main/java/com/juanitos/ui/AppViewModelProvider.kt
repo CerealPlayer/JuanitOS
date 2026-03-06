@@ -140,8 +140,11 @@ object AppViewModelProvider {
         }
         initializer {
             NewClimbingWorkoutViewModel(
+                climbingWorkoutRepository = juanitOSApplication().container.climbingWorkoutRepository,
+                climbingBoulderAttemptRepository = juanitOSApplication().container.climbingBoulderAttemptRepository,
                 climbingBoulderRepository = juanitOSApplication().container.climbingBoulderRepository,
                 climbingMediaRepository = juanitOSApplication().container.climbingMediaRepository,
+                appContext = juanitOSApplication().applicationContext,
             )
         }
         initializer {
