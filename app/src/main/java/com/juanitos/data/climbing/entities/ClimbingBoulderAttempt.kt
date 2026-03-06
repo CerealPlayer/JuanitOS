@@ -40,7 +40,7 @@ data class ClimbingBoulderAttempt(
     @ColumnInfo(name = "video_media_id")
     val videoMediaId: Int? = null,
     @ColumnInfo(name = "attempt_order", defaultValue = "0")
-    val attemptOrder: Int? = 0,
+    val attemptOrder: Int = 0,
     val notes: String? = null,
     @ColumnInfo(name = "created_at", defaultValue = "(datetime('now', 'localtime'))")
     val createdAt: String? = null,
