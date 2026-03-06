@@ -198,15 +198,17 @@ class NewClimbingWorkoutViewModel(
                     }
                 }
 
-                orderedBoulderIds.forEachIndexed { index, boulderId ->
-                    state.attemptsByBoulderId[boulderId].orEmpty().forEach { attempt ->
+                orderedBoulderIds.forEachIndexed { boulderIndex, boulderId ->
+                    state.attemptsByBoulderId[boulderId].orEmpty()
+                        .forEachIndexed { attemptIndex, attempt ->
                         val videoMediaId = saveVideoMedia(attempt)
                         climbingBoulderAttemptRepository.insert(
                             ClimbingBoulderAttempt(
                                 climbingWorkoutId = workoutId,
                                 climbingBoulderId = boulderId,
                                 videoMediaId = videoMediaId,
-                                attemptOrder = index,
+                                boulderOrder = boulderIndex,
+                                attemptOrder = attemptIndex,
                                 notes = attempt.notes.trim().ifBlank { null },
                             )
                         )

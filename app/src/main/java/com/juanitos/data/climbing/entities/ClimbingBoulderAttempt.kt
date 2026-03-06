@@ -39,6 +39,8 @@ data class ClimbingBoulderAttempt(
     val climbingBoulderId: Int,
     @ColumnInfo(name = "video_media_id")
     val videoMediaId: Int? = null,
+    @ColumnInfo(name = "boulder_order", defaultValue = "0")
+    val boulderOrder: Int = 0,
     @ColumnInfo(name = "attempt_order", defaultValue = "0")
     val attemptOrder: Int = 0,
     val notes: String? = null,

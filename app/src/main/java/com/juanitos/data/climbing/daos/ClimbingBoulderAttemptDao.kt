@@ -19,14 +19,14 @@ interface ClimbingBoulderAttemptDao {
     @Delete
     suspend fun delete(climbingBoulderAttempt: ClimbingBoulderAttempt)
 
-    @Query("SELECT * FROM climbing_boulder_attempts ORDER BY climbing_workout_id DESC, attempt_order ASC, id ASC")
+    @Query("SELECT * FROM climbing_boulder_attempts ORDER BY climbing_workout_id DESC, boulder_order ASC, attempt_order ASC, id ASC")
     fun getAll(): Flow<List<ClimbingBoulderAttempt>>
 
     @Query(
         """
         SELECT * FROM climbing_boulder_attempts
         WHERE climbing_workout_id = :climbingWorkoutId
-        ORDER BY attempt_order ASC, id ASC
+        ORDER BY boulder_order ASC, attempt_order ASC, id ASC
         """
     )
     fun getByClimbingWorkoutId(climbingWorkoutId: Int): Flow<List<ClimbingBoulderAttempt>>
