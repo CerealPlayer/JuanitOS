@@ -141,7 +141,7 @@ fun NewClimbingWorkoutScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
-                sectionAttempts.forEach { attempt ->
+                sectionAttempts.forEachIndexed { index, attempt ->
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(
                             modifier = Modifier
@@ -154,7 +154,7 @@ fun NewClimbingWorkoutScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    text = stringResource(R.string.attempt_label, attempt.id),
+                                    text = stringResource(R.string.attempt_label, index + 1),
                                     modifier = Modifier.weight(1f),
                                 )
                                 IconButton(

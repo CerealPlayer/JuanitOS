@@ -27,6 +27,7 @@ import com.juanitos.data.migrations.MIGRATION_22_23
 import com.juanitos.data.migrations.MIGRATION_23_24
 import com.juanitos.data.migrations.MIGRATION_24_25
 import com.juanitos.data.migrations.MIGRATION_25_26
+import com.juanitos.data.migrations.MIGRATION_26_27
 import com.juanitos.data.migrations.MIGRATION_9_10
 import com.juanitos.data.money.daos.CategoryDao
 import com.juanitos.data.money.daos.CycleDao
@@ -52,7 +53,7 @@ import com.juanitos.data.workout.entities.WorkoutSet
         Habit::class, HabitEntry::class, ClimbingWorkout::class, ClimbingMedia::class,
         ClimbingBoulder::class, ClimbingBoulderAttempt::class
     ],
-    version = 26,
+    version = 27,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
@@ -90,7 +91,8 @@ abstract class JuanitOSDatabase : RoomDatabase() {
                         MIGRATION_22_23,
                         MIGRATION_23_24,
                         MIGRATION_24_25,
-                        MIGRATION_25_26
+                        MIGRATION_25_26,
+                        MIGRATION_26_27
                     )
                     .fallbackToDestructiveMigration(false)
                     .build().also { Instance = it }
