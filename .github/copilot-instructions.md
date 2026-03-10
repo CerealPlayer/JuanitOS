@@ -19,9 +19,13 @@ Currently implements:
   - Create habits with optional descriptions
   - Mark habits as completed per day
   - View habit details with a contribution-style activity grid
+- **Climbing Module**: Track climbing workouts with boulders and media-backed attempts
+  - Create workouts with notes, boulder ordering, and per-boulder attempts
+  - Attach optional boulder pictures and attempt videos
+  - Review workouts in a detail view grouped by boulder and ordered attempts
 - **Food Module**: Planned but not yet implemented (route stub exists)
 
-The app uses Room database (schema version 23) with offline-first architecture and local-only data (
+The app uses Room database (schema version 28) with offline-first architecture and local-only data (
 no backend).
 
 ---
@@ -53,12 +57,19 @@ data/
   │   │   └── relations/ (HabitWithEntries)
   │   ├── offline/ (OfflineHabitRepository, OfflineHabitEntryRepository)
   │   └── repositories/ (Repository interfaces)
+  ├── climbing/
+  │   ├── daos/ (ClimbingWorkoutDao, ClimbingBoulderDao, ClimbingMediaDao, ClimbingBoulderAttemptDao)
+  │   ├── entities/
+  │   │   ├── ClimbingWorkout, ClimbingBoulder, ClimbingMedia, ClimbingBoulderAttempt
+  │   ├── offline/ (OfflineClimbingWorkoutRepository, OfflineClimbingBoulderRepository, etc.)
+  │   └── repositories/ (Repository interfaces)
   ├── migrations/
   │   ├── Migrations.kt (5 migrations: 9→10→11→12→13→14)
   │   ├── WorkoutMigrations.kt (2 migrations: 19→20→21)
   │   └── HabitMigrations.kt (2 migrations: 21→22→23)
-  ├── AppContainer.kt (DI interface - 4 Money + 4 Workout + 2 Habit repositories)
-  └── JuanitOSDatabase.kt (Room DB v23, 10 entities, 9 migrations)
+  │   └── ClimbingMigrations.kt (5 migrations: 23→24→25→26→27→28)
+  ├── AppContainer.kt (DI interface - 4 Money + 4 Workout + 2 Habit + 4 Climbing repositories)
+  └── JuanitOSDatabase.kt (Room DB v28, 14 entities, 14 migrations)
 
 ui/
   ├── routes/
@@ -94,10 +105,17 @@ ui/
   │       ├── NewHabitScreen.kt
   │       ├── NewHabitViewModel.kt
   │       └── detail/ (HabitDetailScreen, HabitDetailViewModel)
+  │   └── climbing/
+  │       ├── ClimbingScreen.kt (Workout list)
+  │       ├── ClimbingViewModel.kt
+  │       ├── NewClimbingWorkoutScreen.kt (Create workout with boulder attempts)
+  │       ├── NewClimbingWorkoutViewModel.kt
+  │       ├── boulder/ (NewBoulderScreen, NewBoulderViewModel)
+  │       └── detail/ (ClimbingWorkoutDetailScreen, ClimbingWorkoutDetailViewModel)
   ├── navigation/
   │   ├── JuanitOSNavGraph.kt (Composable navigation)
   │   ├── JuanitOSTopAppBar.kt (Top app bar component)
-  │   ├── Routes.kt (Enum with 25 route definitions)
+  │   ├── Routes.kt (Enum with 23 route definitions)
   │   └── NavigationDestination.kt (Interface for typed destinations)
   ├── commons/
   │   ├── MoneySummaryChart.kt (Custom bar chart visualization)
@@ -107,7 +125,7 @@ ui/
   │   └── categories_search/ (CategoriesSearch composable)
   ├── icons/ (Add, ArrowBack, Delete, MoreVert, Search, Settings)
   ├── theme/ (Color, Theme, Type)
-  └── AppViewModelProvider.kt (Factory with 19 ViewModels)
+  └── AppViewModelProvider.kt (Factory with 23 ViewModels)
 
 lib/
   ├── InputUiState.kt (Generic input state with value, touched, isValid)
@@ -117,7 +135,8 @@ lib/
 
 ### Dependency Injection Pattern
 
-- **AppContainer** interface defines all repositories (4 Money + 4 Workout + 2 Habit repositories)
+- **AppContainer** interface defines all repositories (4 Money + 4 Workout + 2 Habit + 4 Climbing
+  repositories)
 - **AppDataContainer** (in AppContainer.kt) implements with lazy-initialized repositories
 - **AppViewModelProvider** uses viewModelFactory with `juanitOSApplication()` to access container
 - All repositories are stateless, singleton instances
@@ -196,9 +215,9 @@ Each screen has a dedicated UiState data class:
 
 ## Database & Migrations
 
-### Current Schema (version 23)
+### Current Schema (version 28)
 
-**Entities (4 Money + 4 Workout + 2 Habit entities):**
+**Entities (4 Money + 4 Workout + 2 Habit + 4 Climbing entities):**
 
 - **Cycle** - Payment cycles with start/end dates and total income
 - **Transaction** - One-time transactions linked to cycles and categories
@@ -211,6 +230,11 @@ Each screen has a dedicated UiState data class:
 - **WorkoutSet** - A set within a WorkoutExercise (reps, weight, etc.)
 - **Habit** - Habit metadata (name, optional description, created/completed lifecycle dates)
 - **HabitEntry** - Per-day completion entries linked to habits
+- **ClimbingWorkout** - Climbing session metadata with date/time and optional notes
+- **ClimbingBoulder** - Boulder definitions (grade/style) with optional picture media reference
+- **ClimbingMedia** - Local media records for image/video files
+- **ClimbingBoulderAttempt** - Per-workout boulder attempts with attempt/boulder ordering and
+  optional notes/media
 
 **Entity Relations (6):**
 
@@ -229,6 +253,8 @@ food_ingredients, batch_food_ingredients) but currently not in active schema.
 - Money migrations: `data/migrations/Migrations.kt` (MIGRATION_9_10 through MIGRATION_13_14)
 - Workout migrations: `data/migrations/WorkoutMigrations.kt` (MIGRATION_19_20, MIGRATION_20_21)
 - Habit migrations: `data/migrations/HabitMigrations.kt` (MIGRATION_21_22, MIGRATION_22_23)
+- Climbing migrations: `data/migrations/ClimbingMigrations.kt` (MIGRATION_23_24 through
+  MIGRATION_27_28)
 - Use `fallbackToDestructiveMigration(false)` to prevent data loss
 - New migrations must be added to `JuanitOSDatabase.addMigrations()`
 - **Existing migrations cover Food module tables** that are not in current active schema (v14→v19
@@ -334,15 +360,18 @@ food_ingredients, batch_food_ingredients) but currently not in active schema.
 
 **Climbing Module** (In Progress)
 
-- **3 Screens**: Climbing, NewClimbingWorkout, NewBoulder
+- **4 Screens**: Climbing, NewClimbingWorkout, NewBoulder, ClimbingWorkoutDetail
 - **4 Entities**: ClimbingWorkout, ClimbingBoulder, ClimbingBoulderAttempt, ClimbingMedia
 - **4 Repositories**: ClimbingWorkoutRepository, ClimbingBoulderRepository,
   ClimbingBoulderAttemptRepository, ClimbingMediaRepository
-- **1 ViewModel**: NewBoulderViewModel
+- **4 ViewModels**: ClimbingViewModel, NewClimbingWorkoutViewModel, NewBoulderViewModel,
+  ClimbingWorkoutDetailViewModel
 - **Features**:
-  - Climbing landing screen with CTA to start a new climbing workout
-  - New climbing workout flow with notes and add-boulder dialog
+  - Climbing landing screen lists workouts with date/time and unique-boulders-done count
+  - New climbing workout flow supports selecting/reselecting boulders and ordered attempt capture
+  - Attempt media capture uses gallery video selection with per-attempt optional notes
   - New boulder screen with grade/style inputs and optional image picker
+  - Climbing workout detail screen groups attempts by boulder and supports inline video playback
 
 **Food Module** (Not Implemented)
 
@@ -439,41 +468,43 @@ food_ingredients, batch_food_ingredients) but currently not in active schema.
 
 ## All Screens & Routes
 
-| Route                              | Screen File                                 | ViewModel                 | Purpose                                          |
-|------------------------------------|---------------------------------------------|---------------------------|--------------------------------------------------|
-| **home**                           | HomeScreen.kt                               | HomeViewModel             | Dashboard with money summary chart               |
-| **food**                           | _(Not implemented)_                         | -                         | Placeholder route only                           |
-| **money**                          | money/MoneyScreen.kt                        | MoneyViewModel            | Main money dashboard with transactions/spendings |
-| **money_settings**                 | money/settings/MoneySettings.kt             | MoneySettingsViewModel    | Cycle management settings                        |
-| **new_transaction**                | money/transactions/NewTransactionScreen.kt  | NewTransactionViewModel   | Create new transaction                           |
-| **fixed_spending**                 | money/spendings/FixedSpendingsScreen.kt     | FixedSpendingsViewModel   | List all fixed spendings                         |
-| **new_fixed_spending**             | money/spendings/NewFixedSpendingScreen.kt   | NewFixedSpendingViewModel | Create new fixed spending                        |
-| **categories**                     | money/categories/CategoriesScreen.kt        | CategoriesViewModel       | List and manage categories                       |
-| **new_category**                   | money/categories/NewCategoryScreen.kt       | NewCategoryViewModel      | Create new category                              |
-| **workout**                        | workout/WorkoutScreen.kt                    | WorkoutViewModel          | List workouts and navigate to details/exercises  |
-| **new_workout**                    | workout/NewWorkoutScreen.kt                 | NewWorkoutViewModel       | Create workout with exercises and sets           |
-| **workout_detail/{workoutId}**     | workout/detail/WorkoutDetailScreen.kt       | WorkoutDetailViewModel    | View workout details, edit, or delete            |
-| **edit_workout/{workoutId}**       | workout/edit/EditWorkoutScreen.kt           | EditWorkoutViewModel      | Edit workout exercises and sets                  |
-| **exercises**                      | workout/exercises/ExercisesScreen.kt        | ExercisesViewModel        | List exercise definitions                        |
-| **exercise_progress/{exerciseId}** | workout/exercises/ExerciseProgressScreen.kt | ExerciseProgressViewModel | View per-exercise progress history               |
-| **new_exercise_definition**        | workout/exercises/NewExerciseScreen.kt      | NewExerciseViewModel      | Create new exercise definition                   |
-| **habits**                         | habit/HabitsScreen.kt                       | HabitsViewModel           | List habits and navigate to habit details        |
-| **new_habit**                      | habit/NewHabitScreen.kt                     | NewHabitViewModel         | Create new habit                                 |
-| **habit_detail/{habitId}**         | habit/detail/HabitDetailScreen.kt           | HabitDetailViewModel      | View habit and mark completion for today         |
-| **climbing**                       | climbing/ClimbingScreen.kt                  | -                         | Climbing landing screen                          |
-| **new_climbing_workout**           | climbing/NewClimbingWorkoutScreen.kt        | -                         | Create climbing workout and add boulders         |
-| **new_boulder**                    | climbing/boulder/NewBoulderScreen.kt        | NewBoulderViewModel       | Create boulder with optional photo               |
+| Route                                   | Screen File                                    | ViewModel                      | Purpose                                          |
+|-----------------------------------------|------------------------------------------------|--------------------------------|--------------------------------------------------|
+| **home**                                | HomeScreen.kt                                  | HomeViewModel                  | Dashboard with money summary chart               |
+| **food**                                | _(Not implemented)_                            | -                              | Placeholder route only                           |
+| **money**                               | money/MoneyScreen.kt                           | MoneyViewModel                 | Main money dashboard with transactions/spendings |
+| **money_settings**                      | money/settings/MoneySettings.kt                | MoneySettingsViewModel         | Cycle management settings                        |
+| **new_transaction**                     | money/transactions/NewTransactionScreen.kt     | NewTransactionViewModel        | Create new transaction                           |
+| **fixed_spending**                      | money/spendings/FixedSpendingsScreen.kt        | FixedSpendingsViewModel        | List all fixed spendings                         |
+| **new_fixed_spending**                  | money/spendings/NewFixedSpendingScreen.kt      | NewFixedSpendingViewModel      | Create new fixed spending                        |
+| **categories**                          | money/categories/CategoriesScreen.kt           | CategoriesViewModel            | List and manage categories                       |
+| **new_category**                        | money/categories/NewCategoryScreen.kt          | NewCategoryViewModel           | Create new category                              |
+| **workout**                             | workout/WorkoutScreen.kt                       | WorkoutViewModel               | List workouts and navigate to details/exercises  |
+| **new_workout**                         | workout/NewWorkoutScreen.kt                    | NewWorkoutViewModel            | Create workout with exercises and sets           |
+| **workout_detail/{workoutId}**          | workout/detail/WorkoutDetailScreen.kt          | WorkoutDetailViewModel         | View workout details, edit, or delete            |
+| **edit_workout/{workoutId}**            | workout/edit/EditWorkoutScreen.kt              | EditWorkoutViewModel           | Edit workout exercises and sets                  |
+| **exercises**                           | workout/exercises/ExercisesScreen.kt           | ExercisesViewModel             | List exercise definitions                        |
+| **exercise_progress/{exerciseId}**      | workout/exercises/ExerciseProgressScreen.kt    | ExerciseProgressViewModel      | View per-exercise progress history               |
+| **new_exercise_definition**             | workout/exercises/NewExerciseScreen.kt         | NewExerciseViewModel           | Create new exercise definition                   |
+| **habits**                              | habit/HabitsScreen.kt                          | HabitsViewModel                | List habits and navigate to habit details        |
+| **new_habit**                           | habit/NewHabitScreen.kt                        | NewHabitViewModel              | Create new habit                                 |
+| **habit_detail/{habitId}**              | habit/detail/HabitDetailScreen.kt              | HabitDetailViewModel           | View habit and mark completion for today         |
+| **climbing**                            | climbing/ClimbingScreen.kt                     | ClimbingViewModel              | Climbing workout list                            |
+| **new_climbing_workout**                | climbing/NewClimbingWorkoutScreen.kt           | NewClimbingWorkoutViewModel    | Create climbing workout with boulder attempts    |
+| **new_boulder**                         | climbing/boulder/NewBoulderScreen.kt           | NewBoulderViewModel            | Create boulder with optional photo               |
+| **climbing_workout_detail/{workoutId}** | climbing/detail/ClimbingWorkoutDetailScreen.kt | ClimbingWorkoutDetailViewModel | View boulder-grouped attempts and media          |
 
 **Navigation Pattern**: All routes are registered in `JuanitOSNavGraph.kt` using Routes enum values;
 `workout_detail/{workoutId}`, `edit_workout/{workoutId}`, `exercise_progress/{exerciseId}`, and
-`habit_detail/{habitId}` use typed navigation arguments.
+`habit_detail/{habitId}`, `climbing_workout_detail/{workoutId}` use typed navigation arguments.
 
 ---
 
 ## Common Gotchas
 
 1. **SavedStateHandle for nav params**: Parameterized routes exist for workout detail/edit,
-   exercise progress, and habit detail; extract IDs from SavedStateHandle and throw
+   exercise progress, habit detail, and climbing workout detail; extract IDs from SavedStateHandle
+   and throw
    IllegalArgumentException if missing
 2. **Flow vs StateFlow**: Queries return Flow, ViewModels convert to StateFlow with stateIn()
 3. **Database migrations**: Must be added to JuanitOSDatabase.addMigrations() or they won't run
@@ -481,11 +512,13 @@ food_ingredients, batch_food_ingredients) but currently not in active schema.
 5. **Combine operator**: Order matters; final state is determined by last combine's copy()
 6. **InputUiState usage**: Use for form fields instead of separate value/touched/isValid properties
 7. **Food module status**: Route defined but implementation removed; migrations reference legacy
-   food tables (v9-14) that are not in current active schema (v23)
+   food tables (v9-14) that are not in current active schema (v28)
 8. **Workout migrations**: Stored in `WorkoutMigrations.kt` (separate from money migrations); covers
    v19→20→21 adding workout tables and startTime/endTime to Workout
 9. **Workout time fields**: `Workout.startTime` and `Workout.endTime` are stored as nullable
    text columns (`start_time`, `end_time`) and formatted via `lib/dates.kt`
 10. **Habit lifecycle**: Habit completion lifecycle is tracked with `Habit.completedAt`; daily
     completion entries are still represented by `HabitEntry`
+11. **Climbing attempt ordering**: Attempt display uses `boulder_order` then `attempt_order`;
+    preserve both when writing attempts
 
