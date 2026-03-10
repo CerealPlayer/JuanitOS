@@ -4,6 +4,7 @@ enum class Routes(val route: String) {
     Home("home"),
     Food("food"),
     Money("money"),
+    MoneyStats("money_stats"),
     MoneySettings("money_settings"),
     NewTransaction("new_transaction"),
     FixedSpending("fixed_spending"),

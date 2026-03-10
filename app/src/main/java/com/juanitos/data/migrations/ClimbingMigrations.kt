@@ -99,7 +99,7 @@ val MIGRATION_26_27 = object : Migration(26, 27) {
         db.execSQL(
             """
             ALTER TABLE climbing_boulder_attempts
-            ADD COLUMN attempt_order NOT NULL INTEGER DEFAULT 0
+            ADD COLUMN attempt_order INTEGER NOT NULL DEFAULT 0
             """.trimIndent()
         )
     }

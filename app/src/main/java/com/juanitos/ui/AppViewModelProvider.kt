@@ -19,6 +19,7 @@ import com.juanitos.ui.routes.money.categories.CategoriesViewModel
 import com.juanitos.ui.routes.money.categories.NewCategoryViewModel
 import com.juanitos.ui.routes.money.spendings.FixedSpendingsViewModel
 import com.juanitos.ui.routes.money.spendings.NewFixedSpendingViewModel
+import com.juanitos.ui.routes.money.stats.MoneyStatsViewModel
 import com.juanitos.ui.routes.money.transactions.NewTransactionViewModel
 import com.juanitos.ui.routes.workout.NewWorkoutViewModel
 import com.juanitos.ui.routes.workout.WorkoutViewModel
@@ -42,6 +43,12 @@ object AppViewModelProvider {
                 juanitOSApplication().container.cycleRepository,
                 juanitOSApplication().container.fixedSpendingRepository,
                 juanitOSApplication().container.transactionRepository
+            )
+        }
+        initializer {
+            MoneyStatsViewModel(
+                juanitOSApplication().container.cycleRepository,
+                juanitOSApplication().container.fixedSpendingRepository,
             )
         }
         initializer {

@@ -42,6 +42,7 @@ fun MoneyScreen(
     onNewTransaction: () -> Unit,
     onFixedSpendings: () -> Unit,
     onCategories: () -> Unit,
+    onMoneyStats: () -> Unit,
     viewModel: MoneyViewModel = viewModel(
         factory = AppViewModelProvider.Factory
     )
@@ -73,6 +74,12 @@ fun MoneyScreen(
                         Icon(
                             painter = painterResource(R.drawable.category),
                             contentDescription = stringResource(R.string.categories)
+                        )
+                    }
+                    IconButton(onClick = onMoneyStats) {
+                        Icon(
+                            painter = painterResource(R.drawable.statistics),
+                            contentDescription = stringResource(R.string.money_stats)
                         )
                     }
                 },
