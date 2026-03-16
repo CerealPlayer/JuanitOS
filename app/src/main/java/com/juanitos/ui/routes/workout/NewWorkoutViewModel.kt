@@ -15,9 +15,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -65,6 +68,7 @@ class NewWorkoutViewModel(
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NewWorkoutUiState())
+    private val autosaveMutex = Mutex()
 
     val uiState: StateFlow<NewWorkoutUiState> = combine(
         _state,
@@ -155,6 +159,7 @@ class NewWorkoutViewModel(
                 errorMessage = null,
             )
         }
+        queueAutosave()
     }
 
     fun deleteSet(exerciseGroupId: Int, setId: Int) {
@@ -174,12 +179,14 @@ class NewWorkoutViewModel(
             }
             state.copy(exerciseGroups = updatedGroups)
         }
+        queueAutosave()
     }
 
     fun deleteExercise(exerciseGroupId: Int) {
         _state.update { state ->
             state.copy(exerciseGroups = state.exerciseGroups.filterNot { it.id == exerciseGroupId })
         }
+        queueAutosave()
     }
 
     // ── Save dialog ──────────────────────────────────────────────────────────
@@ -197,43 +204,30 @@ class NewWorkoutViewModel(
     }
 
     fun saveWorkout(onSuccess: () -> Unit) {
-        val current = _state.value
-        val workoutId = current.workoutId ?: run { onSuccess(); return }
-        val endTime = LocalTime.now().format(TIME_FORMATTER)
         viewModelScope.launch {
+            val current = _state.value
+            val workoutId = current.workoutId ?: run { onSuccess(); return@launch }
+            _state.update { it.copy(isSavingSet = true) }
             try {
-                current.exerciseGroups.forEachIndexed { exerciseIndex, group ->
-                    val workoutExerciseId = workoutExerciseRepository.insert(
-                        WorkoutExercise(
-                            workoutId = workoutId,
-                            exerciseDefinitionId = group.exercise.id,
-                            position = exerciseIndex
-                        )
-                    ).toInt()
-                    group.sets.forEachIndexed { setIndex, set ->
-                        workoutSetRepository.insert(
-                            WorkoutSet(
-                                workoutExerciseId = workoutExerciseId,
-                                reps = set.reps,
-                                durationSeconds = set.durationSeconds,
-                                weightKg = set.weightKg,
-                                position = setIndex
-                            )
-                        )
-                    }
-                }
-                workoutRepository.update(
-                    Workout(
-                        id = workoutId,
-                        date = current.date,
-                        startTime = current.startTime,
-                        endTime = endTime,
-                        notes = current.notesInput.ifBlank { null }
+                autosaveMutex.withLock {
+                    val latest = _state.value
+                    persistWorkoutStructure(
+                        workoutId = workoutId,
+                        exerciseGroups = latest.exerciseGroups
                     )
-                )
+                    workoutRepository.update(
+                        Workout(
+                            id = workoutId,
+                            date = latest.date,
+                            startTime = latest.startTime,
+                            endTime = LocalTime.now().format(TIME_FORMATTER),
+                            notes = latest.notesInput.ifBlank { null }
+                        )
+                    )
+                }
                 onSuccess()
-            } catch (e: Exception) {
-                _state.update { it.copy(errorMessage = e.message ?: "Error saving workout") }
+            } finally {
+                _state.update { it.copy(isSavingSet = false) }
             }
         }
     }
@@ -252,12 +246,56 @@ class NewWorkoutViewModel(
         val current = _state.value
         val workoutId = current.workoutId ?: run { onSuccess(); return }
         viewModelScope.launch {
-            try {
-                workoutRepository.delete(Workout(id = workoutId, date = current.date))
-            } catch (_: Exception) {
-                // best-effort delete; navigate up regardless
-            }
+            workoutRepository.delete(Workout(id = workoutId, date = current.date))
             onSuccess()
+        }
+    }
+
+    private fun queueAutosave() {
+        viewModelScope.launch {
+            val workoutId = _state.value.workoutId ?: return@launch
+            _state.update { it.copy(isSavingSet = true) }
+            try {
+                autosaveMutex.withLock {
+                    val latest = _state.value
+                    persistWorkoutStructure(
+                        workoutId = workoutId,
+                        exerciseGroups = latest.exerciseGroups
+                    )
+                }
+            } finally {
+                _state.update { it.copy(isSavingSet = false) }
+            }
+        }
+    }
+
+    private suspend fun persistWorkoutStructure(
+        workoutId: Int,
+        exerciseGroups: List<ExerciseGroup>
+    ) {
+        val existingExercises = workoutExerciseRepository.getByWorkoutIdWithSets(workoutId).first()
+        existingExercises.forEach { existing ->
+            workoutExerciseRepository.delete(existing.workoutExercise)
+        }
+        exerciseGroups.forEachIndexed { exerciseIndex, group ->
+            val workoutExerciseId = workoutExerciseRepository.insert(
+                WorkoutExercise(
+                    workoutId = workoutId,
+                    exerciseDefinitionId = group.exercise.id,
+                    position = exerciseIndex
+                )
+            ).toInt()
+            group.sets.forEachIndexed { setIndex, set ->
+                workoutSetRepository.insert(
+                    WorkoutSet(
+                        workoutExerciseId = workoutExerciseId,
+                        reps = set.reps,
+                        durationSeconds = set.durationSeconds,
+                        weightKg = set.weightKg,
+                        position = setIndex
+                    )
+                )
+            }
         }
     }
 
