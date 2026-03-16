@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -97,6 +98,7 @@ fun NewClimbingWorkoutScreen(
         Column(
             modifier = Modifier
                 .padding(innerPadding)
+                .imePadding()
                 .padding(dimensionResource(R.dimen.padding_small))
                 .verticalScroll(rememberScrollState())
         ) {
