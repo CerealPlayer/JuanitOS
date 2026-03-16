@@ -20,6 +20,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +50,8 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
 import com.juanitos.ui.AppViewModelProvider
+import com.juanitos.ui.commons.DeleteConfirmationDialog
+import com.juanitos.ui.icons.MoreVert
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
@@ -64,6 +68,7 @@ object ClimbingWorkoutDetailDestination : NavigationDestination {
 @Composable
 fun ClimbingWorkoutDetailScreen(
     onNavigateUp: () -> Unit,
+    onEditWorkout: (Int) -> Unit,
     viewModel: ClimbingWorkoutDetailViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     data class AttemptDialogUiState(
@@ -74,6 +79,22 @@ fun ClimbingWorkoutDetailScreen(
     val uiState = viewModel.uiState.collectAsState().value
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     var selectedAttempt by remember { mutableStateOf<AttemptDialogUiState?>(null) }
+    val showMenu = remember { mutableStateOf(false) }
+    val showDeleteConfirmation = remember { mutableStateOf(false) }
+
+    if (showDeleteConfirmation.value) {
+        DeleteConfirmationDialog(
+            title = stringResource(R.string.confirm_delete_workout),
+            onConfirm = {
+                showDeleteConfirmation.value = false
+                uiState.workout?.let { workout ->
+                    onNavigateUp()
+                    viewModel.deleteWorkout(workout)
+                }
+            },
+            onDismiss = { showDeleteConfirmation.value = false },
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -81,6 +102,32 @@ fun ClimbingWorkoutDetailScreen(
                 title = stringResource(ClimbingWorkoutDetailDestination.titleRes),
                 canNavigateBack = true,
                 navigateUp = onNavigateUp,
+                actions = {
+                    Box {
+                        IconButton(onClick = { showMenu.value = true }) {
+                            MoreVert()
+                        }
+                        DropdownMenu(
+                            expanded = showMenu.value,
+                            onDismissRequest = { showMenu.value = false },
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.edit)) },
+                                onClick = {
+                                    showMenu.value = false
+                                    uiState.workout?.id?.let(onEditWorkout)
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.delete)) },
+                                onClick = {
+                                    showMenu.value = false
+                                    showDeleteConfirmation.value = true
+                                },
+                            )
+                        }
+                    }
+                },
             )
         },
     ) { innerPadding ->

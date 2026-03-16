@@ -38,8 +38,8 @@ data class BoulderSelectionUiState(
 
 data class ClimbingAttemptUiState(
     val id: Int,
-    val videoMediaId: Int,
-    val videoPath: String,
+    val videoMediaId: Int?,
+    val videoPath: String?,
     val notes: String = "",
 )
 

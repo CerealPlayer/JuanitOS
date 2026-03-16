@@ -11,6 +11,7 @@ import com.juanitos.ui.routes.climbing.ClimbingViewModel
 import com.juanitos.ui.routes.climbing.NewClimbingWorkoutViewModel
 import com.juanitos.ui.routes.climbing.boulder.NewBoulderViewModel
 import com.juanitos.ui.routes.climbing.detail.ClimbingWorkoutDetailViewModel
+import com.juanitos.ui.routes.climbing.edit.EditClimbingWorkoutViewModel
 import com.juanitos.ui.routes.habit.HabitsViewModel
 import com.juanitos.ui.routes.habit.NewHabitViewModel
 import com.juanitos.ui.routes.habit.detail.HabitDetailViewModel
@@ -176,6 +177,16 @@ object AppViewModelProvider {
                 climbingBoulderAttemptRepository = juanitOSApplication().container.climbingBoulderAttemptRepository,
                 climbingBoulderRepository = juanitOSApplication().container.climbingBoulderRepository,
                 climbingMediaRepository = juanitOSApplication().container.climbingMediaRepository,
+            )
+        }
+        initializer {
+            EditClimbingWorkoutViewModel(
+                savedStateHandle = createSavedStateHandle(),
+                climbingWorkoutRepository = juanitOSApplication().container.climbingWorkoutRepository,
+                climbingBoulderAttemptRepository = juanitOSApplication().container.climbingBoulderAttemptRepository,
+                climbingBoulderRepository = juanitOSApplication().container.climbingBoulderRepository,
+                climbingMediaRepository = juanitOSApplication().container.climbingMediaRepository,
+                appContext = juanitOSApplication().applicationContext,
             )
         }
     }

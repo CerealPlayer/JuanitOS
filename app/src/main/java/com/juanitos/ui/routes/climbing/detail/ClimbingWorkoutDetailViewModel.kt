@@ -3,6 +3,7 @@ package com.juanitos.ui.routes.climbing.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juanitos.data.climbing.entities.ClimbingWorkout
 import com.juanitos.data.climbing.repositories.ClimbingBoulderAttemptRepository
 import com.juanitos.data.climbing.repositories.ClimbingBoulderRepository
 import com.juanitos.data.climbing.repositories.ClimbingMediaRepository
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class ClimbingWorkoutAttemptDetailUiState(
     val id: Int,
@@ -31,6 +33,7 @@ data class ClimbingWorkoutBoulderSectionUiState(
 
 data class ClimbingWorkoutDetailUiState(
     val workoutId: Int,
+    val workout: ClimbingWorkout? = null,
     val notes: String?,
     val sections: List<ClimbingWorkoutBoulderSectionUiState> = emptyList(),
     val workoutFound: Boolean = true,
@@ -38,7 +41,7 @@ data class ClimbingWorkoutDetailUiState(
 
 class ClimbingWorkoutDetailViewModel(
     savedStateHandle: SavedStateHandle,
-    climbingWorkoutRepository: ClimbingWorkoutRepository,
+    private val climbingWorkoutRepository: ClimbingWorkoutRepository,
     climbingBoulderAttemptRepository: ClimbingBoulderAttemptRepository,
     climbingBoulderRepository: ClimbingBoulderRepository,
     climbingMediaRepository: ClimbingMediaRepository,
@@ -56,6 +59,7 @@ class ClimbingWorkoutDetailViewModel(
         val workout = workouts.firstOrNull { it.id == workoutId }
             ?: return@combine ClimbingWorkoutDetailUiState(
                 workoutId = workoutId,
+                workout = null,
                 notes = null,
                 sections = emptyList(),
                 workoutFound = false,
@@ -98,6 +102,7 @@ class ClimbingWorkoutDetailViewModel(
 
         ClimbingWorkoutDetailUiState(
             workoutId = workout.id,
+            workout = workout,
             notes = workout.notes,
             sections = sections,
             workoutFound = true,
@@ -114,6 +119,12 @@ class ClimbingWorkoutDetailViewModel(
     fun toggleBoulderSection(boulderId: Int) {
         expandedBoulderIds.update { expanded ->
             if (expanded.contains(boulderId)) expanded - boulderId else expanded + boulderId
+        }
+    }
+
+    fun deleteWorkout(workout: ClimbingWorkout) {
+        viewModelScope.launch {
+            climbingWorkoutRepository.delete(workout)
         }
     }
 

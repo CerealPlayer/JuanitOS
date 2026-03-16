@@ -24,5 +24,6 @@ enum class Routes(val route: String) {
     Climbing("climbing"),
     NewClimbingWorkout("new_climbing_workout"),
     NewBoulder("new_boulder"),
+    EditClimbingWorkout("edit_climbing_workout/{workoutId}"),
     ClimbingWorkoutDetail("climbing_workout_detail/{workoutId}");
 }
