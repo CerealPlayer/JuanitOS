@@ -7,9 +7,10 @@ import com.juanitos.data.habit.entities.Habit
 import com.juanitos.data.habit.entities.HabitEntry
 import com.juanitos.data.habit.repositories.HabitEntryRepository
 import com.juanitos.data.habit.repositories.HabitRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -25,6 +26,9 @@ data class HabitActivityCell(
 data class HabitDetailUiState(
     val habit: Habit? = null,
     val weekColumns: List<List<HabitActivityCell>> = emptyList(),
+    val selectedDate: LocalDate = LocalDate.now(),
+    val minSelectableDate: LocalDate = LocalDate.now().minusMonths(1),
+    val maxSelectableDate: LocalDate = LocalDate.now(),
 )
 
 class HabitDetailViewModel(
@@ -34,15 +38,22 @@ class HabitDetailViewModel(
 ) : ViewModel() {
 
     private val habitId: Int = checkNotNull(savedStateHandle["habitId"])
+    private val maxSelectableDate = LocalDate.now()
+    private val minSelectableDate = maxSelectableDate.minusMonths(1)
+    private val selectedDate = MutableStateFlow(maxSelectableDate)
 
     val uiState: StateFlow<HabitDetailUiState> =
         habitRepository.getByIdWithEntries(habitId)
-            .map { habitWithEntries ->
+            .combine(selectedDate) { habitWithEntries, selectedDate ->
+                val coercedDate = selectedDate.coerceIn(minSelectableDate, maxSelectableDate)
                 HabitDetailUiState(
                     habit = habitWithEntries?.habit,
                     weekColumns = buildHabitActivityWeekColumns(
                         entries = habitWithEntries?.entries ?: emptyList(),
                     ),
+                    selectedDate = coercedDate,
+                    minSelectableDate = minSelectableDate,
+                    maxSelectableDate = maxSelectableDate,
                 )
             }
             .stateIn(
@@ -51,20 +62,22 @@ class HabitDetailViewModel(
                 initialValue = HabitDetailUiState(),
             )
 
-    fun markCompletedToday() {
+    fun onSelectedDateChanged(date: LocalDate) {
+        selectedDate.value = date.coerceIn(minSelectableDate, maxSelectableDate)
+    }
+
+    fun toggleSelectedDateCompletion() {
         viewModelScope.launch {
-            val today = LocalDate.now().toString()
-            val existing = habitEntryRepository.getByHabitIdAndDate(habitId, today)
+            val date = selectedDate.value.coerceIn(minSelectableDate, maxSelectableDate).toString()
+            val existing = habitEntryRepository.getByHabitIdAndDate(habitId, date)
             if (existing != null) {
-                if (!existing.completed) {
-                    habitEntryRepository.update(existing.copy(completed = true))
-                }
+                habitEntryRepository.update(existing.copy(completed = !existing.completed))
                 return@launch
             }
             habitEntryRepository.insert(
                 HabitEntry(
                     habitId = habitId,
-                    date = today,
+                    date = date,
                     completed = true,
                 )
             )

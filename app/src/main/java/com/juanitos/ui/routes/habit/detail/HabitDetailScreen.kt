@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,8 +24,12 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +49,10 @@ import com.juanitos.ui.icons.MoreVert
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 object HabitDetailDestination : NavigationDestination {
     override val route = Routes.HabitDetail
@@ -60,7 +70,9 @@ fun HabitDetailScreen(
     val uiState = viewModel.uiState.collectAsState().value
     val showMenu = remember { mutableStateOf(false) }
     val showDeleteConfirmation = remember { mutableStateOf(false) }
+    val showDatePicker = remember { mutableStateOf(false) }
     val habit = uiState.habit
+    val selectedDateLabel = formatSelectedDate(uiState.selectedDate)
 
     if (showDeleteConfirmation.value && habit != null) {
         DeleteConfirmationDialog(
@@ -71,6 +83,48 @@ fun HabitDetailScreen(
             },
             onDismiss = { showDeleteConfirmation.value = false },
         )
+    }
+
+    if (showDatePicker.value) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = localDateToUtcMillis(uiState.selectedDate),
+            selectableDates = object : SelectableDates {
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                    val date = utcMillisToLocalDate(utcTimeMillis)
+                    return !date.isBefore(uiState.minSelectableDate) &&
+                            !date.isAfter(uiState.maxSelectableDate)
+                }
+
+                override fun isSelectableYear(year: Int): Boolean {
+                    return year in uiState.minSelectableDate.year..uiState.maxSelectableDate.year
+                }
+            },
+        )
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker.value = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let { selectedMillis ->
+                            viewModel.onSelectedDateChanged(utcMillisToLocalDate(selectedMillis))
+                        }
+                        showDatePicker.value = false
+                    }
+                ) {
+                    Text(text = stringResource(R.string.save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker.value = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            },
+        ) {
+            DatePicker(
+                state = datePickerState,
+                showModeToggle = false,
+            )
+        }
     }
 
     Scaffold(
@@ -119,12 +173,24 @@ fun HabitDetailScreen(
         },
         bottomBar = {
             BottomAppBar(
-                actions = {},
+                actions = {
+                    OutlinedButton(onClick = { showDatePicker.value = true }) {
+                        Text(
+                            text = stringResource(
+                                R.string.habit_selected_date,
+                                selectedDateLabel,
+                            ),
+                        )
+                    }
+                },
                 floatingActionButton = {
-                    FloatingActionButton(onClick = { viewModel.markCompletedToday() }) {
+                    FloatingActionButton(onClick = { viewModel.toggleSelectedDateCompletion() }) {
                         Icon(
                             painter = painterResource(R.drawable.check),
-                            contentDescription = stringResource(R.string.mark_habit_complete_today),
+                            contentDescription = stringResource(
+                                R.string.toggle_habit_completion_for_date,
+                                selectedDateLabel,
+                            ),
                         )
                     }
                 }
@@ -263,3 +329,16 @@ private fun HabitActivityGraph(
 }
 
 private const val MIN_WEEKS_TO_SHOW = 8
+private val SELECTED_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yy")
+
+private fun formatSelectedDate(date: LocalDate): String = date.format(SELECTED_DATE_FORMATTER)
+
+private fun localDateToUtcMillis(date: LocalDate): Long = date
+    .atStartOfDay()
+    .toInstant(ZoneOffset.UTC)
+    .toEpochMilli()
+
+private fun utcMillisToLocalDate(utcMillis: Long): LocalDate = Instant
+    .ofEpochMilli(utcMillis)
+    .atZone(ZoneOffset.UTC)
+    .toLocalDate()
