@@ -1,5 +1,6 @@
 package com.juanitos.ui.routes.workout.edit
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -77,6 +78,15 @@ fun EditWorkoutScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val listState = rememberLazyListState()
+    val handleBack: () -> Unit = {
+        if (uiState.hasChanges) {
+            viewModel.openDiscardDialog()
+        } else {
+            onNavigateUp()
+        }
+    }
+
+    BackHandler(onBack = handleBack)
 
     val totalSets = uiState.exerciseGroups.sumOf { it.sets.size }
     LaunchedEffect(totalSets) {
@@ -92,7 +102,7 @@ fun EditWorkoutScreen(
             JuanitOSTopAppBar(
                 title = stringResource(EditWorkoutDestination.titleRes),
                 canNavigateBack = true,
-                navigateUp = onNavigateUp,
+                navigateUp = handleBack,
                 actions = {
                     IconButton(
                         onClick = { viewModel.openSaveDialog() },
@@ -187,6 +197,24 @@ fun EditWorkoutScreen(
             dismissButton = {
                 TextButton(onClick = { viewModel.closeSaveDialog() }) {
                     Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (uiState.showDiscardDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.closeDiscardDialog() },
+            title = { Text(stringResource(R.string.discard_workout_changes)) },
+            text = { Text(stringResource(R.string.discard_workout_changes_message)) },
+            confirmButton = {
+                Button(onClick = { viewModel.discardChanges(onNavigateUp) }) {
+                    Text(stringResource(R.string.discard))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.closeDiscardDialog() }) {
+                    Text(stringResource(R.string.keep_editing))
                 }
             }
         )

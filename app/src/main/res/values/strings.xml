@@ -82,6 +82,8 @@
     <string name="workout_notes_hint">Notes (optional)</string>
     <string name="discard_workout">Discard workout?</string>
     <string name="discard_workout_message">This workout and all its logged sets will be permanently deleted.</string>
+    <string name="discard_workout_changes">Discard changes?</string>
+    <string name="discard_workout_changes_message">Your edits will be removed and this workout will be restored to its original state.</string>
     <string name="keep_editing">Keep editing</string>
     <string name="discard">Discard</string>
     <string name="done">Done</string>
