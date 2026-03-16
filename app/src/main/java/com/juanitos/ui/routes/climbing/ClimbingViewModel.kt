@@ -2,12 +2,14 @@ package com.juanitos.ui.routes.climbing
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juanitos.data.climbing.entities.ClimbingWorkout
 import com.juanitos.data.climbing.repositories.ClimbingBoulderAttemptRepository
 import com.juanitos.data.climbing.repositories.ClimbingWorkoutRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class ClimbingWorkoutCardUiState(
     val id: Int,
@@ -22,7 +24,7 @@ data class ClimbingUiState(
 )
 
 class ClimbingViewModel(
-    climbingWorkoutRepository: ClimbingWorkoutRepository,
+    private val climbingWorkoutRepository: ClimbingWorkoutRepository,
     climbingBoulderAttemptRepository: ClimbingBoulderAttemptRepository,
 ) : ViewModel() {
     val uiState: StateFlow<ClimbingUiState> = combine(
@@ -51,6 +53,19 @@ class ClimbingViewModel(
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
         initialValue = ClimbingUiState(),
     )
+
+    fun deleteWorkout(workout: ClimbingWorkoutCardUiState) {
+        viewModelScope.launch {
+            climbingWorkoutRepository.delete(
+                ClimbingWorkout(
+                    id = workout.id,
+                    date = workout.date,
+                    startTime = workout.startTime,
+                    endTime = workout.endTime,
+                )
+            )
+        }
+    }
 
     private companion object {
         private const val TIMEOUT_MILLIS = 5_000L

@@ -3,6 +3,8 @@ package com.juanitos.ui.routes.climbing
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
+import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -69,6 +71,13 @@ fun NewClimbingWorkoutScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val handleBack: () -> Unit = {
+        if (uiState.hasContent) {
+            viewModel.openDiscardDialog()
+        } else {
+            viewModel.discardWorkout(onNavigateUp)
+        }
+    }
     val boulderActionLabel = if (uiState.selectedBoulder == null) {
         stringResource(R.string.add_boulder)
     } else {
@@ -86,12 +95,14 @@ fun NewClimbingWorkoutScreen(
         onResult = { uri -> uri?.let(viewModel::addAttemptFromUri) }
     )
 
+    BackHandler(onBack = handleBack)
+
     Scaffold(
         topBar = {
             JuanitOSTopAppBar(
                 title = stringResource(NewClimbingWorkoutDestination.titleRes),
                 canNavigateBack = true,
-                navigateUp = onNavigateUp,
+                navigateUp = handleBack,
             )
         },
     ) { innerPadding ->
@@ -171,7 +182,7 @@ fun NewClimbingWorkoutScreen(
                             }
                             AttemptVideoPreview(
                                 context = context,
-                                videoUri = attempt.videoUri,
+                                videoPath = attempt.videoPath,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(dimensionResource(R.dimen.boulder_card_image_height)),
@@ -316,6 +327,24 @@ fun NewClimbingWorkoutScreen(
             }
         )
     }
+
+    if (uiState.showDiscardDialog) {
+        AlertDialog(
+            onDismissRequest = viewModel::closeDiscardDialog,
+            title = { Text(stringResource(R.string.discard_workout)) },
+            text = { Text(stringResource(R.string.discard_workout_message)) },
+            confirmButton = {
+                Button(onClick = { viewModel.discardWorkout(onNavigateUp) }) {
+                    Text(stringResource(R.string.discard))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::closeDiscardDialog) {
+                    Text(stringResource(R.string.keep_editing))
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -347,13 +376,14 @@ private fun BoulderActionCard(
 @Composable
 private fun AttemptVideoPreview(
     context: android.content.Context,
-    videoUri: android.net.Uri,
+    videoPath: String?,
     modifier: Modifier = Modifier,
 ) {
-    val bitmap: Bitmap? = remember(videoUri) {
+    val bitmap: Bitmap? = remember(videoPath) {
+        val path = videoPath ?: return@remember null
         runCatching {
             MediaMetadataRetriever().use { retriever ->
-                retriever.setDataSource(context, videoUri)
+                retriever.setDataSource(context, Uri.fromFile(java.io.File(path)))
                 retriever.frameAtTime
             }
         }.getOrNull()

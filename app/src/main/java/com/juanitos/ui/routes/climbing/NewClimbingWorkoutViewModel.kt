@@ -18,9 +18,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.io.IOException
 import java.time.LocalDate
@@ -35,13 +38,18 @@ data class BoulderSelectionUiState(
 
 data class ClimbingAttemptUiState(
     val id: Int,
-    val videoUri: Uri,
+    val videoMediaId: Int,
+    val videoPath: String,
     val notes: String = "",
 )
 
 data class NewClimbingWorkoutUiState(
+    val workoutId: Int? = null,
+    val date: String = "",
+    val startTime: String? = null,
     val notes: String = "",
     val showBoulderDialog: Boolean = false,
+    val showDiscardDialog: Boolean = false,
     val boulders: List<BoulderSelectionUiState> = emptyList(),
     val selectedBoulderId: Int? = null,
     val selectedBoulderIds: List<Int> = emptyList(),
@@ -59,8 +67,11 @@ data class NewClimbingWorkoutUiState(
     val totalAttemptsCount: Int
         get() = attemptsByBoulderId.values.sumOf { it.size }
 
+    val hasContent: Boolean
+        get() = notes.isNotBlank() || totalAttemptsCount > 0
+
     val canSave: Boolean
-        get() = selectedBoulderId != null && totalAttemptsCount > 0 && !isSaving
+        get() = workoutId != null && totalAttemptsCount > 0 && !isSaving
 }
 
 class NewClimbingWorkoutViewModel(
@@ -71,6 +82,9 @@ class NewClimbingWorkoutViewModel(
     private val appContext: Context,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(NewClimbingWorkoutUiState())
+    private val autosaveMutex = Mutex()
+    private var isFinalizing = false
+
     val uiState: StateFlow<NewClimbingWorkoutUiState> =
         combine(
             _uiState,
@@ -85,8 +99,13 @@ class NewClimbingWorkoutViewModel(
                 initialValue = NewClimbingWorkoutUiState(),
             )
 
+    init {
+        createDraftWorkout()
+    }
+
     fun setNotes(input: String) {
         _uiState.update { it.copy(notes = input, errorMessage = null) }
+        queueAutosave()
     }
 
     fun openBoulderDialog() {
@@ -95,6 +114,30 @@ class NewClimbingWorkoutViewModel(
 
     fun closeBoulderDialog() {
         _uiState.update { it.copy(showBoulderDialog = false) }
+    }
+
+    fun openDiscardDialog() {
+        _uiState.update { it.copy(showDiscardDialog = true) }
+    }
+
+    fun closeDiscardDialog() {
+        _uiState.update { it.copy(showDiscardDialog = false) }
+    }
+
+    fun discardWorkout(onSuccess: () -> Unit) {
+        val current = _uiState.value
+        val workoutId = current.workoutId ?: run { onSuccess(); return }
+        viewModelScope.launch {
+            climbingWorkoutRepository.delete(
+                ClimbingWorkout(
+                    id = workoutId,
+                    date = current.date,
+                    startTime = current.startTime,
+                    notes = current.notes.trim().ifBlank { null },
+                )
+            )
+            onSuccess()
+        }
     }
 
     fun selectBoulder(boulderId: Int) {
@@ -110,25 +153,61 @@ class NewClimbingWorkoutViewModel(
                 errorMessage = null,
             )
         }
+        queueAutosave()
     }
 
     fun addAttemptFromUri(videoUri: Uri) {
-        val selectedBoulderId = _uiState.value.selectedBoulderId ?: run {
+        val current = _uiState.value
+        val selectedBoulderId = current.selectedBoulderId ?: run {
             _uiState.update { it.copy(errorMessage = "Select a boulder before adding an attempt") }
             return
         }
-        _uiState.update { state ->
-            val currentAttempts = state.attemptsByBoulderId[selectedBoulderId].orEmpty()
-            state.copy(
-                attemptsByBoulderId = state.attemptsByBoulderId + (
-                        selectedBoulderId to (currentAttempts + ClimbingAttemptUiState(
-                            id = state.nextAttemptId,
-                            videoUri = videoUri,
-                        ))
-                ),
-                nextAttemptId = state.nextAttemptId + 1,
-                errorMessage = null,
-            )
+        val workoutId = current.workoutId ?: run {
+            _uiState.update { it.copy(errorMessage = "Workout is not ready yet") }
+            return
+        }
+        val attemptId = current.nextAttemptId
+        _uiState.update { it.copy(isSaving = true, errorMessage = null) }
+        viewModelScope.launch {
+            try {
+                val savedMedia = saveVideoMedia(videoUri = videoUri, attemptId = attemptId)
+                _uiState.update { state ->
+                    val latestAttempts = state.attemptsByBoulderId[selectedBoulderId].orEmpty()
+                    state.copy(
+                        attemptsByBoulderId = state.attemptsByBoulderId + (
+                                selectedBoulderId to (latestAttempts + ClimbingAttemptUiState(
+                                    id = attemptId,
+                                    videoMediaId = savedMedia.id,
+                                    videoPath = savedMedia.filePath,
+                                ))
+                                ),
+                        nextAttemptId = attemptId + 1,
+                        errorMessage = null,
+                    )
+                }
+                autosaveMutex.withLock {
+                    persistDraftSnapshot(workoutId, _uiState.value)
+                }
+            } catch (e: IOException) {
+                _uiState.update {
+                    it.copy(isSaving = false, errorMessage = e.message ?: "Error saving video")
+                }
+                return@launch
+            } catch (e: SecurityException) {
+                _uiState.update {
+                    it.copy(
+                        isSaving = false,
+                        errorMessage = e.message ?: "Cannot access selected video",
+                    )
+                }
+                return@launch
+            } catch (e: SQLiteException) {
+                _uiState.update {
+                    it.copy(isSaving = false, errorMessage = e.message ?: "Error saving attempt")
+                }
+                return@launch
+            }
+            _uiState.update { it.copy(isSaving = false) }
         }
     }
 
@@ -145,6 +224,7 @@ class NewClimbingWorkoutViewModel(
                 errorMessage = null,
             )
         }
+        queueAutosave()
     }
 
     fun removeAttempt(attemptId: Int) {
@@ -161,12 +241,13 @@ class NewClimbingWorkoutViewModel(
                 errorMessage = null,
             )
         }
+        queueAutosave()
     }
 
     fun saveWorkout(onSuccess: () -> Unit) {
         val state = _uiState.value
-        if (state.selectedBoulderId == null) {
-            _uiState.update { it.copy(errorMessage = "Select a boulder before saving") }
+        val workoutId = state.workoutId ?: run {
+            _uiState.update { it.copy(errorMessage = "Workout is not ready yet") }
             return
         }
         if (state.totalAttemptsCount == 0) {
@@ -174,71 +255,131 @@ class NewClimbingWorkoutViewModel(
             return
         }
 
+        isFinalizing = true
         _uiState.update { it.copy(isSaving = true, errorMessage = null) }
         viewModelScope.launch {
             try {
-                val now = LocalTime.now().format(TIME_FORMATTER)
+                autosaveMutex.withLock {
+                    val latest = _uiState.value
+                    persistDraftSnapshot(workoutId, latest)
+                    climbingWorkoutRepository.update(
+                        ClimbingWorkout(
+                            id = workoutId,
+                            date = latest.date,
+                            startTime = latest.startTime,
+                            endTime = LocalTime.now().format(TIME_FORMATTER),
+                            notes = latest.notes.trim().ifBlank { null },
+                        )
+                    )
+                }
+                onSuccess()
+            } catch (e: SQLiteException) {
+                _uiState.update {
+                    it.copy(isSaving = false, errorMessage = e.message ?: "Error saving workout")
+                }
+            } finally {
+                _uiState.update { it.copy(isSaving = false) }
+            }
+        }
+    }
+
+    private fun createDraftWorkout() {
+        viewModelScope.launch {
+            val date = LocalDate.now().toString()
+            val startTime = LocalTime.now().format(TIME_FORMATTER)
+            try {
                 val workoutId = climbingWorkoutRepository.insert(
                     ClimbingWorkout(
-                        date = LocalDate.now().toString(),
-                        startTime = now,
-                        endTime = now,
-                        notes = state.notes.trim().ifBlank { null },
+                        date = date,
+                        startTime = startTime,
+                        notes = null,
                     )
                 ).toInt()
-
-                val orderedBoulderIds = buildList {
-                    addAll(
-                        state.selectedBoulderIds.filter { boulderId ->
-                            state.attemptsByBoulderId[boulderId]?.isNotEmpty() == true
-                        }
-                    )
-                    state.attemptsByBoulderId.keys.forEach { boulderId ->
-                        if (!contains(boulderId)) add(boulderId)
-                    }
-                }
-
-                orderedBoulderIds.forEachIndexed { boulderIndex, boulderId ->
-                    state.attemptsByBoulderId[boulderId].orEmpty()
-                        .forEachIndexed { attemptIndex, attempt ->
-                        val videoMediaId = saveVideoMedia(attempt)
-                        climbingBoulderAttemptRepository.insert(
-                            ClimbingBoulderAttempt(
-                                climbingWorkoutId = workoutId,
-                                climbingBoulderId = boulderId,
-                                videoMediaId = videoMediaId,
-                                boulderOrder = boulderIndex,
-                                attemptOrder = attemptIndex,
-                                notes = attempt.notes.trim().ifBlank { null },
-                            )
-                        )
-                    }
-                }
-                _uiState.update { it.copy(isSaving = false) }
-                onSuccess()
-            } catch (e: IOException) {
-                _uiState.update {
-                    it.copy(isSaving = false, errorMessage = e.message ?: "Error saving video")
-                }
-            } catch (e: SecurityException) {
                 _uiState.update {
                     it.copy(
-                        isSaving = false,
-                        errorMessage = e.message ?: "Cannot access selected video",
+                        workoutId = workoutId,
+                        date = date,
+                        startTime = startTime,
                     )
                 }
             } catch (e: SQLiteException) {
                 _uiState.update {
-                    it.copy(isSaving = false, errorMessage = e.message ?: "Error saving workout")
+                    it.copy(
+                        errorMessage = e.message ?: "Error creating workout draft"
+                    )
                 }
             }
         }
     }
 
+    private fun queueAutosave() {
+        if (isFinalizing) return
+        viewModelScope.launch {
+            val workoutId = _uiState.value.workoutId ?: return@launch
+            try {
+                autosaveMutex.withLock {
+                    if (isFinalizing) return@withLock
+                    persistDraftSnapshot(workoutId, _uiState.value)
+                }
+            } catch (e: SQLiteException) {
+                _uiState.update { it.copy(errorMessage = e.message ?: "Error autosaving workout") }
+            }
+        }
+    }
+
+    private suspend fun persistDraftSnapshot(
+        workoutId: Int,
+        state: NewClimbingWorkoutUiState,
+    ) {
+        val existingAttempts =
+            climbingBoulderAttemptRepository.getByClimbingWorkoutId(workoutId).first()
+        existingAttempts.forEach { attempt ->
+            climbingBoulderAttemptRepository.delete(attempt)
+        }
+
+        val orderedBoulderIds = buildList {
+            addAll(state.selectedBoulderIds.filter { boulderId ->
+                state.attemptsByBoulderId[boulderId]?.isNotEmpty() == true
+            })
+            state.attemptsByBoulderId.keys.forEach { boulderId ->
+                if (!contains(boulderId)) add(boulderId)
+            }
+        }
+
+        orderedBoulderIds.forEachIndexed { boulderIndex, boulderId ->
+            state.attemptsByBoulderId[boulderId].orEmpty()
+                .forEachIndexed { attemptIndex, attempt ->
+                    climbingBoulderAttemptRepository.insert(
+                        ClimbingBoulderAttempt(
+                            climbingWorkoutId = workoutId,
+                            climbingBoulderId = boulderId,
+                            videoMediaId = attempt.videoMediaId,
+                            boulderOrder = boulderIndex,
+                            attemptOrder = attemptIndex,
+                            notes = attempt.notes.trim().ifBlank { null },
+                        )
+                    )
+                }
+        }
+
+        climbingWorkoutRepository.update(
+            ClimbingWorkout(
+                id = workoutId,
+                date = state.date,
+                startTime = state.startTime,
+                endTime = null,
+                notes = state.notes.trim().ifBlank { null },
+            )
+        )
+    }
+
     @Throws(IOException::class, SecurityException::class, SQLiteException::class)
-    private suspend fun saveVideoMedia(attempt: ClimbingAttemptUiState): Int {
+    private suspend fun saveVideoMedia(
+        videoUri: Uri,
+        attemptId: Int,
+    ): SavedVideoMedia {
         val resolver = appContext.contentResolver
-        val mimeType = resolver.getType(attempt.videoUri) ?: "video/mp4"
+        val mimeType = resolver.getType(videoUri) ?: "video/mp4"
         val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "mp4"
         val mediaDir = File(appContext.filesDir, "climbing_media")
         if (!mediaDir.exists() && !mediaDir.mkdirs()) {
@@ -247,18 +388,23 @@ class NewClimbingWorkoutViewModel(
 
         val destination = File(
             mediaDir,
-            "attempt_${System.currentTimeMillis()}_${attempt.id}.$extension"
+            "attempt_${System.currentTimeMillis()}_${attemptId}.$extension"
         )
-        resolver.openInputStream(attempt.videoUri)?.use { input ->
+        resolver.openInputStream(videoUri)?.use { input ->
             destination.outputStream().use { output -> input.copyTo(output) }
         } ?: throw IOException("Could not open selected video")
 
-        return climbingMediaRepository.insert(
+        val mediaId = climbingMediaRepository.insert(
             ClimbingMedia(
                 filePath = destination.absolutePath,
                 mimeType = mimeType,
             )
         ).toInt()
+
+        return SavedVideoMedia(
+            id = mediaId,
+            filePath = destination.absolutePath,
+        )
     }
 
     private fun buildBoulderUiState(
@@ -274,6 +420,11 @@ class NewClimbingWorkoutViewModel(
             )
         }
     }
+
+    private data class SavedVideoMedia(
+        val id: Int,
+        val filePath: String,
+    )
 
     private companion object {
         const val TIMEOUT_MILLIS = 5_000L
