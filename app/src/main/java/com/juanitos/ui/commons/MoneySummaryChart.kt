@@ -22,9 +22,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.juanitos.R
-import com.juanitos.ui.routes.MoneySummary
 import java.util.Locale
 import kotlin.math.abs
+
+data class MoneySummary(
+    val totalIncome: Double = 0.0,
+    val totalFixedSpendings: Double = 0.0,
+    val totalTransactions: Double = 0.0,
+    val remaining: Double = 0.0,
+)
 
 @Composable
 fun MoneySummaryChart(summary: MoneySummary) {
@@ -42,7 +48,6 @@ fun MoneySummaryChart(summary: MoneySummary) {
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(16.dp),
     ) {
-        // Title
         Text(
             text = stringResource(R.string.money_summary_title),
             modifier = Modifier
@@ -53,7 +58,6 @@ fun MoneySummaryChart(summary: MoneySummary) {
             textAlign = TextAlign.Center
         )
 
-        // Chart bars with labels and values
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -61,21 +65,16 @@ fun MoneySummaryChart(summary: MoneySummary) {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.Bottom
         ) {
-            // Income column
             BarChart(
                 value = summary.totalIncome,
                 maxValue = maxValue,
                 color = MaterialTheme.colorScheme.primary
             )
-
-            // Expenses column
             BarChart(
                 value = totalExpenses,
                 maxValue = maxValue,
                 color = MaterialTheme.colorScheme.secondary
             )
-
-            // Remaining column
             val remainingColor = if (summary.remaining >= 0) {
                 MaterialTheme.colorScheme.tertiary
             } else {
@@ -123,7 +122,6 @@ private fun BarChart(
     maxValue: Double,
     color: Color
 ) {
-    // Bar
     val heightFraction = (value / maxValue).coerceIn(0.0, 1.0).toFloat()
     Column(
         modifier = Modifier
@@ -164,7 +162,6 @@ private fun LegendItem(
                 fontSize = 10.sp
             )
         }
-//        }
         Text(
             text = value,
             fontSize = 11.sp,
@@ -172,8 +169,3 @@ private fun LegendItem(
         )
     }
 }
-
-
-
-
-

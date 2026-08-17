@@ -1,8 +1,6 @@
 package com.juanitos.ui.navigation
 
 enum class Routes(val route: String) {
-    Home("home"),
-    Food("food"),
     Money("money"),
     MoneyStats("money_stats"),
     MoneySettings("money_settings"),
@@ -10,20 +8,5 @@ enum class Routes(val route: String) {
     FixedSpending("fixed_spending"),
     NewFixedSpending("new_fixed_spending"),
     Categories("categories"),
-    NewCategory("new_category"),
-    Workout("workout"),
-    NewWorkout("new_workout"),
-    EditWorkout("edit_workout/{workoutId}"),
-    Exercises("exercises"),
-    ExerciseProgress("exercise_progress/{exerciseId}"),
-    NewExercise("new_exercise_definition"),
-    WorkoutDetail("workout_detail/{workoutId}"),
-    Habits("habits"),
-    NewHabit("new_habit"),
-    HabitDetail("habit_detail/{habitId}"),
-    Climbing("climbing"),
-    NewClimbingWorkout("new_climbing_workout"),
-    NewBoulder("new_boulder"),
-    EditClimbingWorkout("edit_climbing_workout/{workoutId}"),
-    ClimbingWorkoutDetail("climbing_workout_detail/{workoutId}");
+    NewCategory("new_category");
 }

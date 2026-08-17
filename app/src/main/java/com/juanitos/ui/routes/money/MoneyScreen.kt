@@ -37,7 +37,6 @@ object MoneyDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoneyScreen(
-    onNavigateUp: () -> Unit,
     onMoneySettings: () -> Unit,
     onNewTransaction: () -> Unit,
     onFixedSpendings: () -> Unit,
@@ -52,8 +51,7 @@ fun MoneyScreen(
         topBar = {
             JuanitOSTopAppBar(
                 title = stringResource(MoneyDestination.titleRes),
-                canNavigateBack = true,
-                navigateUp = onNavigateUp,
+                canNavigateBack = false,
                 actions = {
                     IconButton(onClick = onMoneySettings) {
                         Settings()

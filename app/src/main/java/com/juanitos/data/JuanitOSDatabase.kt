@@ -4,31 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.juanitos.data.climbing.daos.ClimbingBoulderAttemptDao
-import com.juanitos.data.climbing.daos.ClimbingBoulderDao
-import com.juanitos.data.climbing.daos.ClimbingMediaDao
-import com.juanitos.data.climbing.daos.ClimbingWorkoutDao
-import com.juanitos.data.climbing.entities.ClimbingBoulder
-import com.juanitos.data.climbing.entities.ClimbingBoulderAttempt
-import com.juanitos.data.climbing.entities.ClimbingMedia
-import com.juanitos.data.climbing.entities.ClimbingWorkout
-import com.juanitos.data.habit.daos.HabitDao
-import com.juanitos.data.habit.daos.HabitEntryDao
-import com.juanitos.data.habit.entities.Habit
-import com.juanitos.data.habit.entities.HabitEntry
 import com.juanitos.data.migrations.MIGRATION_10_11
 import com.juanitos.data.migrations.MIGRATION_11_12
 import com.juanitos.data.migrations.MIGRATION_12_13
 import com.juanitos.data.migrations.MIGRATION_13_14
-import com.juanitos.data.migrations.MIGRATION_19_20
-import com.juanitos.data.migrations.MIGRATION_20_21
-import com.juanitos.data.migrations.MIGRATION_21_22
-import com.juanitos.data.migrations.MIGRATION_22_23
-import com.juanitos.data.migrations.MIGRATION_23_24
-import com.juanitos.data.migrations.MIGRATION_24_25
-import com.juanitos.data.migrations.MIGRATION_25_26
-import com.juanitos.data.migrations.MIGRATION_26_27
-import com.juanitos.data.migrations.MIGRATION_27_28
+import com.juanitos.data.migrations.MIGRATION_28_29
 import com.juanitos.data.migrations.MIGRATION_9_10
 import com.juanitos.data.money.daos.CategoryDao
 import com.juanitos.data.money.daos.CycleDao
@@ -38,23 +18,12 @@ import com.juanitos.data.money.entities.Category
 import com.juanitos.data.money.entities.Cycle
 import com.juanitos.data.money.entities.FixedSpending
 import com.juanitos.data.money.entities.Transaction
-import com.juanitos.data.workout.daos.ExerciseDefinitionDao
-import com.juanitos.data.workout.daos.WorkoutDao
-import com.juanitos.data.workout.daos.WorkoutExerciseDao
-import com.juanitos.data.workout.daos.WorkoutSetDao
-import com.juanitos.data.workout.entities.ExerciseDefinition
-import com.juanitos.data.workout.entities.Workout
-import com.juanitos.data.workout.entities.WorkoutExercise
-import com.juanitos.data.workout.entities.WorkoutSet
 
 @Database(
     entities = [
-        Cycle::class, Transaction::class, FixedSpending::class, Category::class,
-        ExerciseDefinition::class, Workout::class, WorkoutExercise::class, WorkoutSet::class,
-        Habit::class, HabitEntry::class, ClimbingWorkout::class, ClimbingMedia::class,
-        ClimbingBoulder::class, ClimbingBoulderAttempt::class
+        Cycle::class, Transaction::class, FixedSpending::class, Category::class
     ],
-    version = 28,
+    version = 29,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
@@ -62,16 +31,6 @@ abstract class JuanitOSDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun fixedSpendingDao(): FixedSpendingDao
     abstract fun categoryDao(): CategoryDao
-    abstract fun exerciseDefinitionDao(): ExerciseDefinitionDao
-    abstract fun workoutDao(): WorkoutDao
-    abstract fun workoutExerciseDao(): WorkoutExerciseDao
-    abstract fun workoutSetDao(): WorkoutSetDao
-    abstract fun habitDao(): HabitDao
-    abstract fun habitEntryDao(): HabitEntryDao
-    abstract fun climbingWorkoutDao(): ClimbingWorkoutDao
-    abstract fun climbingMediaDao(): ClimbingMediaDao
-    abstract fun climbingBoulderDao(): ClimbingBoulderDao
-    abstract fun climbingBoulderAttemptDao(): ClimbingBoulderAttemptDao
 
     companion object {
         @Volatile
@@ -86,15 +45,7 @@ abstract class JuanitOSDatabase : RoomDatabase() {
                         MIGRATION_11_12,
                         MIGRATION_12_13,
                         MIGRATION_13_14,
-                        MIGRATION_19_20,
-                        MIGRATION_20_21,
-                        MIGRATION_21_22,
-                        MIGRATION_22_23,
-                        MIGRATION_23_24,
-                        MIGRATION_24_25,
-                        MIGRATION_25_26,
-                        MIGRATION_26_27,
-                        MIGRATION_27_28
+                        MIGRATION_28_29
                     )
                     .fallbackToDestructiveMigration(false)
                     .build().also { Instance = it }

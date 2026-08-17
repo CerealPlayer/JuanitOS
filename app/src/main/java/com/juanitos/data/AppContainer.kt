@@ -1,18 +1,6 @@
 package com.juanitos.data
 
 import android.content.Context
-import com.juanitos.data.climbing.offline.OfflineClimbingBoulderAttemptRepository
-import com.juanitos.data.climbing.offline.OfflineClimbingBoulderRepository
-import com.juanitos.data.climbing.offline.OfflineClimbingMediaRepository
-import com.juanitos.data.climbing.offline.OfflineClimbingWorkoutRepository
-import com.juanitos.data.climbing.repositories.ClimbingBoulderAttemptRepository
-import com.juanitos.data.climbing.repositories.ClimbingBoulderRepository
-import com.juanitos.data.climbing.repositories.ClimbingMediaRepository
-import com.juanitos.data.climbing.repositories.ClimbingWorkoutRepository
-import com.juanitos.data.habit.offline.OfflineHabitEntryRepository
-import com.juanitos.data.habit.offline.OfflineHabitRepository
-import com.juanitos.data.habit.repositories.HabitEntryRepository
-import com.juanitos.data.habit.repositories.HabitRepository
 import com.juanitos.data.money.offline.OfflineCategoryRepository
 import com.juanitos.data.money.offline.OfflineCycleRepository
 import com.juanitos.data.money.offline.OfflineFixedSpendingRepository
@@ -21,30 +9,12 @@ import com.juanitos.data.money.repositories.CategoryRepository
 import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
 import com.juanitos.data.money.repositories.TransactionRepository
-import com.juanitos.data.workout.offline.OfflineExerciseDefinitionRepository
-import com.juanitos.data.workout.offline.OfflineWorkoutExerciseRepository
-import com.juanitos.data.workout.offline.OfflineWorkoutRepository
-import com.juanitos.data.workout.offline.OfflineWorkoutSetRepository
-import com.juanitos.data.workout.repositories.ExerciseDefinitionRepository
-import com.juanitos.data.workout.repositories.WorkoutExerciseRepository
-import com.juanitos.data.workout.repositories.WorkoutRepository
-import com.juanitos.data.workout.repositories.WorkoutSetRepository
 
 interface AppContainer {
     val cycleRepository: CycleRepository
     val transactionRepository: TransactionRepository
     val fixedSpendingRepository: FixedSpendingRepository
     val categoryRepository: CategoryRepository
-    val exerciseDefinitionRepository: ExerciseDefinitionRepository
-    val workoutRepository: WorkoutRepository
-    val workoutExerciseRepository: WorkoutExerciseRepository
-    val workoutSetRepository: WorkoutSetRepository
-    val habitRepository: HabitRepository
-    val habitEntryRepository: HabitEntryRepository
-    val climbingWorkoutRepository: ClimbingWorkoutRepository
-    val climbingBoulderRepository: ClimbingBoulderRepository
-    val climbingMediaRepository: ClimbingMediaRepository
-    val climbingBoulderAttemptRepository: ClimbingBoulderAttemptRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -64,57 +34,6 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val categoryRepository: CategoryRepository by lazy {
         OfflineCategoryRepository(
             categoryDao = JuanitOSDatabase.getDatabase(context).categoryDao()
-        )
-    }
-    override val exerciseDefinitionRepository: ExerciseDefinitionRepository by lazy {
-        OfflineExerciseDefinitionRepository(
-            exerciseDefinitionDao = JuanitOSDatabase.getDatabase(context).exerciseDefinitionDao()
-        )
-    }
-    override val workoutRepository: WorkoutRepository by lazy {
-        OfflineWorkoutRepository(
-            workoutDao = JuanitOSDatabase.getDatabase(context).workoutDao()
-        )
-    }
-    override val workoutExerciseRepository: WorkoutExerciseRepository by lazy {
-        OfflineWorkoutExerciseRepository(
-            workoutExerciseDao = JuanitOSDatabase.getDatabase(context).workoutExerciseDao()
-        )
-    }
-    override val workoutSetRepository: WorkoutSetRepository by lazy {
-        OfflineWorkoutSetRepository(
-            workoutSetDao = JuanitOSDatabase.getDatabase(context).workoutSetDao()
-        )
-    }
-    override val habitRepository: HabitRepository by lazy {
-        OfflineHabitRepository(
-            habitDao = JuanitOSDatabase.getDatabase(context).habitDao()
-        )
-    }
-    override val habitEntryRepository: HabitEntryRepository by lazy {
-        OfflineHabitEntryRepository(
-            habitEntryDao = JuanitOSDatabase.getDatabase(context).habitEntryDao()
-        )
-    }
-    override val climbingWorkoutRepository: ClimbingWorkoutRepository by lazy {
-        OfflineClimbingWorkoutRepository(
-            climbingWorkoutDao = JuanitOSDatabase.getDatabase(context).climbingWorkoutDao()
-        )
-    }
-    override val climbingBoulderRepository: ClimbingBoulderRepository by lazy {
-        OfflineClimbingBoulderRepository(
-            climbingBoulderDao = JuanitOSDatabase.getDatabase(context).climbingBoulderDao()
-        )
-    }
-    override val climbingMediaRepository: ClimbingMediaRepository by lazy {
-        OfflineClimbingMediaRepository(
-            climbingMediaDao = JuanitOSDatabase.getDatabase(context).climbingMediaDao()
-        )
-    }
-    override val climbingBoulderAttemptRepository: ClimbingBoulderAttemptRepository by lazy {
-        OfflineClimbingBoulderAttemptRepository(
-            climbingBoulderAttemptDao = JuanitOSDatabase.getDatabase(context)
-                .climbingBoulderAttemptDao()
         )
     }
 }
