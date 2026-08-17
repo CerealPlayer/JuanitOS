@@ -37,6 +37,60 @@ class CycleSchedulingTest {
     }
 
     @Test
+    fun adjustForBankingWeekend_movesSaturdayToNextMonday() {
+        assertEquals(
+            LocalDate.of(2026, 8, 17),
+            adjustForBankingWeekend(LocalDate.of(2026, 8, 15))
+        )
+    }
+
+    @Test
+    fun adjustForBankingWeekend_movesSundayToNextMonday() {
+        assertEquals(
+            LocalDate.of(2026, 8, 17),
+            adjustForBankingWeekend(LocalDate.of(2026, 8, 16))
+        )
+    }
+
+    @Test
+    fun adjustForBankingWeekend_leavesWeekdaysUnchanged() {
+        assertEquals(
+            LocalDate.of(2026, 8, 17),
+            adjustForBankingWeekend(LocalDate.of(2026, 8, 17))
+        )
+    }
+
+    @Test
+    fun scheduledPeriodStart_adjustsForWeekendWhenEnabled() {
+        // 2026-08-15 is a Saturday -> adjusted forward to Monday 2026-08-17.
+        assertEquals(
+            LocalDate.of(2026, 8, 17),
+            scheduledPeriodStart(
+                today = LocalDate.of(2026, 8, 20),
+                dayOfMonth = 15,
+                adjustForWeekends = true
+            )
+        )
+    }
+
+    @Test
+    fun computeReconciliationAction_bootstrapsWithWeekendAdjustedDate() {
+        // 2026-08-15 is a Saturday -> adjusted bootstrap date should be Monday 2026-08-17.
+        val action = computeReconciliationAction(
+            scheduleDayOfMonth = 15,
+            scheduleAmount = 2500.0,
+            openCycle = null,
+            today = LocalDate.of(2026, 8, 20),
+            adjustForWeekends = true
+        )
+        assertTrue(action is CycleReconciliationAction.Bootstrap)
+        assertEquals(
+            LocalDate.of(2026, 8, 17),
+            (action as CycleReconciliationAction.Bootstrap).startDate
+        )
+    }
+
+    @Test
     fun computeReconciliationAction_noActionWhenScheduleUnset() {
         val action = computeReconciliationAction(
             scheduleDayOfMonth = null,

@@ -35,3 +35,11 @@ val MIGRATION_31_32 = object : Migration(31, 32) {
         }
     }
 }
+
+val MIGRATION_32_33 = object : Migration(32, 33) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "alter table income_schedules add column adjust_for_weekends integer not null default 0"
+        )
+    }
+}

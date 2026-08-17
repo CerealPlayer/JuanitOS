@@ -26,6 +26,13 @@
     <string name="income_schedule">Income schedule</string>
     <string name="income_schedule_day_label">Day of month</string>
     <string name="save_schedule">Save schedule</string>
+    <string name="cycle_setup_mode_manual">Manual</string>
+    <string name="cycle_setup_mode_scheduled">Scheduled</string>
+    <string name="income_schedule_adjust_for_weekends">Move to next business day if it falls on a weekend</string>
+    <string name="income_schedule_active_message">A new cycle will start every month on day %1$d with an income of %2$s.</string>
+    <string name="income_schedule_weekend_note">If that day falls on a weekend, the cycle will start on the following business day instead.</string>
+    <string name="close_cycle_start_new_now">Close current cycle and start the next one today</string>
+    <string name="cycle_summary">Started %1$s · Income %2$s</string>
     <string name="cycle_start_date_label">Start date (dd/MM/yyyy)</string>
     <string name="amount">Amount</string>
     <string name="category">Category</string>

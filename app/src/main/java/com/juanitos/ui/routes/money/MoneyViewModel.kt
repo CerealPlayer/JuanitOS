@@ -9,19 +9,15 @@ import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
 import com.juanitos.data.money.repositories.IncomeScheduleRepository
 import com.juanitos.data.money.repositories.TransactionRepository
-import com.juanitos.lib.CycleReconciliationAction
-import com.juanitos.lib.OpenCycleInfo
 import com.juanitos.lib.clampDayOfMonth
-import com.juanitos.lib.computeReconciliationAction
-import com.juanitos.lib.formatLocalDateToDbDatetime
 import com.juanitos.lib.parseDbDatetimeToLocalDate
+import com.juanitos.lib.reconcileCycleWithSchedule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -58,7 +54,7 @@ class MoneyViewModel(
 
     init {
         viewModelScope.launch {
-            reconcileCycleWithSchedule()
+            reconcileCycleWithSchedule(cycleRepository, incomeScheduleRepository)
         }
     }
 
@@ -110,36 +106,6 @@ class MoneyViewModel(
     private fun movementTypePriority(movement: Movement): Int = when (movement) {
         is Movement.FixedSpendingMovement -> 0
         is Movement.TransactionMovement -> 1
-    }
-
-    private suspend fun reconcileCycleWithSchedule() {
-        val schedule = incomeScheduleRepository.get().first()
-        val openCycle = cycleRepository.getCurrentCycle().first()?.cycle
-        val openCycleInfo = openCycle?.let {
-            OpenCycleInfo(id = it.id, startDate = parseDbDatetimeToLocalDate(it.startDate))
-        }
-        when (
-            val action = computeReconciliationAction(
-                scheduleDayOfMonth = schedule?.dayOfMonth,
-                scheduleAmount = schedule?.amount,
-                openCycle = openCycleInfo,
-            )
-        ) {
-            is CycleReconciliationAction.NoAction -> {}
-            is CycleReconciliationAction.Bootstrap -> {
-                cycleRepository.insert(action.amount, formatLocalDateToDbDatetime(action.startDate))
-            }
-
-            is CycleReconciliationAction.Rollover -> {
-                openCycle?.let { cycle ->
-                    cycleRepository.update(cycle.copy(endDate = formatLocalDateToDbDatetime(action.endDate)))
-                }
-                cycleRepository.insert(
-                    action.amount,
-                    formatLocalDateToDbDatetime(action.newStartDate)
-                )
-            }
-        }
     }
 
     fun deleteTransaction(transaction: Transaction) {

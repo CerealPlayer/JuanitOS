@@ -11,4 +11,6 @@ data class IncomeSchedule(
     @ColumnInfo(name = "day_of_month")
     val dayOfMonth: Int,
     val amount: Double,
+    @ColumnInfo(name = "adjust_for_weekends", defaultValue = "0")
+    val adjustForWeekends: Boolean = false,
 )

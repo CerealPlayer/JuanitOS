@@ -10,14 +10,20 @@ import com.juanitos.lib.formatDbDatetimeToShortDate
 import com.juanitos.lib.formatLocalDateToDbDatetime
 import com.juanitos.lib.parseQtDouble
 import com.juanitos.lib.parseShortDateToLocalDate
+import com.juanitos.lib.reconcileCycleWithSchedule
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+enum class CycleSetupMode { MANUAL, SCHEDULED }
+
 data class MoneySettingsUiState(
     val currentCycle: Cycle? = null,
     val schedule: IncomeSchedule? = null,
+
+    val cycleSetupMode: CycleSetupMode = CycleSetupMode.MANUAL,
+    val isCycleSetupModeTouched: Boolean = false,
 
     val incomeInput: String = "",
     val isIncomeValid: Boolean = true,
@@ -27,6 +33,7 @@ data class MoneySettingsUiState(
     val isScheduleDayValid: Boolean = true,
     val scheduleAmountInput: String = "",
     val isScheduleAmountValid: Boolean = true,
+    val scheduleAdjustForWeekends: Boolean = false,
     val isScheduleEdited: Boolean = false,
 
     val editIncomeInput: String = "",
@@ -48,6 +55,9 @@ class MoneySettingsViewModel(
     init {
         loadCurrentCycle()
         loadSchedule()
+        viewModelScope.launch {
+            reconcileCycleWithSchedule(cycleRepository, incomeScheduleRepository)
+        }
     }
 
     private fun loadCurrentCycle() {
@@ -72,11 +82,29 @@ class MoneySettingsViewModel(
                 val current = _uiState.value
                 _uiState.value = current.copy(
                     schedule = schedule,
+                    cycleSetupMode = if (current.isCycleSetupModeTouched) current.cycleSetupMode
+                    else if (schedule != null) CycleSetupMode.SCHEDULED else current.cycleSetupMode,
                     scheduleDayInput = if (current.isScheduleEdited) current.scheduleDayInput
                     else schedule?.dayOfMonth?.toString() ?: "",
                     scheduleAmountInput = if (current.isScheduleEdited) current.scheduleAmountInput
-                    else schedule?.amount?.toString() ?: ""
+                    else schedule?.amount?.toString() ?: "",
+                    scheduleAdjustForWeekends = if (current.isScheduleEdited) current.scheduleAdjustForWeekends
+                    else schedule?.adjustForWeekends ?: false
                 )
+            }
+        }
+    }
+
+    fun setCycleSetupMode(mode: CycleSetupMode) {
+        val current = _uiState.value
+        _uiState.value = current.copy(
+            cycleSetupMode = mode,
+            isCycleSetupModeTouched = true,
+            errorMessage = null
+        )
+        if (mode == CycleSetupMode.MANUAL && current.schedule != null) {
+            viewModelScope.launch {
+                incomeScheduleRepository.clear()
             }
         }
     }
@@ -131,6 +159,25 @@ class MoneySettingsViewModel(
         }
     }
 
+    /**
+     * Manual override for when the real-world payment date doesn't match the schedule (e.g. the
+     * bank paid earlier/later than [scheduledPeriodStart] predicts): ends the current cycle and
+     * opens the next one today, instead of on whatever date the schedule would compute.
+     */
+    fun closeCycleAndStartNewNow() {
+        val cycle = _uiState.value.currentCycle ?: return
+        val schedule = _uiState.value.schedule ?: return
+        viewModelScope.launch {
+            try {
+                cycleRepository.endCycle(cycle.id)
+                cycleRepository.insert(schedule.amount)
+            } catch (e: Exception) {
+                _uiState.value =
+                    _uiState.value.copy(errorMessage = "Error al iniciar el nuevo ciclo")
+            }
+        }
+    }
+
     fun setScheduleDayInput(input: String) {
         val day = input.toIntOrNull()
         _uiState.value = _uiState.value.copy(
@@ -145,6 +192,14 @@ class MoneySettingsViewModel(
         _uiState.value = _uiState.value.copy(
             scheduleAmountInput = input,
             isScheduleAmountValid = parseQtDouble(input) != null,
+            isScheduleEdited = true,
+            errorMessage = null
+        )
+    }
+
+    fun setScheduleAdjustForWeekends(checked: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            scheduleAdjustForWeekends = checked,
             isScheduleEdited = true,
             errorMessage = null
         )
@@ -165,7 +220,8 @@ class MoneySettingsViewModel(
         }
         viewModelScope.launch {
             try {
-                incomeScheduleRepository.upsert(day, amount)
+                incomeScheduleRepository.upsert(day, amount, state.scheduleAdjustForWeekends)
+                reconcileCycleWithSchedule(cycleRepository, incomeScheduleRepository)
                 _uiState.value = _uiState.value.copy(isScheduleEdited = false, errorMessage = null)
             } catch (e: Exception) {
                 _uiState.value =

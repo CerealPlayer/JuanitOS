@@ -12,6 +12,7 @@ import com.juanitos.data.migrations.MIGRATION_28_29
 import com.juanitos.data.migrations.MIGRATION_29_30
 import com.juanitos.data.migrations.MIGRATION_30_31
 import com.juanitos.data.migrations.MIGRATION_31_32
+import com.juanitos.data.migrations.MIGRATION_32_33
 import com.juanitos.data.migrations.MIGRATION_9_10
 import com.juanitos.data.money.SeedDefaultCategoriesCallback
 import com.juanitos.data.money.daos.CategoryDao
@@ -29,7 +30,7 @@ import com.juanitos.data.money.entities.Transaction
     entities = [
         Cycle::class, Transaction::class, FixedSpending::class, Category::class, IncomeSchedule::class
     ],
-    version = 32,
+    version = 33,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
@@ -55,7 +56,8 @@ abstract class JuanitOSDatabase : RoomDatabase() {
                         MIGRATION_28_29,
                         MIGRATION_29_30,
                         MIGRATION_30_31,
-                        MIGRATION_31_32
+                        MIGRATION_31_32,
+                        MIGRATION_32_33
                     )
                     .addCallback(SeedDefaultCategoriesCallback)
                     .fallbackToDestructiveMigration(false)
