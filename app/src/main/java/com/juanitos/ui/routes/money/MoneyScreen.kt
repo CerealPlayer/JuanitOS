@@ -101,26 +101,29 @@ fun MoneyScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
         ) {
-            val fixedSpendings = uiState.value.fixedSpendings
-            val transactions = uiState.value.cycle?.transactions ?: emptyList()
+            val movements = uiState.value.movements
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = dimensionResource(R.dimen.padding_medium)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
-                // Mostrar gastos fijos primero
-                items(fixedSpendings, key = { "fs-${it.fixedSpending.id}" }) { fixedSpending ->
-                    FixedSpendingCard(
-                        fixedSpendingWithCategory = fixedSpending
-                    )
-                }
-                // Luego mostrar transacciones
-                items(transactions, key = { "t-${it.transaction.id}" }) { transaction ->
-                    TransactionCard(
-                        transactionWithCategory = transaction,
-                        onDelete = { viewModel.deleteTransaction(it.transaction) }
-                    )
+                items(movements, key = { movement ->
+                    when (movement) {
+                        is Movement.FixedSpendingMovement -> "fs-${movement.fixedSpending.fixedSpending.id}"
+                        is Movement.TransactionMovement -> "t-${movement.transaction.transaction.id}"
+                    }
+                }) { movement ->
+                    when (movement) {
+                        is Movement.FixedSpendingMovement -> FixedSpendingCard(
+                            fixedSpendingWithCategory = movement.fixedSpending
+                        )
+
+                        is Movement.TransactionMovement -> TransactionCard(
+                            transactionWithCategory = movement.transaction,
+                            onDelete = { viewModel.deleteTransaction(it.transaction) }
+                        )
+                    }
                 }
             }
         }

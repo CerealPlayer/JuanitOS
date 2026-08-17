@@ -28,9 +28,12 @@ fun CategoriesSearch(
     onItemSelect: (Category) -> Unit,
     onAddCategory: () -> Unit,
     categoryFocusRequester: FocusRequester? = null,
-    nextFieldFocusRequester: FocusRequester? = null
+    nextFieldFocusRequester: FocusRequester? = null,
+    initialQuery: String = ""
 ) {
-    var query by remember { mutableStateOf("") }
+    // Keyed on initialQuery so a value that arrives after first composition (e.g. an edit
+    // screen's category loading asynchronously) still prefills the field once.
+    var query by remember(initialQuery) { mutableStateOf(initialQuery) }
     var expanded by remember { mutableStateOf(false) }
 
     val filteredCategories by remember(categories, query) {

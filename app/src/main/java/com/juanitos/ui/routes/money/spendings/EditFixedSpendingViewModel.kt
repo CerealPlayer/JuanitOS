@@ -1,5 +1,6 @@
 package com.juanitos.ui.routes.money.spendings
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.money.entities.Category
@@ -12,39 +13,58 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-// Estado de la UI para el formulario de gasto fijo
-data class NewFixedSpendingUiState(
+data class EditFixedSpendingUiState(
     val amountInput: String = "",
     val isAmountValid: Boolean = true,
     val categoryId: Int = 0,
     val descriptionInput: String = "",
     val dayOfMonthInput: String = "",
     val isDayOfMonthValid: Boolean = true,
+    val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
     val success: Boolean = false,
     val categories: List<Category> = emptyList(),
+    val original: FixedSpending? = null,
 )
 
-class NewFixedSpendingViewModel(
+class EditFixedSpendingViewModel(
+    savedStateHandle: SavedStateHandle,
     private val fixedSpendingRepository: FixedSpendingRepository,
-    private val categoriesRepository: CategoryRepository
+    private val categoryRepository: CategoryRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(NewFixedSpendingUiState())
-    val uiState: StateFlow<NewFixedSpendingUiState> =
+    private val fixedSpendingId: Int = checkNotNull(savedStateHandle["fixedSpendingId"])
+
+    private val _uiState = MutableStateFlow(EditFixedSpendingUiState())
+    val uiState: StateFlow<EditFixedSpendingUiState> =
         _uiState.combine(createCategoriesFlow()) { state, categories ->
             state.copy(categories = categories)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = NewFixedSpendingUiState()
+            initialValue = EditFixedSpendingUiState()
         )
 
-    fun createCategoriesFlow(): Flow<List<Category>> {
-        return categoriesRepository.getAll()
+    init {
+        viewModelScope.launch {
+            val existing = fixedSpendingRepository.getById(fixedSpendingId).first().fixedSpending
+            _uiState.value = _uiState.value.copy(
+                amountInput = existing.amount.toString(),
+                categoryId = existing.categoryId,
+                descriptionInput = existing.description ?: "",
+                dayOfMonthInput = existing.dayOfMonth?.toString() ?: "",
+                isLoading = false,
+                original = existing,
+            )
+        }
+    }
+
+    private fun createCategoriesFlow(): Flow<List<Category>> {
+        return categoryRepository.getAll()
     }
 
     fun setAmountInput(input: String) {
@@ -72,8 +92,9 @@ class NewFixedSpendingViewModel(
         )
     }
 
-    fun saveFixedSpending(onSuccess: () -> Unit) {
+    fun saveChanges(onSuccess: () -> Unit) {
         val state = _uiState.value
+        val original = state.original ?: return
         val amount = parseQtDouble(state.amountInput)
         val category = state.categoryId
         val dayOfMonth = state.dayOfMonthInput.toIntOrNull()
@@ -93,8 +114,8 @@ class NewFixedSpendingViewModel(
         _uiState.value = state.copy(isSaving = true, errorMessage = null)
         viewModelScope.launch {
             try {
-                fixedSpendingRepository.insert(
-                    FixedSpending(
+                fixedSpendingRepository.update(
+                    original.copy(
                         amount = amount,
                         categoryId = category,
                         description = state.descriptionInput,

@@ -9,21 +9,27 @@ import com.juanitos.data.migrations.MIGRATION_11_12
 import com.juanitos.data.migrations.MIGRATION_12_13
 import com.juanitos.data.migrations.MIGRATION_13_14
 import com.juanitos.data.migrations.MIGRATION_28_29
+import com.juanitos.data.migrations.MIGRATION_29_30
+import com.juanitos.data.migrations.MIGRATION_30_31
+import com.juanitos.data.migrations.MIGRATION_31_32
 import com.juanitos.data.migrations.MIGRATION_9_10
+import com.juanitos.data.money.SeedDefaultCategoriesCallback
 import com.juanitos.data.money.daos.CategoryDao
 import com.juanitos.data.money.daos.CycleDao
 import com.juanitos.data.money.daos.FixedSpendingDao
+import com.juanitos.data.money.daos.IncomeScheduleDao
 import com.juanitos.data.money.daos.TransactionDao
 import com.juanitos.data.money.entities.Category
 import com.juanitos.data.money.entities.Cycle
 import com.juanitos.data.money.entities.FixedSpending
+import com.juanitos.data.money.entities.IncomeSchedule
 import com.juanitos.data.money.entities.Transaction
 
 @Database(
     entities = [
-        Cycle::class, Transaction::class, FixedSpending::class, Category::class
+        Cycle::class, Transaction::class, FixedSpending::class, Category::class, IncomeSchedule::class
     ],
-    version = 29,
+    version = 32,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
@@ -31,6 +37,7 @@ abstract class JuanitOSDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun fixedSpendingDao(): FixedSpendingDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun incomeScheduleDao(): IncomeScheduleDao
 
     companion object {
         @Volatile
@@ -45,8 +52,12 @@ abstract class JuanitOSDatabase : RoomDatabase() {
                         MIGRATION_11_12,
                         MIGRATION_12_13,
                         MIGRATION_13_14,
-                        MIGRATION_28_29
+                        MIGRATION_28_29,
+                        MIGRATION_29_30,
+                        MIGRATION_30_31,
+                        MIGRATION_31_32
                     )
+                    .addCallback(SeedDefaultCategoriesCallback)
                     .fallbackToDestructiveMigration(false)
                     .build().also { Instance = it }
             }

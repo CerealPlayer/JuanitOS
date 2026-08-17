@@ -10,7 +10,8 @@ class OfflineFixedSpendingRepository(private val fixedSpendingDao: FixedSpending
         fixedSpendingDao.insert(
             fixedSpending.amount,
             fixedSpending.categoryId,
-            fixedSpending.description
+            fixedSpending.description,
+            dayOfMonth = fixedSpending.dayOfMonth
         )
 
     override suspend fun update(fixedSpending: FixedSpending) =

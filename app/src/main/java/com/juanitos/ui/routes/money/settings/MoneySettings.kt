@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -16,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -60,15 +62,70 @@ fun MoneySettingsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
         ) {
+            Text(text = stringResource(R.string.income_schedule))
+            OutlinedTextField(
+                value = uiState.scheduleDayInput,
+                onValueChange = { viewModel.setScheduleDayInput(it) },
+                singleLine = true,
+                isError = !uiState.isScheduleDayValid,
+                label = { Text(stringResource(R.string.income_schedule_day_label)) },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            OutlinedTextField(
+                value = uiState.scheduleAmountInput,
+                onValueChange = { viewModel.setScheduleAmountInput(it) },
+                singleLine = true,
+                isError = !uiState.isScheduleAmountValid,
+                label = { Text(stringResource(R.string.income_input_label)) },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            Button(
+                onClick = { viewModel.saveSchedule() },
+                enabled = uiState.scheduleDayInput.isNotBlank() && uiState.scheduleAmountInput.isNotBlank(),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(R.string.save_schedule))
+            }
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_small))
+            )
+
             Text(text = stringResource(R.string.current_cycle))
             if (uiState.currentCycle != null) {
-                Text(text = "Inicio: ${uiState.currentCycle?.startDate ?: "-"}")
-                Text(text = "Ingreso: ${uiState.currentCycle?.totalIncome ?: 0.0}")
+                OutlinedTextField(
+                    value = uiState.editIncomeInput,
+                    onValueChange = { viewModel.setEditIncomeInput(it) },
+                    singleLine = true,
+                    isError = !uiState.isEditIncomeValid,
+                    label = { Text(stringResource(R.string.income_input_label)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                OutlinedTextField(
+                    value = uiState.editStartDateInput,
+                    onValueChange = { viewModel.setEditStartDateInput(it) },
+                    singleLine = true,
+                    isError = !uiState.isEditStartDateValid,
+                    label = { Text(stringResource(R.string.cycle_start_date_label)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Text(text = "Fin: ${uiState.currentCycle?.endDate ?: "(abierto)"}")
-                Button(onClick = { viewModel.endCurrentCycle() }) {
+                Button(
+                    onClick = { viewModel.saveCycleEdits() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = stringResource(R.string.save_changes))
+                }
+                Button(
+                    onClick = { viewModel.endCurrentCycle() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(text = stringResource(R.string.end_cycle))
                 }
-            } else {
+            } else if (uiState.schedule == null) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
@@ -94,7 +151,7 @@ fun MoneySettingsScreen(
             if (!uiState.errorMessage.isNullOrEmpty()) {
                 Text(
                     text = uiState.errorMessage ?: "",
-                    color = androidx.compose.ui.graphics.Color.Red
+                    color = Color.Red
                 )
             }
         }

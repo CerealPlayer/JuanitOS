@@ -32,6 +32,7 @@ object FixedSpendingsDestination : NavigationDestination {
 fun FixedSpendingsScreen(
     onNavigateUp: () -> Unit,
     onNewFixedSpending: () -> Unit,
+    onEditFixedSpending: (Int) -> Unit,
     viewModel: FixedSpendingsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val fixedSpendings = viewModel.uiState.collectAsState().value.fixedSpendings
@@ -73,7 +74,8 @@ fun FixedSpendingsScreen(
                             enabled
                         )
                     },
-                    onDelete = { viewModel.deleteFixedSpending(it.fixedSpending) }
+                    onDelete = { viewModel.deleteFixedSpending(it.fixedSpending) },
+                    onClick = { onEditFixedSpending(spending.fixedSpending.id) }
                 )
             }
         }

@@ -9,7 +9,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -28,17 +27,19 @@ import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
 
-object NewFixedSpendingDestination : NavigationDestination {
-    override val route = Routes.NewFixedSpending
-    override val titleRes = R.string.new_fixed_spending
+object EditFixedSpendingDestination : NavigationDestination {
+    override val route = Routes.EditFixedSpending
+    override val titleRes = R.string.edit_fixed_spending
+
+    fun routeWithId(id: Int) = "edit_fixed_spending/$id"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewFixedSpendingScreen(
+fun EditFixedSpendingScreen(
     onNavigateUp: () -> Unit,
     onNewCategory: () -> Unit,
-    viewModel: NewFixedSpendingViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: EditFixedSpendingViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val amountFocusRequester = remember { FocusRequester() }
@@ -46,13 +47,9 @@ fun NewFixedSpendingScreen(
     val dayOfMonthFocusRequester = remember { FocusRequester() }
     val descriptionFocusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(Unit) {
-        amountFocusRequester.requestFocus()
-    }
-
     Scaffold(topBar = {
         JuanitOSTopAppBar(
-            title = stringResource(NewFixedSpendingDestination.titleRes),
+            title = stringResource(EditFixedSpendingDestination.titleRes),
             canNavigateBack = true,
             navigateUp = onNavigateUp
         )
@@ -80,7 +77,8 @@ fun NewFixedSpendingScreen(
                 onItemSelect = { viewModel.setCategoryInput(it.id) },
                 onAddCategory = onNewCategory,
                 categoryFocusRequester = categoryFocusRequester,
-                nextFieldFocusRequester = dayOfMonthFocusRequester
+                nextFieldFocusRequester = dayOfMonthFocusRequester,
+                initialQuery = uiState.categories.find { it.id == uiState.categoryId }?.name ?: ""
             )
             OutlinedTextField(
                 value = uiState.dayOfMonthInput,
@@ -111,7 +109,7 @@ fun NewFixedSpendingScreen(
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { viewModel.saveFixedSpending(onSuccess = onNavigateUp) }
+                    onDone = { viewModel.saveChanges(onSuccess = onNavigateUp) }
                 )
             )
             if (uiState.errorMessage != null) {
@@ -119,12 +117,12 @@ fun NewFixedSpendingScreen(
             }
             Button(
                 onClick = {
-                    viewModel.saveFixedSpending(onSuccess = onNavigateUp)
+                    viewModel.saveChanges(onSuccess = onNavigateUp)
                 },
-                enabled = !uiState.isSaving,
+                enabled = !uiState.isSaving && !uiState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = stringResource(R.string.save))
+                Text(text = stringResource(R.string.save_changes))
             }
         }
     }

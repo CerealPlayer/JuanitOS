@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CycleRepository {
     suspend fun insert(income: Double): Long
+    suspend fun insert(income: Double, startDate: String): Long
     suspend fun update(cycle: Cycle)
     suspend fun delete(cycle: Cycle)
     fun getCurrentCycle(): Flow<CurrentCycleWithDetails?>

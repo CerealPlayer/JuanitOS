@@ -1,6 +1,7 @@
 package com.juanitos.lib
 
 import java.time.LocalDate
+import java.time.YearMonth
 
 /**
  * Convierte un datetime (como el que produce Room: "yyyy-MM-dd HH:mm:ss") a una fecha
@@ -48,6 +49,36 @@ fun parseDbDatetimeToLocalDate(datetime: String?): LocalDate? {
     val (year, month, day) = match.destructured
     return try {
         LocalDate.of(year.toInt(), month.toInt(), day.toInt())
+    } catch (e: Exception) {
+        null
+    }
+}
+
+/**
+ * Clamps a day-of-month into a given YearMonth, so e.g. day 31 in February resolves to
+ * Feb 28/29 instead of throwing.
+ */
+fun clampDayOfMonth(yearMonth: YearMonth, dayOfMonth: Int): LocalDate =
+    yearMonth.atDay(minOf(dayOfMonth, yearMonth.lengthOfMonth()))
+
+/**
+ * Formats a LocalDate into Room's expected "yyyy-MM-dd HH:mm:ss" datetime string.
+ */
+fun formatLocalDateToDbDatetime(date: LocalDate, time: String = "00:00:00"): String = "$date $time"
+
+/**
+ * Parses a "dd/MM/yyyy" (or "dd/MM/yy", matching [formatDbDatetimeToShortDate]'s output, so a
+ * prefilled-but-untouched field round-trips) text input into a LocalDate. Returns null if blank,
+ * malformed, or an invalid calendar date.
+ */
+fun parseShortDateToLocalDate(input: String): LocalDate? {
+    if (input.isBlank()) return null
+
+    val match = Regex("^(\\d{1,2})/(\\d{1,2})/(\\d{2}|\\d{4})$").find(input.trim()) ?: return null
+    val (day, month, yearText) = match.destructured
+    val year = if (yearText.length == 2) 2000 + yearText.toInt() else yearText.toInt()
+    return try {
+        LocalDate.of(year, month.toInt(), day.toInt())
     } catch (e: Exception) {
         null
     }

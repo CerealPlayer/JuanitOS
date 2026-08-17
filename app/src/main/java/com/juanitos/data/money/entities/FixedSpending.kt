@@ -24,6 +24,8 @@ data class FixedSpending(
     val categoryId: Int,
     val description: String? = null,
     val active: Boolean = true,
+    @ColumnInfo(name = "day_of_month")
+    val dayOfMonth: Int? = null,
     @ColumnInfo(name = "created_at", defaultValue = "(datetime('now', 'localtime'))")
     val createdAt: String? = null,
     @ColumnInfo(name = "deleted_at")

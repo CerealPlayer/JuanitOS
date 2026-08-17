@@ -13,6 +13,9 @@ interface CycleDao {
     @Query("insert into cycles (total_income) values (:income)")
     suspend fun insert(income: Double): Long
 
+    @Query("insert into cycles (total_income, start_date) values (:income, :startDate)")
+    suspend fun insert(income: Double, startDate: String): Long
+
     @Update
     suspend fun update(cycle: Cycle)
 

@@ -10,12 +10,13 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FixedSpendingDao {
-    @Query("INSERT INTO fixed_spendings (amount, category_id, description, active) VALUES (:amount, :category, :description, :active)")
+    @Query("INSERT INTO fixed_spendings (amount, category_id, description, active, day_of_month) VALUES (:amount, :category, :description, :active, :dayOfMonth)")
     suspend fun insert(
         amount: Double,
         category: Int,
         description: String?,
-        active: Boolean = true
+        active: Boolean = true,
+        dayOfMonth: Int? = null
     ): Long
 
     @Update

@@ -1,6 +1,7 @@
 package com.juanitos.ui
 
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -8,6 +9,7 @@ import com.juanitos.JuanitOSApplication
 import com.juanitos.ui.routes.money.MoneyViewModel
 import com.juanitos.ui.routes.money.categories.CategoriesViewModel
 import com.juanitos.ui.routes.money.categories.NewCategoryViewModel
+import com.juanitos.ui.routes.money.spendings.EditFixedSpendingViewModel
 import com.juanitos.ui.routes.money.spendings.FixedSpendingsViewModel
 import com.juanitos.ui.routes.money.spendings.NewFixedSpendingViewModel
 import com.juanitos.ui.routes.money.stats.MoneyStatsViewModel
@@ -19,7 +21,8 @@ object AppViewModelProvider {
             MoneyViewModel(
                 juanitOSApplication().container.cycleRepository,
                 juanitOSApplication().container.fixedSpendingRepository,
-                juanitOSApplication().container.transactionRepository
+                juanitOSApplication().container.transactionRepository,
+                juanitOSApplication().container.incomeScheduleRepository
             )
         }
         initializer {
@@ -30,7 +33,8 @@ object AppViewModelProvider {
         }
         initializer {
             com.juanitos.ui.routes.money.settings.MoneySettingsViewModel(
-                juanitOSApplication().container.cycleRepository
+                juanitOSApplication().container.cycleRepository,
+                juanitOSApplication().container.incomeScheduleRepository
             )
         }
         initializer {
@@ -49,6 +53,13 @@ object AppViewModelProvider {
             NewFixedSpendingViewModel(
                 juanitOSApplication().container.fixedSpendingRepository,
                 juanitOSApplication().container.categoryRepository
+            )
+        }
+        initializer {
+            EditFixedSpendingViewModel(
+                savedStateHandle = createSavedStateHandle(),
+                fixedSpendingRepository = juanitOSApplication().container.fixedSpendingRepository,
+                categoryRepository = juanitOSApplication().container.categoryRepository
             )
         }
         initializer {

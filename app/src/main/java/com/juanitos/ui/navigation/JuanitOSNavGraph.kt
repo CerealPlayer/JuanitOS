@@ -3,8 +3,10 @@ package com.juanitos.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.juanitos.ui.routes.money.MoneyDestination
 import com.juanitos.ui.routes.money.MoneyScreen
 import com.juanitos.ui.routes.money.categories.CategoriesDestination
@@ -13,6 +15,8 @@ import com.juanitos.ui.routes.money.categories.NewCategoryDestination
 import com.juanitos.ui.routes.money.categories.NewCategoryScreen
 import com.juanitos.ui.routes.money.settings.MoneySettingsDestination
 import com.juanitos.ui.routes.money.settings.MoneySettingsScreen
+import com.juanitos.ui.routes.money.spendings.EditFixedSpendingDestination
+import com.juanitos.ui.routes.money.spendings.EditFixedSpendingScreen
 import com.juanitos.ui.routes.money.spendings.FixedSpendingsDestination
 import com.juanitos.ui.routes.money.spendings.FixedSpendingsScreen
 import com.juanitos.ui.routes.money.spendings.NewFixedSpendingDestination
@@ -54,10 +58,21 @@ fun JuanitOSNavGraph(
         composable(route = FixedSpendingsDestination.route.route) {
             FixedSpendingsScreen(
                 onNavigateUp = { navController.navigateUp() },
-                onNewFixedSpending = { navController.navigate(NewFixedSpendingDestination.route.route) })
+                onNewFixedSpending = { navController.navigate(NewFixedSpendingDestination.route.route) },
+                onEditFixedSpending = { id ->
+                    navController.navigate(EditFixedSpendingDestination.routeWithId(id))
+                })
         }
         composable(route = NewFixedSpendingDestination.route.route) {
             NewFixedSpendingScreen(onNavigateUp = { navController.navigateUp() }, onNewCategory = {
+                navController.navigate(NewCategoryDestination.route.route)
+            })
+        }
+        composable(
+            route = EditFixedSpendingDestination.route.route,
+            arguments = listOf(navArgument("fixedSpendingId") { type = NavType.IntType })
+        ) {
+            EditFixedSpendingScreen(onNavigateUp = { navController.navigateUp() }, onNewCategory = {
                 navController.navigate(NewCategoryDestination.route.route)
             })
         }

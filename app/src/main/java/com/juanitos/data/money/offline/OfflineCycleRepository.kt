@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 class OfflineCycleRepository(private val cycleDao: CycleDao) : CycleRepository {
     override suspend fun insert(income: Double): Long = cycleDao.insert(income)
+    override suspend fun insert(income: Double, startDate: String): Long =
+        cycleDao.insert(income, startDate)
     override suspend fun update(cycle: Cycle) = cycleDao.update(cycle)
     override suspend fun delete(cycle: Cycle) = cycleDao.delete(cycle)
     override fun getCurrentCycle(): Flow<CurrentCycleWithDetails?> = cycleDao.getCurrentCycle()

@@ -20,6 +20,13 @@
     <string name="new_transaction">New transaction</string>
     <string name="fixed_spendings">Fixed spending\'s</string>
     <string name="new_fixed_spending">New fixed spending</string>
+    <string name="edit_fixed_spending">Edit fixed spending</string>
+    <string name="day_of_month">Day of month</string>
+    <string name="day_of_month_optional">Day of month (optional)</string>
+    <string name="income_schedule">Income schedule</string>
+    <string name="income_schedule_day_label">Day of month</string>
+    <string name="save_schedule">Save schedule</string>
+    <string name="cycle_start_date_label">Start date (dd/MM/yyyy)</string>
     <string name="amount">Amount</string>
     <string name="category">Category</string>
     <string name="categories">Categories</string>

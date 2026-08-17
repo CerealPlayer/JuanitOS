@@ -1,6 +1,7 @@
 package com.juanitos.ui.routes.money
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +46,7 @@ fun FixedSpendingCard(
     modifier: Modifier = Modifier,
     onDelete: ((FixedSpendingWithCategory) -> Unit)? = null,
     onFixedSpendingCheck: ((Boolean) -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
 ) {
     val isEditable = onDelete != null && onFixedSpendingCheck != null
     if (isEditable) {
@@ -101,7 +103,8 @@ fun FixedSpendingCard(
         ) {
             FixedSpendingCardContent(
                 fixedSpending = fixedSpendingWithCategory,
-                onFixedSpendingCheck = onFixedSpendingCheck
+                onFixedSpendingCheck = onFixedSpendingCheck,
+                onClick = onClick
             )
         }
     } else {
@@ -109,6 +112,7 @@ fun FixedSpendingCard(
         FixedSpendingCardContent(
             fixedSpending = fixedSpendingWithCategory,
             onFixedSpendingCheck = onFixedSpendingCheck,
+            onClick = onClick,
             modifier = modifier
         )
     }
@@ -119,10 +123,13 @@ private fun FixedSpendingCardContent(
     fixedSpending: FixedSpendingWithCategory,
     modifier: Modifier = Modifier,
     onFixedSpendingCheck: ((Boolean) -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
 ) {
     val isEditable = onFixedSpendingCheck != null
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
