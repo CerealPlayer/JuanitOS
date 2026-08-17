@@ -5,9 +5,10 @@ repository.
 
 ## Project Overview
 
-**JuanitOS** is an Android personal management app built with Kotlin and Jetpack Compose. Modules:
-Money, Workout, Habit, Climbing (all complete), and Food (route stub only, not implemented). Room
-database schema v28, offline-first, no backend.
+**JuanitOS** is an Android personal finance app built with Kotlin and Jetpack Compose. It was
+previously a multi-module personal management app (Money, Workout, Habit, Climbing, Food stub);
+all non-money modules were removed and the app is now Money-only. Room database schema v29,
+offline-first, no backend.
 
 ## Build Commands
 
@@ -37,16 +38,23 @@ database schema v28, offline-first, no backend.
 
 ```
 app/src/main/java/com/juanitos/
-  data/           # Room entities, DAOs, repositories, migrations
+  data/
+    money/          # Room entities, DAOs, repositories, offline impls (the only data module)
+    migrations/      # Migrations.kt (legacy v9-14), CleanupMigrations.kt (v28-29 drops removed modules' tables)
+    AppContainer.kt  # AppContainer interface + AppDataContainer impl
+    JuanitOSDatabase.kt
   ui/
-    routes/       # Screen composables + ViewModels per module (money/, workout/, habit/, climbing/)
-    navigation/   # JuanitOSNavGraph.kt, Routes.kt (23 routes), JuanitOSTopAppBar.kt
-    commons/      # Shared composables (MoneySummaryChart, DeleteConfirmationDialog, FormColumn, Search)
-    icons/        # Custom Material icon wrappers
-    theme/        # Color, Theme, Type
-    AppViewModelProvider.kt  # Factory for all 23 ViewModels
+    routes/money/   # Screen composables + ViewModels (categories/, spendings/, stats/, settings/, transactions/)
+    navigation/     # JuanitOSNavGraph.kt, Routes.kt (8 routes), JuanitOSTopAppBar.kt
+    commons/        # Shared composables (MoneySummaryChart, DeleteConfirmationDialog, FormColumn, Search, CategoriesSearch)
+    icons/          # Custom Material icon wrappers
+    theme/          # Color, Theme, Type
+    AppViewModelProvider.kt  # Factory for the 8 Money ViewModels
   lib/            # Utilities: InputUiState.kt, dates.kt, validation.kt
 ```
+
+The app opens directly into `MoneyScreen` (`MoneyDestination` is the nav graph's start
+destination) — there is no more home/module-picker screen.
 
 ### Dependency Injection
 
@@ -62,10 +70,10 @@ through `_uiState.update { ... }`. Form screens use `InputUiState(value, touched
 
 ### Navigation
 
-Routes are defined in the `Routes` enum (`Routes.kt`). Each screen has a companion
-`{Screen}Destination` object implementing `NavigationDestination`. Routes are registered in
-`JuanitOSNavGraph.kt`. Parameterized routes (e.g., `workout_detail/{workoutId}`) extract IDs via
-`SavedStateHandle`; throw `IllegalArgumentException` if missing.
+Routes are defined in the `Routes` enum (`Routes.kt`): `Money`, `MoneyStats`, `MoneySettings`,
+`NewTransaction`, `FixedSpending`, `NewFixedSpending`, `Categories`, `NewCategory`. Each screen has
+a companion `{Screen}Destination` object implementing `NavigationDestination`. Routes are
+registered in `JuanitOSNavGraph.kt`.
 
 ### Repository Pattern
 
@@ -74,13 +82,13 @@ implementations (`Offline{X}Repository`) delegate directly to DAOs.
 
 ## Database
 
-- **Room v28**, 14 entities, 14 migrations
-- Migration files: `data/migrations/Migrations.kt` (v9–14), `WorkoutMigrations.kt` (v19–21),
-  `HabitMigrations.kt` (v21–23), `ClimbingMigrations.kt` (v23–28)
+- **Room v29**, 4 entities (`Cycle`, `Transaction`, `FixedSpending`, `Category`), all in
+  `data/money/`
+- Migration files: `data/migrations/Migrations.kt` (v9–14, legacy — predates and does not apply to
+  the current schema), `data/migrations/CleanupMigrations.kt` (`MIGRATION_28_29`, drops the tables
+  that belonged to the removed Workout/Habit/Climbing modules)
 - New migrations must be registered in `JuanitOSDatabase.addMigrations()`
 - `fallbackToDestructiveMigration(false)` — never drop migrations
-- Workout start/end times are stored as nullable text columns (`start_time`, `end_time`) and
-  formatted via `lib/dates.kt`
 
 ## Key Conventions
 
@@ -94,7 +102,7 @@ implementations (`Offline{X}Repository`) delegate directly to DAOs.
 
 ## Workflow: Adding a New Screen
 
-1. Create composable in `ui/routes/{module}/{feature}/{Feature}Screen.kt` with a
+1. Create composable in `ui/routes/money/{feature}/{Feature}Screen.kt` with a
    `{Feature}Destination` object
 2. Create `{Feature}ViewModel` injecting repositories from `AppContainer`
 3. Add ViewModel initializer to `AppViewModelProvider.Factory`
@@ -103,11 +111,11 @@ implementations (`Offline{X}Repository`) delegate directly to DAOs.
 
 ## Workflow: Adding a New Entity
 
-1. Create entity in `data/{module}/entities/` with Room annotations
-2. Create DAO in `data/{module}/daos/`
-3. Create repository interface in `data/{module}/repositories/` (Flow for queries, suspend for
+1. Create entity in `data/money/entities/` with Room annotations
+2. Create DAO in `data/money/daos/`
+3. Create repository interface in `data/money/repositories/` (Flow for queries, suspend for
    writes)
-4. Implement in `data/{module}/offline/Offline{X}Repository.kt`
+4. Implement in `data/money/offline/Offline{X}Repository.kt`
 5. Add to `AppContainer` interface and lazy-initialize in `AppDataContainer`
 6. Add to `@Database` entities array in `JuanitOSDatabase`, add abstract DAO getter
 7. Increment version, write migration, register it in `addMigrations()`
@@ -115,9 +123,7 @@ implementations (`Offline{X}Repository`) delegate directly to DAOs.
 ## Common Gotchas
 
 - **Combine order matters**: the last `combine` call's `copy()` wins for final state
-- **Food module**: route exists, no implementation; legacy migration files (v9–14) reference food
-  tables not in current schema
-- **Climbing attempt ordering**: always preserve `boulder_order` and `attempt_order` when writing
-  attempts
-- **Habit lifecycle**: `Habit.completedAt` tracks lifecycle; `HabitEntry` tracks per-day completions
+- **`data/migrations/Migrations.kt`**: legacy pre-money-only migrations (v9–14) referencing food
+  tables that never existed in this schema — dead weight kept only for migration-chain continuity;
+  do not model new migrations on it
 - **Vico charts**: imported (`vico.compose.m3`) but unused; custom chart is `MoneySummaryChart.kt`
