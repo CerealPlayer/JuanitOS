@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">JuanitOS</string>
     <string name="money">Money tracking</string>
+    <string name="log">Log</string>
     <string name="money_stats">Money stats</string>
     <string name="settings">Settings</string>
     <string name="save">Save</string>
@@ -50,6 +51,9 @@
     <string name="money_stats_no_active_cycle">No active cycle to show stats.</string>
     <string name="money_stats_no_data">No spending data for the current cycle.</string>
     <string name="uncategorized">Uncategorized</string>
+    <string name="search_log">Search description</string>
+    <string name="all_categories">All categories</string>
+    <string name="clear_filter">Clear</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="confirm">Confirm</string>

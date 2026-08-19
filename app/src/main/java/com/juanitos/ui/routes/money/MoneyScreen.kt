@@ -3,16 +3,14 @@ package com.juanitos.ui.routes.money
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -42,6 +40,7 @@ fun MoneyScreen(
     onFixedSpendings: () -> Unit,
     onCategories: () -> Unit,
     onMoneyStats: () -> Unit,
+    onLog: () -> Unit,
     viewModel: MoneyViewModel = viewModel(
         factory = AppViewModelProvider.Factory
     )
@@ -62,6 +61,12 @@ fun MoneyScreen(
         bottomBar = {
             BottomAppBar(
                 actions = {
+                    IconButton(onClick = onLog) {
+                        Icon(
+                            painter = painterResource(R.drawable.categories),
+                            contentDescription = stringResource(R.string.log)
+                        )
+                    }
                     IconButton(onClick = onFixedSpendings) {
                         Icon(
                             painter = painterResource(R.drawable.fixed_spending),
@@ -94,41 +99,22 @@ fun MoneyScreen(
                 .padding(
                     top = innerPadding.calculateTopPadding(),
                     bottom = innerPadding.calculateBottomPadding(),
-                    start = dimensionResource(R.dimen.padding_small),
-                    end = dimensionResource(R.dimen.padding_small)
+                    start = dimensionResource(R.dimen.padding_medium),
+                    end = dimensionResource(R.dimen.padding_medium)
                 )
                 .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
         ) {
-            val movements = uiState.value.movements
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = dimensionResource(R.dimen.padding_medium)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
-            ) {
-                items(movements, key = { movement ->
-                    when (movement) {
-                        is Movement.FixedSpendingMovement -> "fs-${movement.fixedSpending.fixedSpending.id}"
-                        is Movement.TransactionMovement -> "t-${movement.transaction.transaction.id}"
-                    }
-                }) { movement ->
-                    when (movement) {
-                        is Movement.FixedSpendingMovement -> FixedSpendingCard(
-                            fixedSpendingWithCategory = movement.fixedSpending
-                        )
-
-                        is Movement.TransactionMovement -> TransactionCard(
-                            transactionWithCategory = movement.transaction,
-                            onDelete = { viewModel.deleteTransaction(it.transaction) }
-                        )
-                    }
-                }
+            val summary = uiState.value.summary
+            if (summary != null) {
+                CycleSummary(
+                    summary = summary,
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_medium))
+                )
+            } else {
+                Text(text = stringResource(R.string.money_stats_no_active_cycle))
             }
         }
     }
 }
-
-
-

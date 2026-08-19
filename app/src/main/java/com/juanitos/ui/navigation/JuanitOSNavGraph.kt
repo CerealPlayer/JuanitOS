@@ -13,6 +13,8 @@ import com.juanitos.ui.routes.money.categories.CategoriesDestination
 import com.juanitos.ui.routes.money.categories.CategoriesScreen
 import com.juanitos.ui.routes.money.categories.NewCategoryDestination
 import com.juanitos.ui.routes.money.categories.NewCategoryScreen
+import com.juanitos.ui.routes.money.log.LogDestination
+import com.juanitos.ui.routes.money.log.LogScreen
 import com.juanitos.ui.routes.money.settings.MoneySettingsDestination
 import com.juanitos.ui.routes.money.settings.MoneySettingsScreen
 import com.juanitos.ui.routes.money.spendings.EditFixedSpendingDestination
@@ -42,7 +44,11 @@ fun JuanitOSNavGraph(
                 onFixedSpendings = { navController.navigate(FixedSpendingsDestination.route.route) },
                 onCategories = { navController.navigate(CategoriesDestination.route.route) },
                 onMoneyStats = { navController.navigate(MoneyStatsDestination.route.route) },
+                onLog = { navController.navigate(LogDestination.route.route) },
             )
+        }
+        composable(route = LogDestination.route.route) {
+            LogScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = MoneyStatsDestination.route.route) {
             MoneyStatsScreen(onNavigateUp = { navController.navigateUp() })

@@ -2,6 +2,7 @@ package com.juanitos.ui.navigation
 
 enum class Routes(val route: String) {
     Money("money"),
+    Log("log"),
     MoneyStats("money_stats"),
     MoneySettings("money_settings"),
     NewTransaction("new_transaction"),
