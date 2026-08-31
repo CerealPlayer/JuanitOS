@@ -1,6 +1,9 @@
 package com.juanitos.ui.routes.money.transactions
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -12,6 +15,7 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -23,11 +27,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -105,6 +111,11 @@ fun NewTransactionScreen(
                 onValueChange = { viewModel.setAmountInput(it) },
                 label = { Text(text = stringResource(R.string.amount)) },
                 isError = !uiState.isAmountValid,
+                supportingText = {
+                    if (!uiState.isAmountValid) {
+                        Text(text = stringResource(R.string.amount_must_be_positive))
+                    }
+                },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -116,6 +127,10 @@ fun NewTransactionScreen(
                 keyboardActions = KeyboardActions(
                     onNext = { categoryFocusRequester.requestFocus() }
                 )
+            )
+            TransactionTypeSelector(
+                isIncome = uiState.isIncome,
+                onIsIncomeChange = { viewModel.setIsIncome(it) }
             )
             CategoriesSearch(
                 categories = uiState.categories,
@@ -168,6 +183,44 @@ fun NewTransactionScreen(
             ) {
                 Text(text = stringResource(R.string.save))
             }
+        }
+    }
+}
+
+@Composable
+private fun TransactionTypeSelector(
+    isIncome: Boolean,
+    onIsIncomeChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .selectableGroup(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            modifier = Modifier
+                .selectable(
+                    selected = !isIncome,
+                    onClick = { onIsIncomeChange(false) },
+                    role = Role.RadioButton
+                ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RadioButton(selected = !isIncome, onClick = { onIsIncomeChange(false) })
+            Text(text = stringResource(R.string.transaction_type_expense))
+        }
+        Row(
+            modifier = Modifier
+                .selectable(
+                    selected = isIncome,
+                    onClick = { onIsIncomeChange(true) },
+                    role = Role.RadioButton
+                ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RadioButton(selected = isIncome, onClick = { onIsIncomeChange(true) })
+            Text(text = stringResource(R.string.transaction_type_income))
         }
     }
 }

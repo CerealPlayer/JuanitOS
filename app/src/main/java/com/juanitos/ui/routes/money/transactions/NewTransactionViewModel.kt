@@ -29,6 +29,7 @@ data class NewTransactionUiState(
     val categoryId: Int = 0,
     val descriptionInput: String = "",
     val dateInput: String = formatDbDatetimeToShortDate(formatLocalDateToDbDatetime(LocalDate.now())),
+    val isIncome: Boolean = false,
     val frequency: TransactionFrequency? = null,
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
@@ -63,11 +64,16 @@ class NewTransactionViewModel(
     }
 
     fun setAmountInput(input: String) {
+        val amount = parseQtDouble(input)
         _uiState.value = _uiState.value.copy(
             amountInput = input,
-            isAmountValid = parseQtDouble(input) != null,
+            isAmountValid = amount != null && amount >= 0,
             errorMessage = null
         )
+    }
+
+    fun setIsIncome(isIncome: Boolean) {
+        _uiState.value = _uiState.value.copy(isIncome = isIncome)
     }
 
     fun setCategoryId(input: Int) {
@@ -92,10 +98,11 @@ class NewTransactionViewModel(
         val category = state.categoryId
         val accountId = state.selectedAccountId
         val date = parseShortDateToLocalDate(state.dateInput)
-        if (amount == null) {
+        if (amount == null || amount < 0) {
             _uiState.value = state.copy(isAmountValid = false, errorMessage = "Invalid amount")
             return
         }
+        val signedAmount = if (state.isIncome) -amount else amount
         if (category <= 0) {
             _uiState.value = state.copy(errorMessage = "Category required")
             return
@@ -114,7 +121,7 @@ class NewTransactionViewModel(
                 transactionRepository.insert(
                     Transaction(
                         accountId = accountId,
-                        amount = amount,
+                        amount = signedAmount,
                         categoryId = category,
                         description = state.descriptionInput,
                         createdAt = formatLocalDateToDbDatetime(date),

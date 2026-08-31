@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.juanitos.R
 import com.juanitos.lib.MoneyAccountSummary
@@ -24,45 +23,12 @@ fun AccountSummary(summary: MoneyAccountSummary, modifier: Modifier = Modifier) 
     ) {
         Column {
             Text(
-                text = stringResource(R.string.total_income),
+                text = summary.accountName,
                 style = MaterialTheme.typography.labelLarge
             )
             Text(
-                text = formatAmount(summary.totalIncome),
-                style = MaterialTheme.typography.headlineMedium
-            )
-        }
-
-        if (summary.categoryExpenses.isNotEmpty()) {
-            HorizontalDivider()
-            Column(
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
-            ) {
-                summary.categoryExpenses.forEach { category ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(text = category.categoryName)
-                        Text(text = formatAmount(category.amount))
-                    }
-                }
-            }
-        }
-
-        HorizontalDivider()
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = stringResource(R.string.remaining_money),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
                 text = formatAmount(summary.remaining),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = if (summary.remaining < 0) {
                     MaterialTheme.colorScheme.error
@@ -70,6 +36,30 @@ fun AccountSummary(summary: MoneyAccountSummary, modifier: Modifier = Modifier) 
                     MaterialTheme.colorScheme.primary
                 }
             )
+        }
+
+        if (summary.categorySummaries.isNotEmpty()) {
+            HorizontalDivider()
+            Column(
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
+            ) {
+                summary.categorySummaries.forEach { category ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = category.categoryName)
+                        Text(
+                            text = formatAmount(category.amount),
+                            color = if (category.isIncome) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.error
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }

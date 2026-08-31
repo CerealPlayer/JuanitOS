@@ -13,6 +13,7 @@ class MoneySummaryTest {
 
     private val food = Category(id = 1, name = "Food")
     private val rent = Category(id = 2, name = "Rent")
+    private val salary = Category(id = 3, name = "Salary")
 
     private fun accountWith(
         startingBalance: Double = 2000.0,
@@ -37,12 +38,10 @@ class MoneySummaryTest {
     )
 
     @Test
-    fun noTransactions_incomeOnlyRemaining() {
+    fun noTransactions_startingBalanceOnlyRemaining() {
         val summary = computeAccountSummary(accountWith(startingBalance = 1500.0))
 
-        assertEquals(1500.0, summary.totalIncome, 0.0)
-        assertEquals(emptyList<CategoryExpenseSummary>(), summary.categoryExpenses)
-        assertEquals(0.0, summary.totalExpenses, 0.0)
+        assertEquals(emptyList<CategoryAmountSummary>(), summary.categorySummaries)
         assertEquals(1500.0, summary.remaining, 0.0)
     }
 
@@ -56,10 +55,9 @@ class MoneySummaryTest {
         )
 
         assertEquals(
-            listOf(CategoryExpenseSummary("Rent", 400.0)),
-            summary.categoryExpenses
+            listOf(CategoryAmountSummary("Rent", 400.0, isIncome = false)),
+            summary.categorySummaries
         )
-        assertEquals(400.0, summary.totalExpenses, 0.0)
         assertEquals(600.0, summary.remaining, 0.0)
     }
 
@@ -76,28 +74,48 @@ class MoneySummaryTest {
             )
         )
 
-        val byCategory = summary.categoryExpenses.associate { it.categoryName to it.amount }
+        val byCategory = summary.categorySummaries.associate { it.categoryName to it.amount }
         assertEquals(50.0, byCategory["Food"]!!, 0.0)
         assertEquals(500.0, byCategory["Rent"]!!, 0.0)
-        assertEquals(550.0, summary.totalExpenses, 0.0)
         assertEquals(1450.0, summary.remaining, 0.0)
     }
 
     @Test
-    fun negativeTransaction_addsToIncomeInsteadOfExpenses() {
+    fun negativeTransaction_isItsOwnIncomeCategory() {
         val summary = computeAccountSummary(
             accountWith(
                 startingBalance = 2000.0,
-                transactions = listOf(transaction(-100.0, food), transaction(30.0, food))
+                transactions = listOf(transaction(-100.0, salary), transaction(30.0, food))
             )
         )
 
-        assertEquals(2100.0, summary.totalIncome, 0.0)
         assertEquals(
-            listOf(CategoryExpenseSummary("Food", 30.0)),
-            summary.categoryExpenses
+            setOf(
+                CategoryAmountSummary("Salary", 100.0, isIncome = true),
+                CategoryAmountSummary("Food", 30.0, isIncome = false),
+            ),
+            summary.categorySummaries.toSet()
         )
         assertEquals(2070.0, summary.remaining, 0.0)
+    }
+
+    @Test
+    fun sameCategory_incomeAndExpenseKeptSeparate() {
+        val summary = computeAccountSummary(
+            accountWith(
+                startingBalance = 1000.0,
+                transactions = listOf(transaction(-50.0, food), transaction(30.0, food))
+            )
+        )
+
+        assertEquals(
+            setOf(
+                CategoryAmountSummary("Food", 50.0, isIncome = true),
+                CategoryAmountSummary("Food", 30.0, isIncome = false),
+            ),
+            summary.categorySummaries.toSet()
+        )
+        assertEquals(1020.0, summary.remaining, 0.0)
     }
 
     @Test
@@ -109,7 +127,7 @@ class MoneySummaryTest {
             )
         )
 
-        assertEquals(emptyList<CategoryExpenseSummary>(), summary.categoryExpenses)
+        assertEquals(emptyList<CategoryAmountSummary>(), summary.categorySummaries)
     }
 
     @Test
@@ -119,8 +137,8 @@ class MoneySummaryTest {
         )
 
         assertEquals(
-            listOf(CategoryExpenseSummary("Uncategorized", 75.0)),
-            summary.categoryExpenses
+            listOf(CategoryAmountSummary("Uncategorized", 75.0, isIncome = false)),
+            summary.categorySummaries
         )
     }
 
@@ -138,10 +156,9 @@ class MoneySummaryTest {
         )
 
         assertEquals(
-            listOf(CategoryExpenseSummary("Rent", 100.0)),
-            summary.categoryExpenses
+            listOf(CategoryAmountSummary("Rent", 100.0, isIncome = false)),
+            summary.categorySummaries
         )
-        assertEquals(100.0, summary.totalExpenses, 0.0)
         assertEquals(900.0, summary.remaining, 0.0)
     }
 }

@@ -40,6 +40,7 @@ import com.juanitos.lib.isPendingTransaction
 import com.juanitos.ui.commons.DeleteConfirmationDialog
 import kotlinx.coroutines.launch
 import java.util.Locale
+import kotlin.math.abs
 
 private const val PENDING_CARD_ALPHA = 0.55f
 
@@ -134,7 +135,7 @@ fun TransactionCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = String.format(Locale.US, "%.2f€", transaction.amount))
+                    Text(text = String.format(Locale.US, "%.2f€", abs(transaction.amount)))
                     Text(
                         text = category?.name ?: stringResource(R.string.uncategorized),
                         style = MaterialTheme.typography.bodyMedium
