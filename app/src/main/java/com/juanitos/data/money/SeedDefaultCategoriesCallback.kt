@@ -12,5 +12,9 @@ object SeedDefaultCategoriesCallback : RoomDatabase.Callback() {
                 arrayOf(category.name, category.description)
             )
         }
+        db.execSQL(
+            "INSERT INTO categories (name, description) VALUES (?, ?)",
+            arrayOf(CREDIT_CARD_PAYMENT_CATEGORY_NAME, "Lump-sum credit card settlement")
+        )
     }
 }

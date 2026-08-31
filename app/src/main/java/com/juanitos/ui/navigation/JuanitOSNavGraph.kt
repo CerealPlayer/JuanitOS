@@ -15,6 +15,10 @@ import com.juanitos.ui.routes.money.categories.CategoriesDestination
 import com.juanitos.ui.routes.money.categories.CategoriesScreen
 import com.juanitos.ui.routes.money.categories.NewCategoryDestination
 import com.juanitos.ui.routes.money.categories.NewCategoryScreen
+import com.juanitos.ui.routes.money.creditcards.CreditCardsDestination
+import com.juanitos.ui.routes.money.creditcards.CreditCardsScreen
+import com.juanitos.ui.routes.money.creditcards.NewCreditCardDestination
+import com.juanitos.ui.routes.money.creditcards.NewCreditCardScreen
 import com.juanitos.ui.routes.money.log.LogDestination
 import com.juanitos.ui.routes.money.log.LogScreen
 import com.juanitos.ui.routes.money.stats.MoneyStatsDestination
@@ -38,6 +42,7 @@ fun JuanitOSNavGraph(
                 onCategories = { navController.navigate(CategoriesDestination.route.route) },
                 onMoneyStats = { navController.navigate(MoneyStatsDestination.route.route) },
                 onLog = { navController.navigate(LogDestination.route.route) },
+                onCreditCards = { navController.navigate(CreditCardsDestination.route.route) },
             )
         }
         composable(route = LogDestination.route.route) {
@@ -56,9 +61,11 @@ fun JuanitOSNavGraph(
             NewAccountScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = NewTransactionDestination.route.route) {
-            NewTransactionScreen(onNavigateUp = { navController.navigateUp() }, onNewCategory = {
-                navController.navigate(NewCategoryDestination.route.route)
-            })
+            NewTransactionScreen(
+                onNavigateUp = { navController.navigateUp() },
+                onNewCategory = { navController.navigate(NewCategoryDestination.route.route) },
+                onNewCreditCard = { navController.navigate(NewCreditCardDestination.route.route) }
+            )
         }
         composable(route = CategoriesDestination.route.route) {
             CategoriesScreen(
@@ -68,6 +75,15 @@ fun JuanitOSNavGraph(
         }
         composable(route = NewCategoryDestination.route.route) {
             NewCategoryScreen(onNavigateUp = { navController.navigateUp() })
+        }
+        composable(route = CreditCardsDestination.route.route) {
+            CreditCardsScreen(
+                onNavigateUp = { navController.navigateUp() },
+                onNewCreditCard = { navController.navigate(NewCreditCardDestination.route.route) }
+            )
+        }
+        composable(route = NewCreditCardDestination.route.route) {
+            NewCreditCardScreen(onNavigateUp = { navController.navigateUp() })
         }
     }
 }

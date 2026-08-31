@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.icons.Add
+import com.juanitos.ui.icons.CreditCard
 import com.juanitos.ui.icons.Settings
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
@@ -40,6 +41,7 @@ fun MoneyScreen(
     onCategories: () -> Unit,
     onMoneyStats: () -> Unit,
     onLog: () -> Unit,
+    onCreditCards: () -> Unit,
     viewModel: MoneyViewModel = viewModel(
         factory = AppViewModelProvider.Factory
     )
@@ -77,6 +79,9 @@ fun MoneyScreen(
                             painter = painterResource(R.drawable.statistics),
                             contentDescription = stringResource(R.string.money_stats)
                         )
+                    }
+                    IconButton(onClick = onCreditCards) {
+                        CreditCard()
                     }
                 },
                 floatingActionButton = {

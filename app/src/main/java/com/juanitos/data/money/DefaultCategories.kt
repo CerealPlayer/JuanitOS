@@ -26,3 +26,5 @@ val DEFAULT_CATEGORIES: List<DefaultCategory> = listOf(
     DefaultCategory("Gifts & Donations", "Gifts given and charitable donations"),
     DefaultCategory("Miscellaneous", "Anything that doesn't fit elsewhere"),
 )
+
+const val CREDIT_CARD_PAYMENT_CATEGORY_NAME = "Credit Card Payment"

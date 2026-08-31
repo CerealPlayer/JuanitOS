@@ -10,6 +10,8 @@ import com.juanitos.ui.routes.money.accounts.AccountsViewModel
 import com.juanitos.ui.routes.money.accounts.NewAccountViewModel
 import com.juanitos.ui.routes.money.categories.CategoriesViewModel
 import com.juanitos.ui.routes.money.categories.NewCategoryViewModel
+import com.juanitos.ui.routes.money.creditcards.CreditCardsViewModel
+import com.juanitos.ui.routes.money.creditcards.NewCreditCardViewModel
 import com.juanitos.ui.routes.money.log.LogViewModel
 import com.juanitos.ui.routes.money.stats.MoneyStatsViewModel
 import com.juanitos.ui.routes.money.transactions.NewTransactionViewModel
@@ -20,6 +22,7 @@ object AppViewModelProvider {
             MoneyViewModel(
                 juanitOSApplication().container.accountRepository,
                 juanitOSApplication().container.transactionRepository,
+                juanitOSApplication().container.creditCardRepository,
             )
         }
         initializer {
@@ -48,7 +51,8 @@ object AppViewModelProvider {
             NewTransactionViewModel(
                 juanitOSApplication().container.transactionRepository,
                 juanitOSApplication().container.accountRepository,
-                juanitOSApplication().container.categoryRepository
+                juanitOSApplication().container.categoryRepository,
+                juanitOSApplication().container.creditCardRepository
             )
         }
         initializer {
@@ -59,6 +63,18 @@ object AppViewModelProvider {
         initializer {
             NewCategoryViewModel(
                 juanitOSApplication().container.categoryRepository
+            )
+        }
+        initializer {
+            CreditCardsViewModel(
+                juanitOSApplication().container.creditCardRepository,
+                juanitOSApplication().container.accountRepository
+            )
+        }
+        initializer {
+            NewCreditCardViewModel(
+                juanitOSApplication().container.creditCardRepository,
+                juanitOSApplication().container.accountRepository
             )
         }
     }

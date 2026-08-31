@@ -20,7 +20,8 @@ class OfflineTransactionRepository(private val transactionDao: TransactionDao) :
             transaction.description,
             transaction.createdAt ?: formatLocalDateToDbDatetime(LocalDate.now()),
             transaction.frequency,
-            transaction.recurrenceRootId
+            transaction.recurrenceRootId,
+            transaction.creditCardId
         )
 
     override suspend fun update(transaction: Transaction) = transactionDao.update(transaction)
@@ -54,7 +55,8 @@ class OfflineTransactionRepository(private val transactionDao: TransactionDao) :
                     description = template.description,
                     createdAt = formatLocalDateToDbDatetime(nextDate),
                     frequency = null,
-                    recurrenceRootId = template.id
+                    recurrenceRootId = template.id,
+                    creditCardId = template.creditCardId
                 )
                 latestDate = nextDate
             }

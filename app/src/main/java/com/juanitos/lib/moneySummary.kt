@@ -25,7 +25,9 @@ fun computeAccountSummary(
     account: AccountWithDetails,
 ): MoneyAccountSummary {
     val appliedTransactions =
-        account.transactions.filterNot { isPendingTransaction(it.transaction.createdAt) }
+        account.transactions.filterNot {
+            isPendingTransaction(it.transaction.createdAt) || it.transaction.creditCardId != null
+        }
 
     val categorySummaries = appliedTransactions
         .groupBy { (it.category?.name ?: "Uncategorized") to (it.transaction.amount < 0) }

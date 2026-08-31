@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TransactionDao {
     @Query(
-        "INSERT INTO transactions (account_id, amount, category_id, description, created_at, frequency, recurrence_root_id) " +
-                "VALUES (:accountId, :amount, :category, :description, :createdAt, :frequency, :recurrenceRootId)"
+        "INSERT INTO transactions (account_id, amount, category_id, description, created_at, frequency, recurrence_root_id, credit_card_id) " +
+                "VALUES (:accountId, :amount, :category, :description, :createdAt, :frequency, :recurrenceRootId, :creditCardId)"
     )
     suspend fun insert(
         accountId: Int,
@@ -20,7 +20,8 @@ interface TransactionDao {
         description: String?,
         createdAt: String,
         frequency: String?,
-        recurrenceRootId: Int?
+        recurrenceRootId: Int?,
+        creditCardId: Int?
     ): Long
 
     @Update
@@ -40,4 +41,10 @@ interface TransactionDao {
 
     @Query("DELETE FROM transactions WHERE recurrence_root_id = :templateId")
     suspend fun deleteByRecurrenceRoot(templateId: Int)
+
+    @Query(
+        "SELECT COALESCE(SUM(amount), 0) FROM transactions " +
+                "WHERE credit_card_id = :cardId AND created_at > :after AND created_at <= :upTo"
+    )
+    suspend fun sumCreditCardTransactions(cardId: Int, after: String, upTo: String): Double
 }

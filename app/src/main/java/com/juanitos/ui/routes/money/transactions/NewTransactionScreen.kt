@@ -7,6 +7,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -43,6 +44,7 @@ import com.juanitos.lib.formatDbDatetimeToShortDate
 import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.commons.FormColumn
 import com.juanitos.ui.commons.categories_search.CategoriesSearch
+import com.juanitos.ui.commons.credit_card_search.CreditCardSearch
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
@@ -59,6 +61,7 @@ object NewTransactionDestination : NavigationDestination {
 fun NewTransactionScreen(
     onNavigateUp: () -> Unit,
     onNewCategory: () -> Unit,
+    onNewCreditCard: () -> Unit,
     viewModel: NewTransactionViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState.collectAsState().value
@@ -139,6 +142,20 @@ fun NewTransactionScreen(
                 categoryFocusRequester = categoryFocusRequester,
                 nextFieldFocusRequester = descriptionFocusRequester
             )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = uiState.isPaidWithCredit,
+                    onCheckedChange = { viewModel.setIsPaidWithCredit(it) }
+                )
+                Text(text = stringResource(R.string.paid_with_credit))
+            }
+            if (uiState.isPaidWithCredit) {
+                CreditCardSearch(
+                    creditCards = uiState.creditCards,
+                    onItemSelect = { viewModel.setCreditCardId(it.id) },
+                    onAddCreditCard = onNewCreditCard
+                )
+            }
             OutlinedTextField(
                 value = uiState.descriptionInput,
                 onValueChange = { viewModel.setDescriptionInput(it) },

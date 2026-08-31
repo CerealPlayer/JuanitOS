@@ -8,5 +8,7 @@ enum class Routes(val route: String) {
     NewAccount("new_account"),
     NewTransaction("new_transaction"),
     Categories("categories"),
-    NewCategory("new_category");
+    NewCategory("new_category"),
+    CreditCards("credit_cards"),
+    NewCreditCard("new_credit_card");
 }

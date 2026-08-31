@@ -15,26 +15,30 @@ import com.juanitos.data.migrations.MIGRATION_31_32
 import com.juanitos.data.migrations.MIGRATION_32_33
 import com.juanitos.data.migrations.MIGRATION_33_34
 import com.juanitos.data.migrations.MIGRATION_34_35
+import com.juanitos.data.migrations.MIGRATION_35_36
 import com.juanitos.data.migrations.MIGRATION_9_10
 import com.juanitos.data.money.SeedDefaultCategoriesCallback
 import com.juanitos.data.money.daos.AccountDao
 import com.juanitos.data.money.daos.CategoryDao
+import com.juanitos.data.money.daos.CreditCardDao
 import com.juanitos.data.money.daos.TransactionDao
 import com.juanitos.data.money.entities.Account
 import com.juanitos.data.money.entities.Category
+import com.juanitos.data.money.entities.CreditCard
 import com.juanitos.data.money.entities.Transaction
 
 @Database(
     entities = [
-        Account::class, Transaction::class, Category::class
+        Account::class, Transaction::class, Category::class, CreditCard::class
     ],
-    version = 35,
+    version = 36,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
     abstract fun accountDao(): AccountDao
     abstract fun transactionDao(): TransactionDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun creditCardDao(): CreditCardDao
 
     companion object {
         @Volatile
@@ -55,7 +59,8 @@ abstract class JuanitOSDatabase : RoomDatabase() {
                         MIGRATION_31_32,
                         MIGRATION_32_33,
                         MIGRATION_33_34,
-                        MIGRATION_34_35
+                        MIGRATION_34_35,
+                        MIGRATION_35_36
                     )
                     .addCallback(SeedDefaultCategoriesCallback)
                     .fallbackToDestructiveMigration(false)

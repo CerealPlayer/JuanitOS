@@ -18,6 +18,12 @@ import androidx.room.PrimaryKey
             parentColumns = ["id"],
             childColumns = ["category_id"],
             onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = CreditCard::class,
+            parentColumns = ["id"],
+            childColumns = ["credit_card_id"],
+            onDelete = ForeignKey.CASCADE
         )
     ]
 )
@@ -35,5 +41,7 @@ data class Transaction(
     @ColumnInfo(name = "frequency")
     val frequency: String? = null,
     @ColumnInfo(name = "recurrence_root_id")
-    val recurrenceRootId: Int? = null
+    val recurrenceRootId: Int? = null,
+    @ColumnInfo(name = "credit_card_id")
+    val creditCardId: Int? = null
 )

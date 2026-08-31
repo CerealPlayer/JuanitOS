@@ -23,4 +23,7 @@ interface CategoryDao {
 
     @Query("SELECT * FROM categories ORDER BY name ASC")
     fun getAll(): Flow<List<Category>>
+
+    @Query("SELECT * FROM categories WHERE name = :name LIMIT 1")
+    suspend fun getByName(name: String): Category?
 }
