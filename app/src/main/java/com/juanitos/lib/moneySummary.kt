@@ -1,6 +1,6 @@
 package com.juanitos.lib
 
-import com.juanitos.data.money.entities.relations.CurrentCycleWithDetails
+import com.juanitos.data.money.entities.relations.AccountWithDetails
 import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
 
 data class CategoryExpenseSummary(
@@ -8,7 +8,7 @@ data class CategoryExpenseSummary(
     val amount: Double,
 )
 
-data class MoneyCycleSummary(
+data class MoneyAccountSummary(
     val totalIncome: Double,
     val categoryExpenses: List<CategoryExpenseSummary>,
     val totalExpenses: Double,
@@ -20,17 +20,17 @@ data class MoneyCycleSummary(
  * used elsewhere, e.g. [com.juanitos.ui.routes.money.TransactionCard]'s accent color), so they
  * add to income rather than appearing as an expense category.
  */
-fun computeMoneyCycleSummary(
-    cycle: CurrentCycleWithDetails,
+fun computeAccountSummary(
+    account: AccountWithDetails,
     fixedSpendings: List<FixedSpendingWithCategory>,
-): MoneyCycleSummary {
-    val incomeFromTransactions = cycle.transactions
+): MoneyAccountSummary {
+    val incomeFromTransactions = account.transactions
         .filter { it.transaction.amount < 0 }
         .sumOf { -it.transaction.amount }
-    val totalIncome = cycle.cycle.totalIncome + incomeFromTransactions
+    val totalIncome = account.account.startingBalance + incomeFromTransactions
 
     val expensesByCategory = mutableMapOf<String, Double>()
-    cycle.transactions
+    account.transactions
         .filter { it.transaction.amount > 0 }
         .forEach { transaction ->
             val categoryName = transaction.category?.name ?: "Uncategorized"
@@ -50,7 +50,7 @@ fun computeMoneyCycleSummary(
 
     val totalExpenses = categoryExpenses.sumOf { it.amount }
 
-    return MoneyCycleSummary(
+    return MoneyAccountSummary(
         totalIncome = totalIncome,
         categoryExpenses = categoryExpenses,
         totalExpenses = totalExpenses,

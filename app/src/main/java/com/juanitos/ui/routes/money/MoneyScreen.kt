@@ -35,7 +35,7 @@ object MoneyDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoneyScreen(
-    onMoneySettings: () -> Unit,
+    onAccounts: () -> Unit,
     onNewTransaction: () -> Unit,
     onFixedSpendings: () -> Unit,
     onCategories: () -> Unit,
@@ -52,7 +52,7 @@ fun MoneyScreen(
                 title = stringResource(MoneyDestination.titleRes),
                 canNavigateBack = false,
                 actions = {
-                    IconButton(onClick = onMoneySettings) {
+                    IconButton(onClick = onAccounts) {
                         Settings()
                     }
                 }
@@ -108,12 +108,12 @@ fun MoneyScreen(
         ) {
             val summary = uiState.value.summary
             if (summary != null) {
-                CycleSummary(
+                AccountSummary(
                     summary = summary,
                     modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_medium))
                 )
             } else {
-                Text(text = stringResource(R.string.money_stats_no_active_cycle))
+                Text(text = stringResource(R.string.money_stats_no_account))
             }
         }
     }

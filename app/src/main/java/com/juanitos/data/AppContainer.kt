@@ -1,28 +1,25 @@
 package com.juanitos.data
 
 import android.content.Context
+import com.juanitos.data.money.offline.OfflineAccountRepository
 import com.juanitos.data.money.offline.OfflineCategoryRepository
-import com.juanitos.data.money.offline.OfflineCycleRepository
 import com.juanitos.data.money.offline.OfflineFixedSpendingRepository
-import com.juanitos.data.money.offline.OfflineIncomeScheduleRepository
 import com.juanitos.data.money.offline.OfflineTransactionRepository
+import com.juanitos.data.money.repositories.AccountRepository
 import com.juanitos.data.money.repositories.CategoryRepository
-import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
-import com.juanitos.data.money.repositories.IncomeScheduleRepository
 import com.juanitos.data.money.repositories.TransactionRepository
 
 interface AppContainer {
-    val cycleRepository: CycleRepository
+    val accountRepository: AccountRepository
     val transactionRepository: TransactionRepository
     val fixedSpendingRepository: FixedSpendingRepository
     val categoryRepository: CategoryRepository
-    val incomeScheduleRepository: IncomeScheduleRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
-    override val cycleRepository: CycleRepository by lazy {
-        OfflineCycleRepository(cycleDao = JuanitOSDatabase.getDatabase(context).cycleDao())
+    override val accountRepository: AccountRepository by lazy {
+        OfflineAccountRepository(accountDao = JuanitOSDatabase.getDatabase(context).accountDao())
     }
     override val transactionRepository: TransactionRepository by lazy {
         OfflineTransactionRepository(
@@ -37,11 +34,6 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val categoryRepository: CategoryRepository by lazy {
         OfflineCategoryRepository(
             categoryDao = JuanitOSDatabase.getDatabase(context).categoryDao()
-        )
-    }
-    override val incomeScheduleRepository: IncomeScheduleRepository by lazy {
-        OfflineIncomeScheduleRepository(
-            incomeScheduleDao = JuanitOSDatabase.getDatabase(context).incomeScheduleDao()
         )
     }
 }

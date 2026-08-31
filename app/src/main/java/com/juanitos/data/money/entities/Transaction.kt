@@ -8,9 +8,9 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "transactions", foreignKeys = [
         ForeignKey(
-            entity = Cycle::class,
+            entity = Account::class,
             parentColumns = ["id"],
-            childColumns = ["cycle_id"],
+            childColumns = ["account_id"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
@@ -24,8 +24,8 @@ import androidx.room.PrimaryKey
 data class Transaction(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
-    @ColumnInfo(name = "cycle_id")
-    val cycleId: Int,
+    @ColumnInfo(name = "account_id")
+    val accountId: Int,
     val amount: Double,
     @ColumnInfo(name = "category_id")
     val categoryId: Int,

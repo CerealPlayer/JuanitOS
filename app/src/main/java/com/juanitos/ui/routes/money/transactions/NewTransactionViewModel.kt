@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.money.entities.Category
 import com.juanitos.data.money.entities.Transaction
-import com.juanitos.data.money.entities.relations.CurrentCycleWithDetails
+import com.juanitos.data.money.entities.relations.AccountWithDetails
+import com.juanitos.data.money.repositories.AccountRepository
 import com.juanitos.data.money.repositories.CategoryRepository
-import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.TransactionRepository
 import com.juanitos.lib.parseQtDouble
 import kotlinx.coroutines.flow.Flow
@@ -26,19 +26,19 @@ data class NewTransactionUiState(
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
     val success: Boolean = false,
-    val currentCycleId: Int? = null,
+    val selectedAccountId: Int? = null,
     val categories: List<Category> = emptyList()
 )
 
 class NewTransactionViewModel(
     private val transactionRepository: TransactionRepository,
-    private val cycleRepository: CycleRepository,
+    private val accountRepository: AccountRepository,
     private val categoryRepository: CategoryRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(NewTransactionUiState())
     val uiState: StateFlow<NewTransactionUiState> =
-        _uiState.combine(createCurrentCycleFlow()) { state, cycle ->
-            state.copy(currentCycleId = cycle?.cycle?.id)
+        _uiState.combine(createSelectedAccountFlow()) { state, account ->
+            state.copy(selectedAccountId = account?.account?.id)
         }.combine(createCategoriesFlow()) { state, categories ->
             state.copy(categories = categories)
         }.stateIn(
@@ -47,8 +47,8 @@ class NewTransactionViewModel(
             initialValue = NewTransactionUiState()
         )
 
-    private fun createCurrentCycleFlow(): Flow<CurrentCycleWithDetails?> {
-        return cycleRepository.getCurrentCycle()
+    private fun createSelectedAccountFlow(): Flow<AccountWithDetails?> {
+        return accountRepository.getSelected()
     }
 
     private fun createCategoriesFlow(): Flow<List<Category>> {
@@ -75,7 +75,7 @@ class NewTransactionViewModel(
         val state = uiState.value
         val amount = parseQtDouble(state.amountInput)
         val category = state.categoryId
-        val cycleId = state.currentCycleId
+        val accountId = state.selectedAccountId
         if (amount == null) {
             _uiState.value = state.copy(isAmountValid = false, errorMessage = "Invalid amount")
             return
@@ -84,8 +84,8 @@ class NewTransactionViewModel(
             _uiState.value = state.copy(errorMessage = "Category required")
             return
         }
-        if (cycleId == null) {
-            _uiState.value = state.copy(errorMessage = "No active cycle")
+        if (accountId == null) {
+            _uiState.value = state.copy(errorMessage = "No account selected")
             return
         }
         _uiState.value = state.copy(isSaving = true, errorMessage = null)
@@ -93,7 +93,7 @@ class NewTransactionViewModel(
             try {
                 transactionRepository.insert(
                     Transaction(
-                        cycleId = cycleId,
+                        accountId = accountId,
                         amount = amount,
                         categoryId = category,
                         description = state.descriptionInput

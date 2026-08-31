@@ -2,16 +2,16 @@ package com.juanitos.data.money.entities.relations
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.juanitos.data.money.entities.Cycle
+import com.juanitos.data.money.entities.Account
 import com.juanitos.data.money.entities.Transaction
 
-data class CurrentCycleWithDetails(
+data class AccountWithDetails(
     @Embedded
-    val cycle: Cycle,
+    val account: Account,
     @Relation(
         entity = Transaction::class,
         parentColumn = "id",
-        entityColumn = "cycle_id"
+        entityColumn = "account_id"
     )
     val transactions: List<TransactionWithCategory>,
 )

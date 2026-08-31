@@ -2,9 +2,9 @@ package com.juanitos.ui.routes.money.stats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanitos.data.money.entities.relations.CurrentCycleWithDetails
+import com.juanitos.data.money.entities.relations.AccountWithDetails
 import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
-import com.juanitos.data.money.repositories.CycleRepository
+import com.juanitos.data.money.repositories.AccountRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,7 +25,7 @@ data class MoneyStatsSlice(
 )
 
 data class MoneyStatsUiState(
-    val hasActiveCycle: Boolean = false,
+    val hasSelectedAccount: Boolean = false,
     val slices: List<MoneyStatsSlice> = emptyList(),
     val totalSpent: Double = 0.0,
 ) {
@@ -33,18 +33,18 @@ data class MoneyStatsUiState(
 }
 
 class MoneyStatsViewModel(
-    private val cycleRepository: CycleRepository,
+    private val accountRepository: AccountRepository,
     private val fixedSpendingRepository: FixedSpendingRepository,
 ) : ViewModel() {
     val uiState: StateFlow<MoneyStatsUiState> = combine(
-        createCycleFlow(),
+        createAccountFlow(),
         createFixedSpendingsFlow(),
-    ) { cycle, fixedSpendings ->
-        if (cycle == null) {
+    ) { account, fixedSpendings ->
+        if (account == null) {
             return@combine MoneyStatsUiState()
         }
 
-        val transactionSlices = cycle.transactions
+        val transactionSlices = account.transactions
             .groupBy { it.category?.name }
             .map { (categoryName, transactions) ->
                 MoneyStatsSlice(
@@ -70,7 +70,7 @@ class MoneyStatsViewModel(
 
         val slices = transactionSlices + fixedSpendingSlice
         MoneyStatsUiState(
-            hasActiveCycle = true,
+            hasSelectedAccount = true,
             slices = slices,
             totalSpent = slices.sumOf { it.amount },
         )
@@ -80,8 +80,8 @@ class MoneyStatsViewModel(
         initialValue = MoneyStatsUiState(),
     )
 
-    private fun createCycleFlow(): Flow<CurrentCycleWithDetails?> {
-        return cycleRepository.getCurrentCycle()
+    private fun createAccountFlow(): Flow<AccountWithDetails?> {
+        return accountRepository.getSelected()
     }
 
     private fun createFixedSpendingsFlow(): Flow<List<FixedSpendingWithCategory>> {
@@ -94,4 +94,3 @@ class MoneyStatsViewModel(
         private const val TIMEOUT_MILLIS = 5_000L
     }
 }
-

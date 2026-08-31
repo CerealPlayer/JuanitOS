@@ -8,7 +8,7 @@ class OfflineTransactionRepository(private val transactionDao: TransactionDao) :
     TransactionRepository {
     override suspend fun insert(transaction: Transaction) =
         transactionDao.insert(
-            transaction.cycleId,
+            transaction.accountId,
             transaction.amount,
             transaction.categoryId,
             transaction.description

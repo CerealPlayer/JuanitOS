@@ -4,14 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.money.entities.Category
 import com.juanitos.data.money.entities.Transaction
-import com.juanitos.data.money.entities.relations.CurrentCycleWithDetails
+import com.juanitos.data.money.entities.relations.AccountWithDetails
 import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
+import com.juanitos.data.money.repositories.AccountRepository
 import com.juanitos.data.money.repositories.CategoryRepository
-import com.juanitos.data.money.repositories.CycleRepository
 import com.juanitos.data.money.repositories.FixedSpendingRepository
 import com.juanitos.data.money.repositories.TransactionRepository
 import com.juanitos.lib.clampDayOfMonth
-import com.juanitos.lib.parseDbDatetimeToLocalDate
 import com.juanitos.ui.routes.money.Movement
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +32,7 @@ data class LogUiState(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LogViewModel(
-    private val cycleRepository: CycleRepository,
+    private val accountRepository: AccountRepository,
     private val fixedSpendingRepository: FixedSpendingRepository,
     private val transactionRepository: TransactionRepository,
     private val categoryRepository: CategoryRepository,
@@ -42,13 +41,13 @@ class LogViewModel(
     private val selectedCategoryId = MutableStateFlow<Int?>(null)
 
     val uiState: StateFlow<LogUiState> = combine(
-        createCycleFlow(),
+        createAccountFlow(),
         createFixedSpendingsFlow(),
         categoryRepository.getAll(),
         searchQuery,
         selectedCategoryId,
-    ) { cycle, fixedSpendings, categories, query, categoryId ->
-        val movements = mergeMovements(cycle, fixedSpendings)
+    ) { account, fixedSpendings, categories, query, categoryId ->
+        val movements = mergeMovements(account, fixedSpendings)
             .filter { matchesQuery(it, query) && matchesCategory(it, categoryId) }
         LogUiState(
             movements = movements,
@@ -62,8 +61,8 @@ class LogViewModel(
         initialValue = LogUiState()
     )
 
-    private fun createCycleFlow(): Flow<CurrentCycleWithDetails?> {
-        return cycleRepository.getCurrentCycle()
+    private fun createAccountFlow(): Flow<AccountWithDetails?> {
+        return accountRepository.getSelected()
     }
 
     private fun createFixedSpendingsFlow(): Flow<List<FixedSpendingWithCategory>> {
@@ -91,26 +90,23 @@ class LogViewModel(
     }
 
     private fun mergeMovements(
-        cycle: CurrentCycleWithDetails?,
+        account: AccountWithDetails?,
         fixedSpendings: List<FixedSpendingWithCategory>
     ): List<Movement> {
-        val cycleMonth = cycle?.cycle?.startDate
-            ?.let(::parseDbDatetimeToLocalDate)
-            ?.let(YearMonth::from)
-            ?: YearMonth.now()
+        val currentMonth = YearMonth.now()
 
         val fixedSpendingMovements = fixedSpendings.map { fixedSpending ->
             Movement.FixedSpendingMovement(
                 fixedSpending = fixedSpending,
                 date = fixedSpending.fixedSpending.dayOfMonth?.let {
                     clampDayOfMonth(
-                        cycleMonth,
+                        currentMonth,
                         it
                     )
                 }
             )
         }
-        val transactionMovements = (cycle?.transactions ?: emptyList())
+        val transactionMovements = (account?.transactions ?: emptyList())
             .map { Movement.TransactionMovement(it) }
 
         // Undated fixed spendings sort first (matches pre-scheduling behavior), then everything

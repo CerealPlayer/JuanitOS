@@ -44,8 +44,8 @@ app/src/main/java/com/juanitos/
     AppContainer.kt  # AppContainer interface + AppDataContainer impl
     JuanitOSDatabase.kt
   ui/
-    routes/money/   # Screen composables + ViewModels (categories/, spendings/, stats/, settings/, transactions/)
-    navigation/     # JuanitOSNavGraph.kt, Routes.kt (8 routes), JuanitOSTopAppBar.kt
+    routes/money/   # Screen composables + ViewModels (categories/, spendings/, stats/, accounts/, transactions/)
+    navigation/     # JuanitOSNavGraph.kt, Routes.kt (9 routes), JuanitOSTopAppBar.kt
     commons/        # Shared composables (MoneySummaryChart, DeleteConfirmationDialog, FormColumn, Search, CategoriesSearch)
     icons/          # Custom Material icon wrappers
     theme/          # Color, Theme, Type
@@ -70,10 +70,10 @@ through `_uiState.update { ... }`. Form screens use `InputUiState(value, touched
 
 ### Navigation
 
-Routes are defined in the `Routes` enum (`Routes.kt`): `Money`, `MoneyStats`, `MoneySettings`,
-`NewTransaction`, `FixedSpending`, `NewFixedSpending`, `Categories`, `NewCategory`. Each screen has
-a companion `{Screen}Destination` object implementing `NavigationDestination`. Routes are
-registered in `JuanitOSNavGraph.kt`.
+Routes are defined in the `Routes` enum (`Routes.kt`): `Money`, `MoneyStats`, `Accounts`,
+`NewAccount`, `NewTransaction`, `FixedSpending`, `NewFixedSpending`, `Categories`, `NewCategory`.
+Each screen has a companion `{Screen}Destination` object implementing `NavigationDestination`.
+Routes are registered in `JuanitOSNavGraph.kt`.
 
 ### Repository Pattern
 
@@ -82,11 +82,19 @@ implementations (`Offline{X}Repository`) delegate directly to DAOs.
 
 ## Database
 
-- **Room v29**, 4 entities (`Cycle`, `Transaction`, `FixedSpending`, `Category`), all in
-  `data/money/`
+- **Room v34**, 4 entities (`Account`, `Transaction`, `FixedSpending`, `Category`), all in
+  `data/money/`. `Account` replaces the old `Cycle` concept: it has no start/end date, holds a
+  `startingBalance`, and accumulates `Transaction`s indefinitely (`Transaction.accountId` FK).
+  Exactly one `Account` has `isSelected = true` at a time; every other money screen (home, log,
+  stats, new transaction) reads/writes the selected account via `AccountRepository.getSelected()`.
+  `FixedSpending` and `Category` remain account-independent (global).
 - Migration files: `data/migrations/Migrations.kt` (v9–14, legacy — predates and does not apply to
   the current schema), `data/migrations/CleanupMigrations.kt` (`MIGRATION_28_29`, drops the tables
-  that belonged to the removed Workout/Habit/Climbing modules)
+  that belonged to the removed Workout/Habit/Climbing modules),
+  `data/migrations/AccountMigrations.kt`
+  (`MIGRATION_33_34`, drops the old `cycles`/`income_schedules`/`transactions` tables and creates
+  `accounts` + a new `transactions` table with `account_id` — a fresh-start migration, existing
+  cycle data is not preserved)
 - New migrations must be registered in `JuanitOSDatabase.addMigrations()`
 - `fallbackToDestructiveMigration(false)` — never drop migrations
 

@@ -13,11 +13,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.juanitos.R
-import com.juanitos.lib.MoneyCycleSummary
+import com.juanitos.lib.MoneyAccountSummary
 import java.util.Locale
 
 @Composable
-fun CycleSummary(summary: MoneyCycleSummary, modifier: Modifier = Modifier) {
+fun AccountSummary(summary: MoneyAccountSummary, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))

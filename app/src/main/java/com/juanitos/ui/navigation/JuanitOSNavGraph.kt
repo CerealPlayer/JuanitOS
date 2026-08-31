@@ -9,14 +9,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.juanitos.ui.routes.money.MoneyDestination
 import com.juanitos.ui.routes.money.MoneyScreen
+import com.juanitos.ui.routes.money.accounts.AccountsDestination
+import com.juanitos.ui.routes.money.accounts.AccountsScreen
+import com.juanitos.ui.routes.money.accounts.NewAccountDestination
+import com.juanitos.ui.routes.money.accounts.NewAccountScreen
 import com.juanitos.ui.routes.money.categories.CategoriesDestination
 import com.juanitos.ui.routes.money.categories.CategoriesScreen
 import com.juanitos.ui.routes.money.categories.NewCategoryDestination
 import com.juanitos.ui.routes.money.categories.NewCategoryScreen
 import com.juanitos.ui.routes.money.log.LogDestination
 import com.juanitos.ui.routes.money.log.LogScreen
-import com.juanitos.ui.routes.money.settings.MoneySettingsDestination
-import com.juanitos.ui.routes.money.settings.MoneySettingsScreen
 import com.juanitos.ui.routes.money.spendings.EditFixedSpendingDestination
 import com.juanitos.ui.routes.money.spendings.EditFixedSpendingScreen
 import com.juanitos.ui.routes.money.spendings.FixedSpendingsDestination
@@ -39,7 +41,7 @@ fun JuanitOSNavGraph(
     ) {
         composable(route = MoneyDestination.route.route) {
             MoneyScreen(
-                onMoneySettings = { navController.navigate(MoneySettingsDestination.route.route) },
+                onAccounts = { navController.navigate(AccountsDestination.route.route) },
                 onNewTransaction = { navController.navigate(NewTransactionDestination.route.route) },
                 onFixedSpendings = { navController.navigate(FixedSpendingsDestination.route.route) },
                 onCategories = { navController.navigate(CategoriesDestination.route.route) },
@@ -53,8 +55,14 @@ fun JuanitOSNavGraph(
         composable(route = MoneyStatsDestination.route.route) {
             MoneyStatsScreen(onNavigateUp = { navController.navigateUp() })
         }
-        composable(route = MoneySettingsDestination.route.route) {
-            MoneySettingsScreen(onNavigateUp = { navController.navigateUp() })
+        composable(route = AccountsDestination.route.route) {
+            AccountsScreen(
+                onNavigateUp = { navController.navigateUp() },
+                onNewAccount = { navController.navigate(NewAccountDestination.route.route) }
+            )
+        }
+        composable(route = NewAccountDestination.route.route) {
+            NewAccountScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable(route = NewTransactionDestination.route.route) {
             NewTransactionScreen(onNavigateUp = { navController.navigateUp() }, onNewCategory = {

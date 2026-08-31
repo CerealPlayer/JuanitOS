@@ -7,6 +7,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.juanitos.JuanitOSApplication
 import com.juanitos.ui.routes.money.MoneyViewModel
+import com.juanitos.ui.routes.money.accounts.AccountsViewModel
+import com.juanitos.ui.routes.money.accounts.NewAccountViewModel
 import com.juanitos.ui.routes.money.categories.CategoriesViewModel
 import com.juanitos.ui.routes.money.categories.NewCategoryViewModel
 import com.juanitos.ui.routes.money.log.LogViewModel
@@ -20,14 +22,13 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
             MoneyViewModel(
-                juanitOSApplication().container.cycleRepository,
+                juanitOSApplication().container.accountRepository,
                 juanitOSApplication().container.fixedSpendingRepository,
-                juanitOSApplication().container.incomeScheduleRepository
             )
         }
         initializer {
             LogViewModel(
-                juanitOSApplication().container.cycleRepository,
+                juanitOSApplication().container.accountRepository,
                 juanitOSApplication().container.fixedSpendingRepository,
                 juanitOSApplication().container.transactionRepository,
                 juanitOSApplication().container.categoryRepository
@@ -35,20 +36,24 @@ object AppViewModelProvider {
         }
         initializer {
             MoneyStatsViewModel(
-                juanitOSApplication().container.cycleRepository,
+                juanitOSApplication().container.accountRepository,
                 juanitOSApplication().container.fixedSpendingRepository,
             )
         }
         initializer {
-            com.juanitos.ui.routes.money.settings.MoneySettingsViewModel(
-                juanitOSApplication().container.cycleRepository,
-                juanitOSApplication().container.incomeScheduleRepository
+            AccountsViewModel(
+                juanitOSApplication().container.accountRepository
+            )
+        }
+        initializer {
+            NewAccountViewModel(
+                juanitOSApplication().container.accountRepository
             )
         }
         initializer {
             NewTransactionViewModel(
                 juanitOSApplication().container.transactionRepository,
-                juanitOSApplication().container.cycleRepository,
+                juanitOSApplication().container.accountRepository,
                 juanitOSApplication().container.categoryRepository
             )
         }

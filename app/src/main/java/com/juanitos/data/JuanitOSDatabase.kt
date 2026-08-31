@@ -13,32 +13,30 @@ import com.juanitos.data.migrations.MIGRATION_29_30
 import com.juanitos.data.migrations.MIGRATION_30_31
 import com.juanitos.data.migrations.MIGRATION_31_32
 import com.juanitos.data.migrations.MIGRATION_32_33
+import com.juanitos.data.migrations.MIGRATION_33_34
 import com.juanitos.data.migrations.MIGRATION_9_10
 import com.juanitos.data.money.SeedDefaultCategoriesCallback
+import com.juanitos.data.money.daos.AccountDao
 import com.juanitos.data.money.daos.CategoryDao
-import com.juanitos.data.money.daos.CycleDao
 import com.juanitos.data.money.daos.FixedSpendingDao
-import com.juanitos.data.money.daos.IncomeScheduleDao
 import com.juanitos.data.money.daos.TransactionDao
+import com.juanitos.data.money.entities.Account
 import com.juanitos.data.money.entities.Category
-import com.juanitos.data.money.entities.Cycle
 import com.juanitos.data.money.entities.FixedSpending
-import com.juanitos.data.money.entities.IncomeSchedule
 import com.juanitos.data.money.entities.Transaction
 
 @Database(
     entities = [
-        Cycle::class, Transaction::class, FixedSpending::class, Category::class, IncomeSchedule::class
+        Account::class, Transaction::class, FixedSpending::class, Category::class
     ],
-    version = 33,
+    version = 34,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
-    abstract fun cycleDao(): CycleDao
+    abstract fun accountDao(): AccountDao
     abstract fun transactionDao(): TransactionDao
     abstract fun fixedSpendingDao(): FixedSpendingDao
     abstract fun categoryDao(): CategoryDao
-    abstract fun incomeScheduleDao(): IncomeScheduleDao
 
     companion object {
         @Volatile
@@ -57,7 +55,8 @@ abstract class JuanitOSDatabase : RoomDatabase() {
                         MIGRATION_29_30,
                         MIGRATION_30_31,
                         MIGRATION_31_32,
-                        MIGRATION_32_33
+                        MIGRATION_32_33,
+                        MIGRATION_33_34
                     )
                     .addCallback(SeedDefaultCategoriesCallback)
                     .fallbackToDestructiveMigration(false)

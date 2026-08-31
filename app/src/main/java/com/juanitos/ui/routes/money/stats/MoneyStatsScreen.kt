@@ -79,8 +79,8 @@ fun MoneyStatsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium)),
         ) {
-            if (!uiState.hasActiveCycle) {
-                Text(text = stringResource(R.string.money_stats_no_active_cycle))
+            if (!uiState.hasSelectedAccount) {
+                Text(text = stringResource(R.string.money_stats_no_account))
                 return@Column
             }
 
