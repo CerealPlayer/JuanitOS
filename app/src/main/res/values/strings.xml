@@ -24,6 +24,7 @@
     <string name="change_date">Change</string>
     <string name="frequency">Frequency</string>
     <string name="frequency_one_time">One time</string>
+    <string name="will_be_applied_on">Will be applied on %1$s</string>
     <string name="amount">Amount</string>
     <string name="category">Category</string>
     <string name="categories">Categories</string>

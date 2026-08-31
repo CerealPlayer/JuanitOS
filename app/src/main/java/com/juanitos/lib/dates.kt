@@ -67,6 +67,13 @@ fun clampDayOfMonth(yearMonth: YearMonth, dayOfMonth: Int): LocalDate =
 fun formatLocalDateToDbDatetime(date: LocalDate, time: String = "00:00:00"): String = "$date $time"
 
 /**
+ * True if the given Room datetime is strictly after today, i.e. a transaction that hasn't
+ * happened yet and shouldn't count toward balances/stats until its date arrives.
+ */
+fun isPendingTransaction(createdAt: String?): Boolean =
+    parseDbDatetimeToLocalDate(createdAt)?.isAfter(LocalDate.now()) == true
+
+/**
  * Parses a "dd/MM/yyyy" (or "dd/MM/yy", matching [formatDbDatetimeToShortDate]'s output, so a
  * prefilled-but-untouched field round-trips) text input into a LocalDate. Returns null if blank,
  * malformed, or an invalid calendar date.

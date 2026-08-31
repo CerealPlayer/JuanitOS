@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -34,9 +35,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.juanitos.R
 import com.juanitos.data.money.entities.relations.TransactionWithCategory
+import com.juanitos.lib.formatDbDatetimeToShortDate
+import com.juanitos.lib.isPendingTransaction
 import com.juanitos.ui.commons.DeleteConfirmationDialog
 import kotlinx.coroutines.launch
 import java.util.Locale
+
+private const val PENDING_CARD_ALPHA = 0.55f
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +52,7 @@ fun TransactionCard(
 ) {
     val transaction = transactionWithCategory.transaction
     val category = transactionWithCategory.category
+    val isPending = isPendingTransaction(transaction.createdAt)
 
     val dismissState = rememberSwipeToDismissBoxState()
     val showDeleteConfirmation = remember { mutableStateOf(false) }
@@ -99,10 +105,10 @@ fun TransactionCard(
             }
         }
     ) {
-        val accentColor = if (transaction.amount > 0) {
-            MaterialTheme.colorScheme.error
-        } else {
-            MaterialTheme.colorScheme.primary
+        val accentColor = when {
+            isPending -> MaterialTheme.colorScheme.outline
+            transaction.amount > 0 -> MaterialTheme.colorScheme.error
+            else -> MaterialTheme.colorScheme.primary
         }
         val accentWidth = 6.dp
         Card(
@@ -120,7 +126,9 @@ fun TransactionCard(
                 },
         ) {
             Column(
-                modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                modifier = Modifier
+                    .alpha(if (isPending) PENDING_CARD_ALPHA else 1f)
+                    .padding(dimensionResource(R.dimen.padding_small))
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -136,6 +144,17 @@ fun TransactionCard(
                     Text(
                         text = transaction.description,
                         style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
+                    )
+                }
+                if (isPending) {
+                    Text(
+                        text = stringResource(
+                            R.string.will_be_applied_on,
+                            formatDbDatetimeToShortDate(transaction.createdAt)
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline,
                         modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
                     )
                 }

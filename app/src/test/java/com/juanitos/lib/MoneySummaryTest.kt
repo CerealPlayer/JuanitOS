@@ -7,6 +7,7 @@ import com.juanitos.data.money.entities.relations.AccountWithDetails
 import com.juanitos.data.money.entities.relations.TransactionWithCategory
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.time.LocalDate
 
 class MoneySummaryTest {
 
@@ -21,8 +22,17 @@ class MoneySummaryTest {
         transactions = transactions,
     )
 
-    private fun transaction(amount: Double, category: Category?) = TransactionWithCategory(
-        transaction = Transaction(accountId = 1, amount = amount, categoryId = category?.id ?: 0),
+    private fun transaction(
+        amount: Double,
+        category: Category?,
+        createdAt: String? = null,
+    ) = TransactionWithCategory(
+        transaction = Transaction(
+            accountId = 1,
+            amount = amount,
+            categoryId = category?.id ?: 0,
+            createdAt = createdAt,
+        ),
         category = category,
     )
 
@@ -112,5 +122,26 @@ class MoneySummaryTest {
             listOf(CategoryExpenseSummary("Uncategorized", 75.0)),
             summary.categoryExpenses
         )
+    }
+
+    @Test
+    fun futureDatedTransaction_excludedFromTotals() {
+        val futureDate = LocalDate.now().plusDays(5).toString() + " 00:00:00"
+        val summary = computeAccountSummary(
+            accountWith(
+                startingBalance = 1000.0,
+                transactions = listOf(
+                    transaction(100.0, rent),
+                    transaction(400.0, rent, createdAt = futureDate)
+                )
+            )
+        )
+
+        assertEquals(
+            listOf(CategoryExpenseSummary("Rent", 100.0)),
+            summary.categoryExpenses
+        )
+        assertEquals(100.0, summary.totalExpenses, 0.0)
+        assertEquals(900.0, summary.remaining, 0.0)
     }
 }

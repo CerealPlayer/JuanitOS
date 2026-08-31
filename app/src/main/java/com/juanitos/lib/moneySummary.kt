@@ -22,13 +22,16 @@ data class MoneyAccountSummary(
 fun computeAccountSummary(
     account: AccountWithDetails,
 ): MoneyAccountSummary {
-    val incomeFromTransactions = account.transactions
+    val appliedTransactions =
+        account.transactions.filterNot { isPendingTransaction(it.transaction.createdAt) }
+
+    val incomeFromTransactions = appliedTransactions
         .filter { it.transaction.amount < 0 }
         .sumOf { -it.transaction.amount }
     val totalIncome = account.account.startingBalance + incomeFromTransactions
 
     val expensesByCategory = mutableMapOf<String, Double>()
-    account.transactions
+    appliedTransactions
         .filter { it.transaction.amount > 0 }
         .forEach { transaction ->
             val categoryName = transaction.category?.name ?: "Uncategorized"

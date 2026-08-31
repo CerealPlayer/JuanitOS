@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.money.entities.relations.AccountWithDetails
 import com.juanitos.data.money.repositories.AccountRepository
+import com.juanitos.lib.isPendingTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +33,7 @@ class MoneyStatsViewModel(
         }
 
         val slices = account.transactions
+            .filterNot { isPendingTransaction(it.transaction.createdAt) }
             .groupBy { it.category?.name }
             .map { (categoryName, transactions) ->
                 MoneyStatsSlice(
