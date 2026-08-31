@@ -11,7 +11,7 @@ data class Account(
     val name: String,
     @ColumnInfo(name = "starting_balance")
     val startingBalance: Double = 0.0,
-    @ColumnInfo(name = "is_selected")
+    @ColumnInfo(name = "is_selected", defaultValue = "0")
     val isSelected: Boolean = false,
     @ColumnInfo(name = "created_at", defaultValue = "(datetime('now', 'localtime'))")
     val createdAt: String? = null,

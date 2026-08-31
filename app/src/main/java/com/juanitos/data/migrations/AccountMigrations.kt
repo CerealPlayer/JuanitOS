@@ -35,3 +35,19 @@ val MIGRATION_33_34 = object : Migration(33, 34) {
         )
     }
 }
+
+/**
+ * No-op at the SQL level: the `accounts` table created by [MIGRATION_33_34] already declares
+ * `is_selected INTEGER NOT NULL DEFAULT 0`. This migration exists only to bump the DB version so
+ * Room's schema identity check (now that [com.juanitos.data.money.entities.Account.isSelected]
+ * declares `defaultValue = "0"` to match) passes for existing installs. Without this, a *fresh*
+ * install would generate the accounts table straight from the entity annotations - which, before
+ * this fix, had no SQL default for is_selected - and crash with a NOT NULL constraint violation
+ * the first time [com.juanitos.data.money.daos.AccountDao.insert] (which omits is_selected,
+ * relying on the default) ran.
+ */
+val MIGRATION_36_37 = object : Migration(36, 37) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Intentionally empty; see KDoc above.
+    }
+}

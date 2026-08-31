@@ -16,6 +16,7 @@ import com.juanitos.data.migrations.MIGRATION_32_33
 import com.juanitos.data.migrations.MIGRATION_33_34
 import com.juanitos.data.migrations.MIGRATION_34_35
 import com.juanitos.data.migrations.MIGRATION_35_36
+import com.juanitos.data.migrations.MIGRATION_36_37
 import com.juanitos.data.migrations.MIGRATION_9_10
 import com.juanitos.data.money.SeedDefaultCategoriesCallback
 import com.juanitos.data.money.daos.AccountDao
@@ -31,7 +32,7 @@ import com.juanitos.data.money.entities.Transaction
     entities = [
         Account::class, Transaction::class, Category::class, CreditCard::class
     ],
-    version = 36,
+    version = 37,
     exportSchema = false
 )
 abstract class JuanitOSDatabase : RoomDatabase() {
@@ -60,12 +61,28 @@ abstract class JuanitOSDatabase : RoomDatabase() {
                         MIGRATION_32_33,
                         MIGRATION_33_34,
                         MIGRATION_34_35,
-                        MIGRATION_35_36
+                        MIGRATION_35_36,
+                        MIGRATION_36_37
                     )
                     .addCallback(SeedDefaultCategoriesCallback)
                     .fallbackToDestructiveMigration(false)
                     .build().also { Instance = it }
             }
+        }
+
+        /**
+         * For tests. Runs queries on the calling thread (via a same-thread [java.util.concurrent.Executor])
+         * so a suspend repository call started from `viewModelScope.launch` completes synchronously
+         * within that launch, instead of racing a real background-thread executor that Compose's
+         * test idling can't see.
+         */
+        fun buildInMemory(context: Context): JuanitOSDatabase {
+            val synchronousExecutor = java.util.concurrent.Executor { it.run() }
+            return Room.inMemoryDatabaseBuilder(context, JuanitOSDatabase::class.java)
+                .addCallback(SeedDefaultCategoriesCallback)
+                .setQueryExecutor(synchronousExecutor)
+                .setTransactionExecutor(synchronousExecutor)
+                .build()
         }
     }
 }
