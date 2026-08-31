@@ -3,23 +3,14 @@ package com.juanitos.ui.routes.money.stats
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanitos.data.money.entities.relations.AccountWithDetails
-import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
 import com.juanitos.data.money.repositories.AccountRepository
-import com.juanitos.data.money.repositories.FixedSpendingRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-enum class MoneyStatsSliceType {
-    TransactionCategory,
-    FixedSpending
-}
-
 data class MoneyStatsSlice(
-    val type: MoneyStatsSliceType,
     val label: String? = null,
     val amount: Double = 0.0,
 )
@@ -34,21 +25,16 @@ data class MoneyStatsUiState(
 
 class MoneyStatsViewModel(
     private val accountRepository: AccountRepository,
-    private val fixedSpendingRepository: FixedSpendingRepository,
 ) : ViewModel() {
-    val uiState: StateFlow<MoneyStatsUiState> = combine(
-        createAccountFlow(),
-        createFixedSpendingsFlow(),
-    ) { account, fixedSpendings ->
+    val uiState: StateFlow<MoneyStatsUiState> = createAccountFlow().map { account ->
         if (account == null) {
-            return@combine MoneyStatsUiState()
+            return@map MoneyStatsUiState()
         }
 
-        val transactionSlices = account.transactions
+        val slices = account.transactions
             .groupBy { it.category?.name }
             .map { (categoryName, transactions) ->
                 MoneyStatsSlice(
-                    type = MoneyStatsSliceType.TransactionCategory,
                     label = categoryName,
                     amount = transactions.sumOf { it.transaction.amount },
                 )
@@ -56,19 +42,6 @@ class MoneyStatsViewModel(
             .filter { it.amount > 0.0 }
             .sortedBy { it.label.orEmpty() }
 
-        val fixedSpendingsAmount = fixedSpendings.sumOf { it.fixedSpending.amount }
-        val fixedSpendingSlice = if (fixedSpendingsAmount > 0.0) {
-            listOf(
-                MoneyStatsSlice(
-                    type = MoneyStatsSliceType.FixedSpending,
-                    amount = fixedSpendingsAmount,
-                )
-            )
-        } else {
-            emptyList()
-        }
-
-        val slices = transactionSlices + fixedSpendingSlice
         MoneyStatsUiState(
             hasSelectedAccount = true,
             slices = slices,
@@ -82,12 +55,6 @@ class MoneyStatsViewModel(
 
     private fun createAccountFlow(): Flow<AccountWithDetails?> {
         return accountRepository.getSelected()
-    }
-
-    private fun createFixedSpendingsFlow(): Flow<List<FixedSpendingWithCategory>> {
-        return fixedSpendingRepository.getAll().map { spendings ->
-            spendings.filter { it.fixedSpending.active }
-        }
     }
 
     companion object {

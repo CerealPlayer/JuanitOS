@@ -31,5 +31,9 @@ data class Transaction(
     val categoryId: Int,
     val description: String? = null,
     @ColumnInfo(name = "created_at", defaultValue = "(datetime('now', 'localtime'))")
-    val createdAt: String? = null
+    val createdAt: String? = null,
+    @ColumnInfo(name = "frequency")
+    val frequency: String? = null,
+    @ColumnInfo(name = "recurrence_root_id")
+    val recurrenceRootId: Int? = null
 )

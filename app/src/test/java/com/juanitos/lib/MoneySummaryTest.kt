@@ -2,10 +2,8 @@ package com.juanitos.lib
 
 import com.juanitos.data.money.entities.Account
 import com.juanitos.data.money.entities.Category
-import com.juanitos.data.money.entities.FixedSpending
 import com.juanitos.data.money.entities.Transaction
 import com.juanitos.data.money.entities.relations.AccountWithDetails
-import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
 import com.juanitos.data.money.entities.relations.TransactionWithCategory
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -28,14 +26,9 @@ class MoneySummaryTest {
         category = category,
     )
 
-    private fun fixedSpending(amount: Double, category: Category) = FixedSpendingWithCategory(
-        fixedSpending = FixedSpending(amount = amount, categoryId = category.id),
-        category = category,
-    )
-
     @Test
-    fun noTransactionsOrFixedSpendings_incomeOnlyRemaining() {
-        val summary = computeAccountSummary(accountWith(startingBalance = 1500.0), emptyList())
+    fun noTransactions_incomeOnlyRemaining() {
+        val summary = computeAccountSummary(accountWith(startingBalance = 1500.0))
 
         assertEquals(1500.0, summary.totalIncome, 0.0)
         assertEquals(emptyList<CategoryExpenseSummary>(), summary.categoryExpenses)
@@ -44,10 +37,12 @@ class MoneySummaryTest {
     }
 
     @Test
-    fun onlyFixedSpendings_groupedByCategory() {
+    fun transactions_groupedByCategory() {
         val summary = computeAccountSummary(
-            accountWith(startingBalance = 1000.0),
-            listOf(fixedSpending(400.0, rent))
+            accountWith(
+                startingBalance = 1000.0,
+                transactions = listOf(transaction(400.0, rent))
+            )
         )
 
         assertEquals(
@@ -59,13 +54,16 @@ class MoneySummaryTest {
     }
 
     @Test
-    fun mixedTransactionsAndFixedSpendings_mergeIntoSameCategory() {
+    fun multipleTransactions_mergeIntoSameCategory() {
         val summary = computeAccountSummary(
             accountWith(
                 startingBalance = 2000.0,
-                transactions = listOf(transaction(50.0, food), transaction(100.0, rent))
-            ),
-            listOf(fixedSpending(400.0, rent))
+                transactions = listOf(
+                    transaction(50.0, food),
+                    transaction(100.0, rent),
+                    transaction(400.0, rent)
+                )
+            )
         )
 
         val byCategory = summary.categoryExpenses.associate { it.categoryName to it.amount }
@@ -81,8 +79,7 @@ class MoneySummaryTest {
             accountWith(
                 startingBalance = 2000.0,
                 transactions = listOf(transaction(-100.0, food), transaction(30.0, food))
-            ),
-            emptyList()
+            )
         )
 
         assertEquals(2100.0, summary.totalIncome, 0.0)
@@ -94,10 +91,12 @@ class MoneySummaryTest {
     }
 
     @Test
-    fun zeroAmountFixedSpending_isHidden() {
+    fun zeroAmountTransaction_isHidden() {
         val summary = computeAccountSummary(
-            accountWith(startingBalance = 1000.0),
-            listOf(fixedSpending(0.0, rent))
+            accountWith(
+                startingBalance = 1000.0,
+                transactions = listOf(transaction(0.0, rent))
+            )
         )
 
         assertEquals(emptyList<CategoryExpenseSummary>(), summary.categoryExpenses)
@@ -106,8 +105,7 @@ class MoneySummaryTest {
     @Test
     fun uncategorizedTransaction_groupedUnderUncategorized() {
         val summary = computeAccountSummary(
-            accountWith(transactions = listOf(transaction(75.0, null))),
-            emptyList()
+            accountWith(transactions = listOf(transaction(75.0, null)))
         )
 
         assertEquals(

@@ -1,7 +1,6 @@
 package com.juanitos.lib
 
 import com.juanitos.data.money.entities.relations.AccountWithDetails
-import com.juanitos.data.money.entities.relations.FixedSpendingWithCategory
 
 data class CategoryExpenseSummary(
     val categoryName: String,
@@ -22,7 +21,6 @@ data class MoneyAccountSummary(
  */
 fun computeAccountSummary(
     account: AccountWithDetails,
-    fixedSpendings: List<FixedSpendingWithCategory>,
 ): MoneyAccountSummary {
     val incomeFromTransactions = account.transactions
         .filter { it.transaction.amount < 0 }
@@ -37,12 +35,6 @@ fun computeAccountSummary(
             expensesByCategory[categoryName] =
                 (expensesByCategory[categoryName] ?: 0.0) + transaction.transaction.amount
         }
-    fixedSpendings.forEach { fixedSpending ->
-        val categoryName = fixedSpending.category.name
-        expensesByCategory[categoryName] =
-            (expensesByCategory[categoryName] ?: 0.0) + fixedSpending.fixedSpending.amount
-    }
-
     val categoryExpenses = expensesByCategory
         .filter { it.value > 0.0 }
         .map { (categoryName, amount) -> CategoryExpenseSummary(categoryName, amount) }

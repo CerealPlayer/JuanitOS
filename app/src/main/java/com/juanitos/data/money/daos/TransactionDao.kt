@@ -9,8 +9,19 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransactionDao {
-    @Query("INSERT INTO transactions (account_id, amount, category_id, description) VALUES (:accountId, :amount, :category, :description)")
-    suspend fun insert(accountId: Int, amount: Double, category: Int, description: String?): Long
+    @Query(
+        "INSERT INTO transactions (account_id, amount, category_id, description, created_at, frequency, recurrence_root_id) " +
+                "VALUES (:accountId, :amount, :category, :description, :createdAt, :frequency, :recurrenceRootId)"
+    )
+    suspend fun insert(
+        accountId: Int,
+        amount: Double,
+        category: Int,
+        description: String?,
+        createdAt: String,
+        frequency: String?,
+        recurrenceRootId: Int?
+    ): Long
 
     @Update
     suspend fun update(transaction: Transaction)
@@ -20,4 +31,13 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transactions WHERE id = :id")
     fun getById(id: Int): Flow<Transaction>
+
+    @Query("SELECT * FROM transactions WHERE account_id = :accountId AND frequency IS NOT NULL AND recurrence_root_id IS NULL")
+    suspend fun getRecurringTemplates(accountId: Int): List<Transaction>
+
+    @Query("SELECT MAX(created_at) FROM transactions WHERE id = :templateId OR recurrence_root_id = :templateId")
+    suspend fun getLatestOccurrenceDate(templateId: Int): String?
+
+    @Query("DELETE FROM transactions WHERE recurrence_root_id = :templateId")
+    suspend fun deleteByRecurrenceRoot(templateId: Int)
 }

@@ -3,10 +3,8 @@ package com.juanitos.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.juanitos.ui.routes.money.MoneyDestination
 import com.juanitos.ui.routes.money.MoneyScreen
 import com.juanitos.ui.routes.money.accounts.AccountsDestination
@@ -19,12 +17,6 @@ import com.juanitos.ui.routes.money.categories.NewCategoryDestination
 import com.juanitos.ui.routes.money.categories.NewCategoryScreen
 import com.juanitos.ui.routes.money.log.LogDestination
 import com.juanitos.ui.routes.money.log.LogScreen
-import com.juanitos.ui.routes.money.spendings.EditFixedSpendingDestination
-import com.juanitos.ui.routes.money.spendings.EditFixedSpendingScreen
-import com.juanitos.ui.routes.money.spendings.FixedSpendingsDestination
-import com.juanitos.ui.routes.money.spendings.FixedSpendingsScreen
-import com.juanitos.ui.routes.money.spendings.NewFixedSpendingDestination
-import com.juanitos.ui.routes.money.spendings.NewFixedSpendingScreen
 import com.juanitos.ui.routes.money.stats.MoneyStatsDestination
 import com.juanitos.ui.routes.money.stats.MoneyStatsScreen
 import com.juanitos.ui.routes.money.transactions.NewTransactionDestination
@@ -43,7 +35,6 @@ fun JuanitOSNavGraph(
             MoneyScreen(
                 onAccounts = { navController.navigate(AccountsDestination.route.route) },
                 onNewTransaction = { navController.navigate(NewTransactionDestination.route.route) },
-                onFixedSpendings = { navController.navigate(FixedSpendingsDestination.route.route) },
                 onCategories = { navController.navigate(CategoriesDestination.route.route) },
                 onMoneyStats = { navController.navigate(MoneyStatsDestination.route.route) },
                 onLog = { navController.navigate(LogDestination.route.route) },
@@ -66,27 +57,6 @@ fun JuanitOSNavGraph(
         }
         composable(route = NewTransactionDestination.route.route) {
             NewTransactionScreen(onNavigateUp = { navController.navigateUp() }, onNewCategory = {
-                navController.navigate(NewCategoryDestination.route.route)
-            })
-        }
-        composable(route = FixedSpendingsDestination.route.route) {
-            FixedSpendingsScreen(
-                onNavigateUp = { navController.navigateUp() },
-                onNewFixedSpending = { navController.navigate(NewFixedSpendingDestination.route.route) },
-                onEditFixedSpending = { id ->
-                    navController.navigate(EditFixedSpendingDestination.routeWithId(id))
-                })
-        }
-        composable(route = NewFixedSpendingDestination.route.route) {
-            NewFixedSpendingScreen(onNavigateUp = { navController.navigateUp() }, onNewCategory = {
-                navController.navigate(NewCategoryDestination.route.route)
-            })
-        }
-        composable(
-            route = EditFixedSpendingDestination.route.route,
-            arguments = listOf(navArgument("fixedSpendingId") { type = NavType.IntType })
-        ) {
-            EditFixedSpendingScreen(onNavigateUp = { navController.navigateUp() }, onNewCategory = {
                 navController.navigate(NewCategoryDestination.route.route)
             })
         }

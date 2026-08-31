@@ -8,7 +8,11 @@ import com.juanitos.data.money.entities.relations.AccountWithDetails
 import com.juanitos.data.money.repositories.AccountRepository
 import com.juanitos.data.money.repositories.CategoryRepository
 import com.juanitos.data.money.repositories.TransactionRepository
+import com.juanitos.lib.TransactionFrequency
+import com.juanitos.lib.formatDbDatetimeToShortDate
+import com.juanitos.lib.formatLocalDateToDbDatetime
 import com.juanitos.lib.parseQtDouble
+import com.juanitos.lib.parseShortDateToLocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 // Estado de la UI para el formulario de transacción
 data class NewTransactionUiState(
@@ -23,6 +28,8 @@ data class NewTransactionUiState(
     val isAmountValid: Boolean = true,
     val categoryId: Int = 0,
     val descriptionInput: String = "",
+    val dateInput: String = formatDbDatetimeToShortDate(formatLocalDateToDbDatetime(LocalDate.now())),
+    val frequency: TransactionFrequency? = null,
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
     val success: Boolean = false,
@@ -71,11 +78,20 @@ class NewTransactionViewModel(
         _uiState.value = _uiState.value.copy(descriptionInput = input)
     }
 
+    fun setDateInput(input: String) {
+        _uiState.value = _uiState.value.copy(dateInput = input, errorMessage = null)
+    }
+
+    fun setFrequency(frequency: TransactionFrequency?) {
+        _uiState.value = _uiState.value.copy(frequency = frequency)
+    }
+
     fun saveTransaction(onSuccess: () -> Unit) {
         val state = uiState.value
         val amount = parseQtDouble(state.amountInput)
         val category = state.categoryId
         val accountId = state.selectedAccountId
+        val date = parseShortDateToLocalDate(state.dateInput)
         if (amount == null) {
             _uiState.value = state.copy(isAmountValid = false, errorMessage = "Invalid amount")
             return
@@ -88,6 +104,10 @@ class NewTransactionViewModel(
             _uiState.value = state.copy(errorMessage = "No account selected")
             return
         }
+        if (date == null) {
+            _uiState.value = state.copy(errorMessage = "Invalid date")
+            return
+        }
         _uiState.value = state.copy(isSaving = true, errorMessage = null)
         viewModelScope.launch {
             try {
@@ -96,7 +116,9 @@ class NewTransactionViewModel(
                         accountId = accountId,
                         amount = amount,
                         categoryId = category,
-                        description = state.descriptionInput
+                        description = state.descriptionInput,
+                        createdAt = formatLocalDateToDbDatetime(date),
+                        frequency = state.frequency?.name
                     )
                 )
                 _uiState.value = state.copy(success = true, isSaving = false)

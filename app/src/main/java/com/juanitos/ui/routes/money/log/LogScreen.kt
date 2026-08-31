@@ -34,8 +34,6 @@ import com.juanitos.ui.AppViewModelProvider
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
-import com.juanitos.ui.routes.money.FixedSpendingCard
-import com.juanitos.ui.routes.money.Movement
 import com.juanitos.ui.routes.money.TransactionCard
 
 object LogDestination : NavigationDestination {
@@ -84,27 +82,16 @@ fun LogScreen(
                 onCategorySelected = { viewModel.setCategoryFilter(it) }
             )
 
-            val movements = uiState.value.movements
+            val transactions = uiState.value.transactions
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
             ) {
-                items(movements, key = { movement ->
-                    when (movement) {
-                        is Movement.FixedSpendingMovement -> "fs-${movement.fixedSpending.fixedSpending.id}"
-                        is Movement.TransactionMovement -> "t-${movement.transaction.transaction.id}"
-                    }
-                }) { movement ->
-                    when (movement) {
-                        is Movement.FixedSpendingMovement -> FixedSpendingCard(
-                            fixedSpendingWithCategory = movement.fixedSpending
-                        )
-
-                        is Movement.TransactionMovement -> TransactionCard(
-                            transactionWithCategory = movement.transaction,
-                            onDelete = { viewModel.deleteTransaction(it.transaction) }
-                        )
-                    }
+                items(transactions, key = { it.transaction.id }) { transaction ->
+                    TransactionCard(
+                        transactionWithCategory = transaction,
+                        onDelete = { viewModel.deleteTransaction(it.transaction) }
+                    )
                 }
             }
         }

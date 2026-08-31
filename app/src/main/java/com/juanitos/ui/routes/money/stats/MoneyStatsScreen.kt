@@ -175,7 +175,6 @@ private fun LegendRow(item: MoneyStatsLegendItem) {
 private fun rememberLegendItems(
     slices: List<MoneyStatsSlice>,
 ): List<MoneyStatsLegendItem> {
-    val fixedSpendingColor = MaterialTheme.colorScheme.secondary
     val categoryPalette = listOf(
         MaterialTheme.colorScheme.primary,
         MaterialTheme.colorScheme.tertiary,
@@ -186,7 +185,6 @@ private fun rememberLegendItems(
     )
 
     val categoryColors = slices
-        .filter { it.type == MoneyStatsSliceType.TransactionCategory }
         .mapNotNull { it.label }
         .distinct()
         .sorted()
@@ -194,21 +192,11 @@ private fun rememberLegendItems(
         .toMap()
 
     return slices.map { slice ->
-        val label = when (slice.type) {
-            MoneyStatsSliceType.FixedSpending -> stringResource(R.string.fixed_spendings)
-            MoneyStatsSliceType.TransactionCategory -> slice.label
-                ?: stringResource(R.string.uncategorized)
-        }
-
-        val color = when (slice.type) {
-            MoneyStatsSliceType.FixedSpending -> fixedSpendingColor
-            MoneyStatsSliceType.TransactionCategory -> {
-                if (slice.label != null) {
-                    categoryColors[slice.label] ?: MaterialTheme.colorScheme.primary
-                } else {
-                    categoryPalette.first()
-                }
-            }
+        val label = slice.label ?: stringResource(R.string.uncategorized)
+        val color = if (slice.label != null) {
+            categoryColors[slice.label] ?: categoryPalette.first()
+        } else {
+            categoryPalette.first()
         }
 
         MoneyStatsLegendItem(

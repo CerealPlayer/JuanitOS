@@ -44,12 +44,12 @@ app/src/main/java/com/juanitos/
     AppContainer.kt  # AppContainer interface + AppDataContainer impl
     JuanitOSDatabase.kt
   ui/
-    routes/money/   # Screen composables + ViewModels (categories/, spendings/, stats/, accounts/, transactions/)
-    navigation/     # JuanitOSNavGraph.kt, Routes.kt (9 routes), JuanitOSTopAppBar.kt
+    routes/money/   # Screen composables + ViewModels (categories/, log/, stats/, accounts/, transactions/)
+    navigation/     # JuanitOSNavGraph.kt, Routes.kt (8 routes), JuanitOSTopAppBar.kt
     commons/        # Shared composables (MoneySummaryChart, DeleteConfirmationDialog, FormColumn, Search, CategoriesSearch)
     icons/          # Custom Material icon wrappers
     theme/          # Color, Theme, Type
-    AppViewModelProvider.kt  # Factory for the 8 Money ViewModels
+    AppViewModelProvider.kt  # Factory for the Money ViewModels
   lib/            # Utilities: InputUiState.kt, dates.kt, validation.kt
 ```
 
@@ -70,8 +70,8 @@ through `_uiState.update { ... }`. Form screens use `InputUiState(value, touched
 
 ### Navigation
 
-Routes are defined in the `Routes` enum (`Routes.kt`): `Money`, `MoneyStats`, `Accounts`,
-`NewAccount`, `NewTransaction`, `FixedSpending`, `NewFixedSpending`, `Categories`, `NewCategory`.
+Routes are defined in the `Routes` enum (`Routes.kt`): `Money`, `Log`, `MoneyStats`, `Accounts`,
+`NewAccount`, `NewTransaction`, `Categories`, `NewCategory`.
 Each screen has a companion `{Screen}Destination` object implementing `NavigationDestination`.
 Routes are registered in `JuanitOSNavGraph.kt`.
 
@@ -82,19 +82,31 @@ implementations (`Offline{X}Repository`) delegate directly to DAOs.
 
 ## Database
 
-- **Room v34**, 4 entities (`Account`, `Transaction`, `FixedSpending`, `Category`), all in
+- **Room v35**, 3 entities (`Account`, `Transaction`, `Category`), all in
   `data/money/`. `Account` replaces the old `Cycle` concept: it has no start/end date, holds a
   `startingBalance`, and accumulates `Transaction`s indefinitely (`Transaction.accountId` FK).
   Exactly one `Account` has `isSelected = true` at a time; every other money screen (home, log,
   stats, new transaction) reads/writes the selected account via `AccountRepository.getSelected()`.
-  `FixedSpending` and `Category` remain account-independent (global).
+  `Category` remains account-independent (global).
+- **Recurring transactions**: there is no separate "fixed spending" entity — a `Transaction` can
+  optionally carry a `frequency` (`TransactionFrequency`: `WEEKLY`/`BIWEEKLY`/`MONTHLY`, stored as
+  the enum's `.name` string) and is otherwise dated via `createdAt`, settable at creation via a
+  date picker (defaults to today). A row with `frequency != null` and `recurrenceRootId == null`
+  is a recurring "template"; a row with `recurrenceRootId` set to the template's id is a generated
+  occurrence. `TransactionRepository.generateDueOccurrences(accountId)` (called from
+  `MoneyViewModel.init`, so it runs each time the app opens) inserts any occurrences due since the
+  template's last generated date, materializing them as real `Transaction` rows — there is no
+  WorkManager/background job, so occurrences only appear once the app is reopened after they're
+  due.
 - Migration files: `data/migrations/Migrations.kt` (v9–14, legacy — predates and does not apply to
   the current schema), `data/migrations/CleanupMigrations.kt` (`MIGRATION_28_29`, drops the tables
   that belonged to the removed Workout/Habit/Climbing modules),
   `data/migrations/AccountMigrations.kt`
   (`MIGRATION_33_34`, drops the old `cycles`/`income_schedules`/`transactions` tables and creates
   `accounts` + a new `transactions` table with `account_id` — a fresh-start migration, existing
-  cycle data is not preserved)
+  cycle data is not preserved), `data/migrations/RecurrenceMigrations.kt` (`MIGRATION_34_35`, adds
+  `frequency`/`recurrence_root_id` columns to `transactions` and drops the old `fixed_spendings`
+  table — fresh-start, existing fixed spendings are not converted)
 - New migrations must be registered in `JuanitOSDatabase.addMigrations()`
 - `fallbackToDestructiveMigration(false)` — never drop migrations
 

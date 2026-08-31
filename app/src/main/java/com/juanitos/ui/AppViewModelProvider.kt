@@ -1,7 +1,6 @@
 package com.juanitos.ui
 
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -12,9 +11,6 @@ import com.juanitos.ui.routes.money.accounts.NewAccountViewModel
 import com.juanitos.ui.routes.money.categories.CategoriesViewModel
 import com.juanitos.ui.routes.money.categories.NewCategoryViewModel
 import com.juanitos.ui.routes.money.log.LogViewModel
-import com.juanitos.ui.routes.money.spendings.EditFixedSpendingViewModel
-import com.juanitos.ui.routes.money.spendings.FixedSpendingsViewModel
-import com.juanitos.ui.routes.money.spendings.NewFixedSpendingViewModel
 import com.juanitos.ui.routes.money.stats.MoneyStatsViewModel
 import com.juanitos.ui.routes.money.transactions.NewTransactionViewModel
 
@@ -23,13 +19,12 @@ object AppViewModelProvider {
         initializer {
             MoneyViewModel(
                 juanitOSApplication().container.accountRepository,
-                juanitOSApplication().container.fixedSpendingRepository,
+                juanitOSApplication().container.transactionRepository,
             )
         }
         initializer {
             LogViewModel(
                 juanitOSApplication().container.accountRepository,
-                juanitOSApplication().container.fixedSpendingRepository,
                 juanitOSApplication().container.transactionRepository,
                 juanitOSApplication().container.categoryRepository
             )
@@ -37,7 +32,6 @@ object AppViewModelProvider {
         initializer {
             MoneyStatsViewModel(
                 juanitOSApplication().container.accountRepository,
-                juanitOSApplication().container.fixedSpendingRepository,
             )
         }
         initializer {
@@ -55,24 +49,6 @@ object AppViewModelProvider {
                 juanitOSApplication().container.transactionRepository,
                 juanitOSApplication().container.accountRepository,
                 juanitOSApplication().container.categoryRepository
-            )
-        }
-        initializer {
-            FixedSpendingsViewModel(
-                juanitOSApplication().container.fixedSpendingRepository
-            )
-        }
-        initializer {
-            NewFixedSpendingViewModel(
-                juanitOSApplication().container.fixedSpendingRepository,
-                juanitOSApplication().container.categoryRepository
-            )
-        }
-        initializer {
-            EditFixedSpendingViewModel(
-                savedStateHandle = createSavedStateHandle(),
-                fixedSpendingRepository = juanitOSApplication().container.fixedSpendingRepository,
-                categoryRepository = juanitOSApplication().container.categoryRepository
             )
         }
         initializer {

@@ -37,7 +37,6 @@ object MoneyDestination : NavigationDestination {
 fun MoneyScreen(
     onAccounts: () -> Unit,
     onNewTransaction: () -> Unit,
-    onFixedSpendings: () -> Unit,
     onCategories: () -> Unit,
     onMoneyStats: () -> Unit,
     onLog: () -> Unit,
@@ -65,12 +64,6 @@ fun MoneyScreen(
                         Icon(
                             painter = painterResource(R.drawable.categories),
                             contentDescription = stringResource(R.string.log)
-                        )
-                    }
-                    IconButton(onClick = onFixedSpendings) {
-                        Icon(
-                            painter = painterResource(R.drawable.fixed_spending),
-                            contentDescription = stringResource(R.string.new_fixed_spending)
                         )
                     }
                     IconButton(onClick = onCategories) {
