@@ -44,7 +44,9 @@ object AppViewModelProvider {
         }
         initializer {
             NewAccountViewModel(
-                juanitOSApplication().container.accountRepository
+                juanitOSApplication().container.accountRepository,
+                juanitOSApplication().container.transactionRepository,
+                juanitOSApplication().container.categoryRepository
             )
         }
         initializer {

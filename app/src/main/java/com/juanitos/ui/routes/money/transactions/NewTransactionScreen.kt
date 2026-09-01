@@ -8,26 +8,15 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -39,17 +28,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanitos.R
-import com.juanitos.lib.TransactionFrequency
-import com.juanitos.lib.formatDbDatetimeToShortDate
 import com.juanitos.ui.AppViewModelProvider
+import com.juanitos.ui.commons.DateField
 import com.juanitos.ui.commons.FormColumn
+import com.juanitos.ui.commons.FrequencySelector
 import com.juanitos.ui.commons.categories_search.CategoriesSearch
 import com.juanitos.ui.commons.credit_card_search.CreditCardSearch
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
-import java.time.Instant
-import java.time.ZoneId
 
 object NewTransactionDestination : NavigationDestination {
     override val route = Routes.NewTransaction
@@ -68,37 +55,9 @@ fun NewTransactionScreen(
     val amountFocusRequester = remember { FocusRequester() }
     val categoryFocusRequester = remember { FocusRequester() }
     val descriptionFocusRequester = remember { FocusRequester() }
-    var showDatePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         amountFocusRequester.requestFocus()
-    }
-
-    if (showDatePicker) {
-        val datePickerState = rememberDatePickerState()
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    val millis = datePickerState.selectedDateMillis
-                    if (millis != null) {
-                        val date =
-                            Instant.ofEpochMilli(millis).atZone(ZoneId.of("UTC")).toLocalDate()
-                        viewModel.setDateInput(formatDbDatetimeToShortDate("$date"))
-                    }
-                    showDatePicker = false
-                }) {
-                    Text(stringResource(R.string.confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
     }
 
     Scaffold(topBar = {
@@ -171,18 +130,10 @@ fun NewTransactionScreen(
                     onDone = { viewModel.saveTransaction(onSuccess = onNavigateUp) }
                 )
             )
-            OutlinedTextField(
-                value = uiState.dateInput,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(text = stringResource(R.string.date)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                trailingIcon = {
-                    TextButton(onClick = { showDatePicker = true }) {
-                        Text(stringResource(R.string.change_date))
-                    }
-                }
+            DateField(
+                label = stringResource(R.string.date),
+                dateInput = uiState.dateInput,
+                onDateSelected = { viewModel.setDateInput(it) }
             )
             FrequencySelector(
                 frequency = uiState.frequency,
@@ -238,53 +189,6 @@ private fun TransactionTypeSelector(
         ) {
             RadioButton(selected = isIncome, onClick = { onIsIncomeChange(true) })
             Text(text = stringResource(R.string.transaction_type_income))
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun FrequencySelector(
-    frequency: TransactionFrequency?,
-    onFrequencySelected: (TransactionFrequency?) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it }
-    ) {
-        OutlinedTextField(
-            value = frequency?.label ?: stringResource(R.string.frequency_one_time),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.frequency)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.frequency_one_time)) },
-                onClick = {
-                    onFrequencySelected(null)
-                    expanded = false
-                },
-                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-            )
-            TransactionFrequency.entries.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option.label) },
-                    onClick = {
-                        onFrequencySelected(option)
-                        expanded = false
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-                )
-            }
         }
     }
 }

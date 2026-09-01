@@ -17,6 +17,14 @@
     <string name="new_account">New account</string>
     <string name="account_name_label">Account name</string>
     <string name="starting_balance_label">Starting balance</string>
+    <string name="skip_setup">Skip</string>
+    <string name="quick_setup">Quick setup</string>
+    <string name="recurring_income_title">Recurring income</string>
+    <string name="recurring_expense_title">Recurring expenses</string>
+    <string name="next">Next</string>
+    <string name="summary_title">Summary</string>
+    <string name="accept_and_create_account">Accept &amp; create account</string>
+    <string name="remove">Remove</string>
     <string name="credit_cards">Credit cards</string>
     <string name="new_credit_card">New credit card</string>
     <string name="credit_card_name_label">Card name</string>

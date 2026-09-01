@@ -59,7 +59,7 @@ class AccountAndTransactionFlowTest {
             .performTextInput("Test Account")
         composeTestRule.onNodeWithText(string(R.string.starting_balance_label))
             .performTextInput("100")
-        composeTestRule.onNodeWithText(string(R.string.save)).performClick()
+        composeTestRule.onNodeWithText(string(R.string.skip_setup)).performClick()
         composeTestRule.waitForIdle()
 
         // Back on Accounts, the new (auto-selected) account is listed.

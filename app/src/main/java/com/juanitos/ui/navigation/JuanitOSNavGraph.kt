@@ -58,7 +58,10 @@ fun JuanitOSNavGraph(
             )
         }
         composable(route = NewAccountDestination.route.route) {
-            NewAccountScreen(onNavigateUp = { navController.navigateUp() })
+            NewAccountScreen(
+                onNavigateUp = { navController.navigateUp() },
+                onNewCategory = { navController.navigate(NewCategoryDestination.route.route) }
+            )
         }
         composable(route = NewTransactionDestination.route.route) {
             NewTransactionScreen(
