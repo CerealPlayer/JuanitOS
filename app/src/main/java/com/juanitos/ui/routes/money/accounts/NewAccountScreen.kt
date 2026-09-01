@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -12,8 +13,13 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -149,12 +155,35 @@ private fun RecurringStep(
     drafts: List<DraftTransaction>,
     onNext: () -> Unit,
 ) {
+    var showUnsavedDialog by remember { mutableStateOf(false) }
+    val hasUnsavedDraft = uiState.draftAmountInput.isNotBlank() ||
+            uiState.draftDescriptionInput.isNotBlank() ||
+            uiState.draftCategoryId != 0
+
+    if (showUnsavedDialog) {
+        UnsavedDraftDialog(
+            onAdd = {
+                onAdd()
+                showUnsavedDialog = false
+            },
+            onDiscard = {
+                viewModel.clearDraftForm()
+                showUnsavedDialog = false
+                onNext()
+            },
+            onDismiss = { showUnsavedDialog = false }
+        )
+    }
+
     Text(
         text = stringResource(
             if (isIncome) R.string.recurring_income_title else R.string.recurring_expense_title
         ),
         fontWeight = FontWeight.Bold
     )
+    if (drafts.isEmpty()) {
+        Text(text = stringResource(R.string.no_recurring_items))
+    }
     drafts.forEach { draft ->
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -208,11 +237,34 @@ private fun RecurringStep(
         Text(stringResource(R.string.add))
     }
     Button(
-        onClick = onNext,
+        onClick = { if (hasUnsavedDraft) showUnsavedDialog = true else onNext() },
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(stringResource(R.string.next))
     }
+}
+
+@Composable
+private fun UnsavedDraftDialog(
+    onAdd: () -> Unit,
+    onDiscard: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.unsaved_recurring_title)) },
+        text = { Text(text = stringResource(R.string.unsaved_recurring_message)) },
+        confirmButton = {
+            TextButton(onClick = onAdd) {
+                Text(text = stringResource(R.string.add))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDiscard) {
+                Text(text = stringResource(R.string.discard_and_continue))
+            }
+        }
+    )
 }
 
 @Composable

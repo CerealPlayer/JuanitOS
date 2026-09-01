@@ -25,6 +25,10 @@
     <string name="summary_title">Summary</string>
     <string name="accept_and_create_account">Accept &amp; create account</string>
     <string name="remove">Remove</string>
+    <string name="no_recurring_items">Nothing recorded yet</string>
+    <string name="unsaved_recurring_title">Unsaved entry</string>
+    <string name="unsaved_recurring_message">You filled in a recurring transaction but haven\'t pressed Add yet. Add it now, or discard it and continue.</string>
+    <string name="discard_and_continue">Discard and continue</string>
     <string name="credit_cards">Credit cards</string>
     <string name="new_credit_card">New credit card</string>
     <string name="credit_card_name_label">Card name</string>
@@ -62,6 +66,7 @@
     <string name="remaining_money">Remaining money</string>
     <string name="money_stats_no_account">No account selected to show stats.</string>
     <string name="money_stats_no_data">No spending data for the selected account.</string>
+    <string name="money_stats_income_expense_title">Income vs. Expenses</string>
     <string name="uncategorized">Uncategorized</string>
     <string name="search_log">Search description</string>
     <string name="all_categories">All categories</string>

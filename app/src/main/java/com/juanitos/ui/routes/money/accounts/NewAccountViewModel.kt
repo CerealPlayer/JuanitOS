@@ -147,7 +147,7 @@ class NewAccountViewModel(
         )
     }
 
-    private fun resetDraftForm(state: NewAccountUiState): NewAccountUiState {
+    private fun clearedDraftFields(state: NewAccountUiState): NewAccountUiState {
         return state.copy(
             draftAmountInput = "",
             isDraftAmountValid = true,
@@ -157,9 +157,17 @@ class NewAccountViewModel(
                 formatLocalDateToDbDatetime(LocalDate.now())
             ),
             draftFrequency = TransactionFrequency.MONTHLY,
-            nextDraftId = state.nextDraftId + 1,
             errorMessage = null,
         )
+    }
+
+    private fun resetDraftForm(state: NewAccountUiState): NewAccountUiState {
+        return clearedDraftFields(state).copy(nextDraftId = state.nextDraftId + 1)
+    }
+
+    /** Discards whatever is currently typed into the draft add-form, without recording it as a draft. */
+    fun clearDraftForm() {
+        _uiState.value = clearedDraftFields(_uiState.value)
     }
 
     fun addIncome() {
@@ -212,17 +220,18 @@ class NewAccountViewModel(
 
     fun goToQuickSetup() {
         validateDetails() ?: return
-        _uiState.value =
-            _uiState.value.copy(step = NewAccountStep.RECURRING_INCOME, errorMessage = null)
+        _uiState.value = clearedDraftFields(_uiState.value)
+            .copy(step = NewAccountStep.RECURRING_INCOME, errorMessage = null)
     }
 
     fun goToExpenseStep() {
-        _uiState.value =
-            _uiState.value.copy(step = NewAccountStep.RECURRING_EXPENSE, errorMessage = null)
+        _uiState.value = clearedDraftFields(_uiState.value)
+            .copy(step = NewAccountStep.RECURRING_EXPENSE, errorMessage = null)
     }
 
     fun goToSummaryStep() {
-        _uiState.value = _uiState.value.copy(step = NewAccountStep.SUMMARY, errorMessage = null)
+        _uiState.value = clearedDraftFields(_uiState.value)
+            .copy(step = NewAccountStep.SUMMARY, errorMessage = null)
     }
 
     fun previousStep() {
@@ -232,7 +241,8 @@ class NewAccountViewModel(
             NewAccountStep.RECURRING_EXPENSE -> NewAccountStep.RECURRING_INCOME
             NewAccountStep.SUMMARY -> NewAccountStep.RECURRING_EXPENSE
         }
-        _uiState.value = _uiState.value.copy(step = previous, errorMessage = null)
+        _uiState.value =
+            clearedDraftFields(_uiState.value).copy(step = previous, errorMessage = null)
     }
 
     private suspend fun insertAccountAndMaybeSelect(name: String, startingBalance: Double): Int {

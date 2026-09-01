@@ -1,5 +1,6 @@
 package com.juanitos.lib
 
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -72,6 +73,30 @@ fun formatLocalDateToDbDatetime(date: LocalDate, time: String = "00:00:00"): Str
  */
 fun isPendingTransaction(createdAt: String?): Boolean =
     parseDbDatetimeToLocalDate(createdAt)?.isAfter(LocalDate.now()) == true
+
+/**
+ * Calendar-based windows a stats screen can filter transactions by. [ALL_TIME] has no bound.
+ */
+enum class StatsPeriod(val label: String) {
+    WEEK("This Week"),
+    MONTH("This Month"),
+    YEAR("This Year"),
+    ALL_TIME("All Time"),
+}
+
+/**
+ * Returns the inclusive [start, end] LocalDate bounds for [period], relative to [today].
+ * Both bounds are null for [StatsPeriod.ALL_TIME] (no filtering).
+ */
+fun statsPeriodRange(
+    period: StatsPeriod,
+    today: LocalDate = LocalDate.now(),
+): Pair<LocalDate?, LocalDate?> = when (period) {
+    StatsPeriod.WEEK -> today.with(DayOfWeek.MONDAY) to today.with(DayOfWeek.SUNDAY)
+    StatsPeriod.MONTH -> today.withDayOfMonth(1) to today.withDayOfMonth(today.lengthOfMonth())
+    StatsPeriod.YEAR -> today.withDayOfYear(1) to today.withDayOfYear(today.lengthOfYear())
+    StatsPeriod.ALL_TIME -> null to null
+}
 
 /**
  * Parses a "dd/MM/yyyy" (or "dd/MM/yy", matching [formatDbDatetimeToShortDate]'s output, so a
