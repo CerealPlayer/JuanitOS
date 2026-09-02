@@ -6,10 +6,12 @@ import com.juanitos.data.JuanitOSDatabase
 import com.juanitos.data.money.offline.OfflineAccountRepository
 import com.juanitos.data.money.offline.OfflineCategoryRepository
 import com.juanitos.data.money.offline.OfflineCreditCardRepository
+import com.juanitos.data.money.offline.OfflineMonthlySummaryRepository
 import com.juanitos.data.money.offline.OfflineTransactionRepository
 import com.juanitos.data.money.repositories.AccountRepository
 import com.juanitos.data.money.repositories.CategoryRepository
 import com.juanitos.data.money.repositories.CreditCardRepository
+import com.juanitos.data.money.repositories.MonthlySummaryRepository
 import com.juanitos.data.money.repositories.TransactionRepository
 
 /**
@@ -24,7 +26,11 @@ class TestAppContainer(context: Context) : AppContainer {
         OfflineAccountRepository(accountDao = database.accountDao())
     }
     override val transactionRepository: TransactionRepository by lazy {
-        OfflineTransactionRepository(transactionDao = database.transactionDao())
+        OfflineTransactionRepository(
+            transactionDao = database.transactionDao(),
+            accountDao = database.accountDao(),
+            monthlySummaryDao = database.monthlySummaryDao(),
+        )
     }
     override val categoryRepository: CategoryRepository by lazy {
         OfflineCategoryRepository(categoryDao = database.categoryDao())
@@ -33,7 +39,15 @@ class TestAppContainer(context: Context) : AppContainer {
         OfflineCreditCardRepository(
             creditCardDao = database.creditCardDao(),
             transactionDao = database.transactionDao(),
-            categoryDao = database.categoryDao()
+            categoryDao = database.categoryDao(),
+            accountDao = database.accountDao(),
+            monthlySummaryDao = database.monthlySummaryDao(),
+        )
+    }
+    override val monthlySummaryRepository: MonthlySummaryRepository by lazy {
+        OfflineMonthlySummaryRepository(
+            monthlySummaryDao = database.monthlySummaryDao(),
+            transactionDao = database.transactionDao(),
         )
     }
 }

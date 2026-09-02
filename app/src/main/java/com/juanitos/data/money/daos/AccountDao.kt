@@ -11,11 +11,23 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AccountDao {
-    @Query("INSERT INTO accounts (name, starting_balance) VALUES (:name, :startingBalance)")
+    @Query(
+        "INSERT INTO accounts (name, starting_balance, current_balance) " +
+                "VALUES (:name, :startingBalance, :startingBalance)"
+    )
     suspend fun insert(name: String, startingBalance: Double): Long
 
     @Update
     suspend fun update(account: Account)
+
+    @Query("UPDATE accounts SET current_balance = current_balance + :delta WHERE id = :accountId")
+    suspend fun adjustBalance(accountId: Int, delta: Double)
+
+    @Query("SELECT last_balance_sweep_at FROM accounts WHERE id = :accountId")
+    suspend fun getLastSweptAt(accountId: Int): String?
+
+    @Query("UPDATE accounts SET last_balance_sweep_at = :at WHERE id = :accountId")
+    suspend fun updateLastSweptAt(accountId: Int, at: String)
 
     @Delete
     suspend fun delete(account: Account)

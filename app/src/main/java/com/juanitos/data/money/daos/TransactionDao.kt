@@ -47,4 +47,41 @@ interface TransactionDao {
                 "WHERE credit_card_id = :cardId AND created_at > :after AND created_at <= :upTo"
     )
     suspend fun sumCreditCardTransactions(cardId: Int, after: String, upTo: String): Double
+
+    @Query(
+        "SELECT substr(created_at, 1, 7) AS month, " +
+                "COALESCE(SUM(CASE WHEN amount < 0 THEN -amount ELSE 0 END), 0) AS income, " +
+                "COALESCE(SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END), 0) AS expenses " +
+                "FROM transactions WHERE recurrence_root_id = :templateId AND credit_card_id IS NULL " +
+                "AND created_at <= :now GROUP BY substr(created_at, 1, 7)"
+    )
+    suspend fun sumBalanceAffectingByRecurrenceRootGroupedByMonth(
+        templateId: Int,
+        now: String
+    ): List<MonthlyIncomeExpenseTotals>
+
+    @Query(
+        "SELECT substr(created_at, 1, 7) AS month, " +
+                "COALESCE(SUM(CASE WHEN amount < 0 THEN -amount ELSE 0 END), 0) AS income, " +
+                "COALESCE(SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END), 0) AS expenses " +
+                "FROM transactions WHERE account_id = :accountId AND credit_card_id IS NULL " +
+                "AND created_at <= :now AND created_at > :lastSweptAt " +
+                "GROUP BY substr(created_at, 1, 7)"
+    )
+    suspend fun sumNewlyDueTransactionsGroupedByMonth(
+        accountId: Int,
+        now: String,
+        lastSweptAt: String
+    ): List<MonthlyIncomeExpenseTotals>
+
+    @Query(
+        "SELECT COALESCE(SUM(CASE WHEN amount < 0 THEN -amount ELSE 0 END), 0) AS income, " +
+                "COALESCE(SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END), 0) AS expenses " +
+                "FROM transactions WHERE account_id = :accountId AND credit_card_id IS NULL " +
+                "AND created_at LIKE :monthPrefix || '%'"
+    )
+    suspend fun sumIncomeAndExpenses(accountId: Int, monthPrefix: String): IncomeExpenseTotals
 }
+
+data class IncomeExpenseTotals(val income: Double, val expenses: Double)
+data class MonthlyIncomeExpenseTotals(val month: String, val income: Double, val expenses: Double)

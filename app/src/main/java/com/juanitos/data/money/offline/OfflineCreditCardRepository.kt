@@ -1,8 +1,10 @@
 package com.juanitos.data.money.offline
 
 import com.juanitos.data.money.CREDIT_CARD_PAYMENT_CATEGORY_NAME
+import com.juanitos.data.money.daos.AccountDao
 import com.juanitos.data.money.daos.CategoryDao
 import com.juanitos.data.money.daos.CreditCardDao
+import com.juanitos.data.money.daos.MonthlySummaryDao
 import com.juanitos.data.money.daos.TransactionDao
 import com.juanitos.data.money.entities.CreditCard
 import com.juanitos.data.money.repositories.CreditCardRepository
@@ -17,6 +19,8 @@ class OfflineCreditCardRepository(
     private val creditCardDao: CreditCardDao,
     private val transactionDao: TransactionDao,
     private val categoryDao: CategoryDao,
+    private val accountDao: AccountDao,
+    private val monthlySummaryDao: MonthlySummaryDao,
 ) : CreditCardRepository {
     override suspend fun insert(accountId: Int, name: String, paymentDay: Int): Long =
         creditCardDao.insert(accountId, name, paymentDay)
@@ -56,6 +60,13 @@ class OfflineCreditCardRepository(
                             recurrenceRootId = null,
                             creditCardId = null
                         )
+                        // The settlement's own createdAt is always <= today (loop bound above)
+                        // and creditCardId is null, so it's always balance-affecting.
+                        accountDao.adjustBalance(card.accountId, -sum)
+                        val month = upTo.take(7)
+                        val incomeDelta = if (sum < 0) -sum else 0.0
+                        val expenseDelta = if (sum > 0) sum else 0.0
+                        monthlySummaryDao.adjust(card.accountId, month, incomeDelta, expenseDelta)
                     }
                 }
                 creditCardDao.updateLastSettledAt(card.id, upTo)

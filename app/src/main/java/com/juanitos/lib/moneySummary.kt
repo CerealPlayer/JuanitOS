@@ -25,9 +25,7 @@ fun computeAccountSummary(
     account: AccountWithDetails,
 ): MoneyAccountSummary {
     val appliedTransactions =
-        account.transactions.filterNot {
-            isPendingTransaction(it.transaction.createdAt) || it.transaction.creditCardId != null
-        }
+        account.transactions.filter { isBalanceAffecting(it.transaction) }
 
     val categorySummaries = appliedTransactions
         .groupBy { (it.category?.name ?: "Uncategorized") to (it.transaction.amount < 0) }
@@ -42,13 +40,9 @@ fun computeAccountSummary(
         .filter { it.amount > 0.0 }
         .sortedByDescending { it.amount }
 
-    val totalIncome = account.account.startingBalance +
-            categorySummaries.filter { it.isIncome }.sumOf { it.amount }
-    val totalExpenses = categorySummaries.filterNot { it.isIncome }.sumOf { it.amount }
-
     return MoneyAccountSummary(
         accountName = account.account.name,
-        remaining = totalIncome - totalExpenses,
+        remaining = account.account.currentBalance,
         categorySummaries = categorySummaries,
     )
 }

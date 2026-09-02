@@ -3,6 +3,7 @@ package com.juanitos.data.money
 data class DefaultCategory(val name: String, val description: String?)
 
 val DEFAULT_CATEGORIES: List<DefaultCategory> = listOf(
+    DefaultCategory("Salary", "Monthly salary or wages"),
     DefaultCategory("Rent / Mortgage", "Housing payment"),
     DefaultCategory("Loans", "Personal or student loan payments"),
     DefaultCategory("Electricity", "Power bill"),

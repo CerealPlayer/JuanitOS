@@ -17,9 +17,15 @@ class MoneySummaryTest {
 
     private fun accountWith(
         startingBalance: Double = 2000.0,
+        currentBalance: Double,
         transactions: List<TransactionWithCategory> = emptyList(),
     ) = AccountWithDetails(
-        account = Account(id = 1, name = "Main", startingBalance = startingBalance),
+        account = Account(
+            id = 1,
+            name = "Main",
+            startingBalance = startingBalance,
+            currentBalance = currentBalance,
+        ),
         transactions = transactions,
     )
 
@@ -39,7 +45,8 @@ class MoneySummaryTest {
 
     @Test
     fun noTransactions_startingBalanceOnlyRemaining() {
-        val summary = computeAccountSummary(accountWith(startingBalance = 1500.0))
+        val summary =
+            computeAccountSummary(accountWith(startingBalance = 1500.0, currentBalance = 1500.0))
 
         assertEquals(emptyList<CategoryAmountSummary>(), summary.categorySummaries)
         assertEquals(1500.0, summary.remaining, 0.0)
@@ -50,6 +57,7 @@ class MoneySummaryTest {
         val summary = computeAccountSummary(
             accountWith(
                 startingBalance = 1000.0,
+                currentBalance = 600.0,
                 transactions = listOf(transaction(400.0, rent))
             )
         )
@@ -66,6 +74,7 @@ class MoneySummaryTest {
         val summary = computeAccountSummary(
             accountWith(
                 startingBalance = 2000.0,
+                currentBalance = 1450.0,
                 transactions = listOf(
                     transaction(50.0, food),
                     transaction(100.0, rent),
@@ -85,6 +94,7 @@ class MoneySummaryTest {
         val summary = computeAccountSummary(
             accountWith(
                 startingBalance = 2000.0,
+                currentBalance = 2070.0,
                 transactions = listOf(transaction(-100.0, salary), transaction(30.0, food))
             )
         )
@@ -104,6 +114,7 @@ class MoneySummaryTest {
         val summary = computeAccountSummary(
             accountWith(
                 startingBalance = 1000.0,
+                currentBalance = 1020.0,
                 transactions = listOf(transaction(-50.0, food), transaction(30.0, food))
             )
         )
@@ -123,6 +134,7 @@ class MoneySummaryTest {
         val summary = computeAccountSummary(
             accountWith(
                 startingBalance = 1000.0,
+                currentBalance = 1000.0,
                 transactions = listOf(transaction(0.0, rent))
             )
         )
@@ -133,7 +145,7 @@ class MoneySummaryTest {
     @Test
     fun uncategorizedTransaction_groupedUnderUncategorized() {
         val summary = computeAccountSummary(
-            accountWith(transactions = listOf(transaction(75.0, null)))
+            accountWith(currentBalance = 1925.0, transactions = listOf(transaction(75.0, null)))
         )
 
         assertEquals(
@@ -148,6 +160,7 @@ class MoneySummaryTest {
         val summary = computeAccountSummary(
             accountWith(
                 startingBalance = 1000.0,
+                currentBalance = 900.0,
                 transactions = listOf(
                     transaction(100.0, rent),
                     transaction(400.0, rent, createdAt = futureDate)

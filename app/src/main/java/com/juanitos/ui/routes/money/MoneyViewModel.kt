@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.juanitos.data.money.entities.relations.AccountWithDetails
 import com.juanitos.data.money.repositories.AccountRepository
 import com.juanitos.data.money.repositories.CreditCardRepository
+import com.juanitos.data.money.repositories.MonthlySummaryRepository
 import com.juanitos.data.money.repositories.TransactionRepository
 import com.juanitos.lib.MoneyAccountSummary
 import com.juanitos.lib.computeAccountSummary
@@ -23,6 +24,7 @@ class MoneyViewModel(
     private val accountRepository: AccountRepository,
     private val transactionRepository: TransactionRepository,
     private val creditCardRepository: CreditCardRepository,
+    private val monthlySummaryRepository: MonthlySummaryRepository,
 ) : ViewModel() {
     val uiState: StateFlow<MoneyUiState> = createAccountFlow().map { account ->
         if (account == null) {
@@ -42,6 +44,8 @@ class MoneyViewModel(
                 if (account != null) {
                     transactionRepository.generateDueOccurrences(account.account.id)
                     creditCardRepository.generateDueSettlements(account.account.id)
+                    transactionRepository.applyDuePendingTransactions(account.account.id)
+                    monthlySummaryRepository.finalizeElapsedMonths(account.account.id)
                 }
             }
         }

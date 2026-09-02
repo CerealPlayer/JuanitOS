@@ -23,6 +23,7 @@ object AppViewModelProvider {
                 juanitOSApplication().container.accountRepository,
                 juanitOSApplication().container.transactionRepository,
                 juanitOSApplication().container.creditCardRepository,
+                juanitOSApplication().container.monthlySummaryRepository,
             )
         }
         initializer {
