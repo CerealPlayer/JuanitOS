@@ -99,6 +99,18 @@ fun statsPeriodRange(
 }
 
 /**
+ * Day-of-month for [today], i.e. how many days of the current month (including today) have
+ * elapsed. Always >= 1, so it's safe to divide by.
+ */
+fun daysElapsedInMonth(today: LocalDate = LocalDate.now()): Int = today.dayOfMonth
+
+/**
+ * How many days remain in the current month after [today]. 0 on the last day of the month.
+ */
+fun daysRemainingInMonth(today: LocalDate = LocalDate.now()): Int =
+    today.lengthOfMonth() - today.dayOfMonth
+
+/**
  * Parses a "dd/MM/yyyy" (or "dd/MM/yy", matching [formatDbDatetimeToShortDate]'s output, so a
  * prefilled-but-untouched field round-trips) text input into a LocalDate. Returns null if blank,
  * malformed, or an invalid calendar date.

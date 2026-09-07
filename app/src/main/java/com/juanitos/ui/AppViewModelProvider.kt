@@ -12,6 +12,7 @@ import com.juanitos.ui.routes.money.categories.CategoriesViewModel
 import com.juanitos.ui.routes.money.categories.NewCategoryViewModel
 import com.juanitos.ui.routes.money.creditcards.CreditCardsViewModel
 import com.juanitos.ui.routes.money.creditcards.NewCreditCardViewModel
+import com.juanitos.ui.routes.money.goal.SavingsGoalViewModel
 import com.juanitos.ui.routes.money.log.LogViewModel
 import com.juanitos.ui.routes.money.stats.MoneyStatsViewModel
 import com.juanitos.ui.routes.money.transactions.NewTransactionViewModel
@@ -24,6 +25,7 @@ object AppViewModelProvider {
                 juanitOSApplication().container.transactionRepository,
                 juanitOSApplication().container.creditCardRepository,
                 juanitOSApplication().container.monthlySummaryRepository,
+                juanitOSApplication().container.savingsGoalRepository,
             )
         }
         initializer {
@@ -78,6 +80,12 @@ object AppViewModelProvider {
             NewCreditCardViewModel(
                 juanitOSApplication().container.creditCardRepository,
                 juanitOSApplication().container.accountRepository
+            )
+        }
+        initializer {
+            SavingsGoalViewModel(
+                juanitOSApplication().container.accountRepository,
+                juanitOSApplication().container.savingsGoalRepository,
             )
         }
     }

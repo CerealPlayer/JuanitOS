@@ -19,6 +19,8 @@ import com.juanitos.ui.routes.money.creditcards.CreditCardsDestination
 import com.juanitos.ui.routes.money.creditcards.CreditCardsScreen
 import com.juanitos.ui.routes.money.creditcards.NewCreditCardDestination
 import com.juanitos.ui.routes.money.creditcards.NewCreditCardScreen
+import com.juanitos.ui.routes.money.goal.SavingsGoalDestination
+import com.juanitos.ui.routes.money.goal.SavingsGoalScreen
 import com.juanitos.ui.routes.money.log.LogDestination
 import com.juanitos.ui.routes.money.log.LogScreen
 import com.juanitos.ui.routes.money.stats.MoneyStatsDestination
@@ -43,6 +45,7 @@ fun JuanitOSNavGraph(
                 onMoneyStats = { navController.navigate(MoneyStatsDestination.route.route) },
                 onLog = { navController.navigate(LogDestination.route.route) },
                 onCreditCards = { navController.navigate(CreditCardsDestination.route.route) },
+                onSavingsGoal = { navController.navigate(SavingsGoalDestination.route.route) },
             )
         }
         composable(route = LogDestination.route.route) {
@@ -87,6 +90,9 @@ fun JuanitOSNavGraph(
         }
         composable(route = NewCreditCardDestination.route.route) {
             NewCreditCardScreen(onNavigateUp = { navController.navigateUp() })
+        }
+        composable(route = SavingsGoalDestination.route.route) {
+            SavingsGoalScreen(onNavigateUp = { navController.navigateUp() })
         }
     }
 }

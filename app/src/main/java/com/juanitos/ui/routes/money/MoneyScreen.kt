@@ -27,6 +27,7 @@ import com.juanitos.ui.icons.Settings
 import com.juanitos.ui.navigation.JuanitOSTopAppBar
 import com.juanitos.ui.navigation.NavigationDestination
 import com.juanitos.ui.navigation.Routes
+import com.juanitos.ui.routes.money.goal.SavingsGoalCard
 
 object MoneyDestination : NavigationDestination {
     override val route = Routes.Money
@@ -42,6 +43,7 @@ fun MoneyScreen(
     onMoneyStats: () -> Unit,
     onLog: () -> Unit,
     onCreditCards: () -> Unit,
+    onSavingsGoal: () -> Unit,
     viewModel: MoneyViewModel = viewModel(
         factory = AppViewModelProvider.Factory
     )
@@ -106,9 +108,14 @@ fun MoneyScreen(
         ) {
             val summary = uiState.value.summary
             if (summary != null) {
+                SavingsGoalCard(
+                    projection = uiState.value.savingsGoalProjection,
+                    onClick = onSavingsGoal,
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_medium))
+                )
                 AccountSummary(
                     summary = summary,
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_medium))
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
                 )
             } else {
                 Text(text = stringResource(R.string.money_stats_no_account))

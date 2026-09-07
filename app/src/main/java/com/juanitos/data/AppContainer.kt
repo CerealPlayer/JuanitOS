@@ -5,11 +5,13 @@ import com.juanitos.data.money.offline.OfflineAccountRepository
 import com.juanitos.data.money.offline.OfflineCategoryRepository
 import com.juanitos.data.money.offline.OfflineCreditCardRepository
 import com.juanitos.data.money.offline.OfflineMonthlySummaryRepository
+import com.juanitos.data.money.offline.OfflineSavingsGoalRepository
 import com.juanitos.data.money.offline.OfflineTransactionRepository
 import com.juanitos.data.money.repositories.AccountRepository
 import com.juanitos.data.money.repositories.CategoryRepository
 import com.juanitos.data.money.repositories.CreditCardRepository
 import com.juanitos.data.money.repositories.MonthlySummaryRepository
+import com.juanitos.data.money.repositories.SavingsGoalRepository
 import com.juanitos.data.money.repositories.TransactionRepository
 
 interface AppContainer {
@@ -18,6 +20,7 @@ interface AppContainer {
     val categoryRepository: CategoryRepository
     val creditCardRepository: CreditCardRepository
     val monthlySummaryRepository: MonthlySummaryRepository
+    val savingsGoalRepository: SavingsGoalRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
@@ -50,5 +53,8 @@ class AppDataContainer(private val context: Context) : AppContainer {
             monthlySummaryDao = db.monthlySummaryDao(),
             transactionDao = db.transactionDao(),
         )
+    }
+    override val savingsGoalRepository: SavingsGoalRepository by lazy {
+        OfflineSavingsGoalRepository(savingsGoalDao = db.savingsGoalDao())
     }
 }
